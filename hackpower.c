@@ -44,15 +44,23 @@ BOOL EncontrarProcesso(const char *nome, DWORD *pid)
 	snapHandle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (snapHandle == NULL)
 	{
-		printf("Falha ao verificar quais processos estão rodando na máquina.\n");
+		printf("Falha ao verificar quais processos estão executando.\n");
 		*pid = local_pid;
+		
+		if(entradas)
+			free(entradas);
+		
 		return FALSE;
 	}
 
 	if (!Process32First(snapHandle, entradas))
 	{
-		printf("Falha ao inicializar varredura dos processos na memória.\n");
+		printf("Falha ao inicializar varredura dos processos na memória. Erro %lu\n", GetLastError());
 		*pid = local_pid;
+		
+		if(entradas)
+			free(entradas);
+		
 		return FALSE;
 	}
 
@@ -69,6 +77,9 @@ BOOL EncontrarProcesso(const char *nome, DWORD *pid)
 
 	} while (Process32Next(snapHandle, entradas));
 
+	if(entradas)
+		free(entradas);
+	
 	*pid = local_pid;
 
 	return FALSE;
@@ -152,31 +163,26 @@ DWORD PegarEnderecoBase(const char *nome_executavel, const char *nome_modulo)
 	return endereco_base;
 }
 
-char *substring(char *str, char start)
+char *substring(char *str, char k)
 {
-	char *s = NULL;
-
-	if (str == NULL)
-		return str;
-
-	s = str;
-
-	while (*s != start)
+	char *s = str;
+	
+	while(*s)
 	{
-		*s++;
+		if(*s == k)
+			break;
+		
+		s++;
 	}
-	*s++;
-
-#ifdef _DEBUG
-	printf("Substring: %s\n", s);
-#endif 
-
-	return *s;
+	
+	s++;
+	
+	return s;
 }
 
 void uso(char **arg)
 {
-	printf("\n\nUso %s %s:<energia> %s:<delay_milissegundos>\n\n", 
+	printf("\n\nUso %s %s<energia> %s<delay_milissegundos>\n\n", 
 		arg[0],
 		OPCAO_ENERGIA,
 		OPCAO_DELAY);
@@ -188,7 +194,9 @@ int main(int argc, char **argv)
 	int delay = -1;
 	bool temos_energia = false;
 	bool temos_delay = false;
-
+	bool read_ok = false;
+	bool write_ok = false;
+	
 	// Analisar os argumentos
 	if (argc != 3)
 	{
@@ -198,6 +206,9 @@ int main(int argc, char **argv)
 
 	for (int x = 0; x < argc; x++)
 	{
+#ifdef _DEBUG
+		printf( "cmdline #%d -> %s\n", x, argv[x]);
+#endif
 		if (strncmp(argv[x], OPCAO_ENERGIA, 3) == 0)
 		{
 #ifdef _DEBUG
@@ -208,6 +219,7 @@ int main(int argc, char **argv)
 				printf("Erro: parametro duplicado -> '%s'\n", OPCAO_ENERGIA);
 				return 1;
 			}
+			
 			char *sub = NULL;
 
 			sub = substring(argv[x], ':');
@@ -235,56 +247,101 @@ int main(int argc, char **argv)
 		}
 	}
 
+	if(!temos_delay || !temos_energia || (delay <= 0) || (energia <= 0))
+	{
+		printf( "[!] Parametros invalidos passados na linha de comando.\n");
+		return 1;
+	}
+	
 #ifdef _DEBUG
-	printf("- Energia %d\n- Delay: %d ms\n", energia, delay);
+	printf("[*] Energia %d\n- Delay: %d ms\n", energia, delay);
 #endif
 
 	DWORD pid;
 	BOOL warzone = FALSE;
 	HANDLE warzoneHandle = NULL;
 	DWORD nread;
+	DWORD nwrite;
 
 	// Variáveis para armazenar valores do jogo
 	DWORD valor_energia;
 	
+	printf( "[*] Aguardando o warzone 2100 ser aberto ...\n");
 	while (!warzone)
 	{
 		warzone = EncontrarProcesso("warzone2100.exe", &pid);
+		Sleep(delay);
 	}
 	
 	warzoneHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
 	if (!warzoneHandle)
 	{
 		if (GetLastError() == 5) {
-			printf("Execute este programa como administrador.\n");
+			printf("[*] Execute este programa como administrador.\n");
 		}
 		else {
-			printf("Um erro desconhecido ocorreu: %lu\n", GetLastError());
+			printf("[!] Um erro desconhecido ocorreu: %lu\n", GetLastError());
 		}
 		return 1;
 	}
 
-	// FIXME: Código para verificar pegar a versão do warzone ...
+	// FIXME: Código para verificar qual é a versão do warzone ...
 	struct warzone_game wz;
 	wz.base = PegarEnderecoBase("warzone2100.exe", "warzone2100.exe");
 	if (wz.base == -1)
 	{
-		// Algo deu errado
+		if(warzoneHandle)
+			CloseHandle(warzoneHandle);
+		
 		return 1;
 	}
-
-
+	
 	// Pegar o valor atual da energia do jogador
-	if (ReadProcessMemory(warzoneHandle, (const void*)(wz.base + desloc_wz323), &valor_energia, sizeof(DWORD),
-		&nread))
+	if (ReadProcessMemory(warzoneHandle, (const void*)(wz.base + desloc_wz323), &valor_energia, sizeof(DWORD), &nread))
 	{
-		printf("Energia atual do jogador: %lu\n", valor_energia);
+		if(valor_energia <= 0)
+		{
+			do 
+			{
+				if(!ReadProcessMemory(warzoneHandle, (const void*)(wz.base + desloc_wz323), &valor_energia, sizeof(DWORD), &nread))
+				{
+					// Tratar erro ...
+					read_ok = false;
+					break;
+				}
+				
+				Sleep(delay);
+				read_ok = true;
+			} while(valor_energia <= 0);
+			
+			if(read_ok)
+			{
+				if(valor_energia < energia)
+				{
+					if(!WriteProcessMemory(warzoneHandle, (const void *)(wz.base + desloc_wz323), &energia, sizeof(int), &nwrite))
+					{
+						printf( "[!] Falha ao mudar energia do jogador. Erro %lu\n", GetLastError());
+						write_ok = false;
+					} else 
+					{
+						printf( "[+] Energia anterior: %lu\n", valor_energia);
+						printf( "[+] Energia atual: %lu\n", energia);
+						write_ok = true;
+					}
+				}
+			} else 
+			{
+				printf( "[!] Erro fatal. Nao foi possivel ler o valor da energia do jogador.\n");
+			}
+		}
 	}
 	else
 	{
 		// TODO: Tratar erro ...
+		if(warzoneHandle)
+			CloseHandle(warzoneHandle);
 	}
-
+	
 	return 0;
 }
 
