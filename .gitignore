@@ -5,3 +5,4 @@ vs2017/.vs/
 *.suo
 *.o
 *obj
+*.user
