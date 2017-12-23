@@ -2,7 +2,8 @@
 	Hack de energia para o warzone 2100
 
 	Versões suportadas;
-	2.3.9 (não testado ainda)
+	2.3.9
+	3.1.5
 	3.2.3
 	
 	Autor: Lucas Vieira de Jesus <lucas.engen.cc@gmail.com>
@@ -10,8 +11,9 @@
 	Compile no Visual Studio com a opção MultiByte habilitada
 */
 
-#define WZ_323		0xA1
-#define WZ_239		0xA2
+#define WZ_239		0xA1
+#define WZ_315		0xA2
+#define WZ_323		0xA3
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,6 +30,7 @@ typedef BOOL (WINAPI *QFPINA)(HANDLE hProcess, DWORD flag, LPSTR path, PDWORD bu
 #define OPCAO_DELAY		"-d:"
 
 const DWORD desloc_wz239 = 0xD795F0;
+const DWORD desloc_wz315 = 0x120BC24;
 const DWORD desloc_wz323 = 0x1B6FA44;
 
 struct warzone_game
@@ -225,6 +228,10 @@ BOOL GetPlayerPower(HANDLE warzoneHandle, DWORD *power, int wz_version)
 			bResult = ReadProcessMemory(warzoneHandle, (void*)(wz.base + desloc_wz239), &local_power, sizeof(DWORD), &nread);		
 		break;
 		
+		case WZ_315:
+			bResult = ReadProcessMemory(warzoneHandle, (void*)(wz.base + desloc_wz315), &local_power, sizeof(DWORD), &nread);
+		break;
+		
 		case WZ_323:
 			bResult = ReadProcessMemory(warzoneHandle, (void*)(wz.base + desloc_wz323), &local_power, sizeof(DWORD), &nread);
 		break;
@@ -261,6 +268,10 @@ BOOL SetPlayerPower(HANDLE warzoneHandle, DWORD power, int wz_version)
 			bResult = WriteProcessMemory(warzoneHandle, (void*)(wz.base + desloc_wz239), (const void*)&power, sizeof(DWORD), &nwrite);
 		break;
 		
+		case WZ_315:
+			bResult = WriteProcessMemory(warzoneHandle, (void*)(wz.base + desloc_wz315), (const void*)&power, sizeof(DWORD), &nwrite);
+		break;
+		
 		case WZ_323:
 			bResult = WriteProcessMemory(warzoneHandle, (void*)(wz.base + desloc_wz323), (const void*)&power, sizeof(DWORD), &nwrite);
 		break;
@@ -277,7 +288,7 @@ void uso(char **arg)
 		OPCAO_DELAY);
 }
 
-int DoTask(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	int energia_desejada = -1;
 	int delay = -1;
@@ -375,8 +386,8 @@ int DoTask(int argc, char **argv)
 	char wz_path[MAX_PATH] = { 0 };
 	char version[32];
 	DWORD qfpi_dwSize = MAX_PATH;
-	QFPINA queryFullProcessImageNameA = NULL;
-
+	QFPINA fQueryFullProcessImageNameA = NULL;
+	
 	HMODULE kernel32 = NULL;
 
 	kernel32 = LoadLibraryA("kernel32.dll");
@@ -386,15 +397,15 @@ int DoTask(int argc, char **argv)
 		exit(1);
 	}
 
-	queryFullProcessImageNameA = (QFPINA)GetProcAddress(kernel32, "QueryFullProcessImageNameA");
-	if (queryFullProcessImageNameA == NULL)
+	fQueryFullProcessImageNameA = (QFPINA)GetProcAddress(kernel32, "QueryFullProcessImageNameA");
+	if (fQueryFullProcessImageNameA == NULL)
 	{
 		printf("[!] Falha ao pegar endereço da função. %lu\n", GetLastError());
 		exit(1);
 	}
 
 	printf("[+] Verificando versao ...\n");
-	if (queryFullProcessImageNameA(warzoneHandle, 0, wz_path, &qfpi_dwSize))
+	if (fQueryFullProcessImageNameA(warzoneHandle, 0, wz_path, &qfpi_dwSize))
 	{
 		printf("[*] Warzone 2100 path: %s\n", wz_path);
 		
@@ -461,6 +472,8 @@ int DoTask(int argc, char **argv)
 		version_flag = WZ_323;
 	else if(major == 2 && minor == 3 && patch == 9)
 		version_flag = WZ_239;
+	else if(major == 3 && minor == 1 && patch == 5)
+		version_flag = WZ_315;
 	else {
 		printf( "[!] Versão não suportada.\n");
 		exit(1);
