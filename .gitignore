@@ -6,3 +6,10 @@ vs2017/.vs/
 *.o
 *obj
 *.user
+*.pdb
+*.ilk
+*.tlog
+*.log
+*.idb
+*.filters
+*.config

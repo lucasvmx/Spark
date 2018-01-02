@@ -1,11 +1,16 @@
-PARAMS=-static -static-libgcc -o wph
+PARAMS=-static -static-libgcc
 WARNINGS=-Wall -Wextra
-SOURCES=hack.c
+SOURCES=WzHack.c
 DEFINES=-D_DEBUG
 CC=gcc
+RM=del /f /q
 
-all: hack.o
-	$(CC) $(SOURCES) $(PARAMS)
+all: WzHack.o
+	$(CC) $(SOURCES) $(PARAMS) -o WzHack
+
+debug: WzHack.o
+	$(CC) $(SOURCES) $(PARAMS) $(DEFINES) -o WzHack-Debug
 	
-debug: hack.o
-	$(CC) $(SOURCES) $(PARAMS) $(DEFINES)
+clean:	
+	$(RM) *.exe *.o
+
