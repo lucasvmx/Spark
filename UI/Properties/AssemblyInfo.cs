@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // As informações gerais sobre um assembly são controladas por
 // conjunto de atributos. Altere estes valores de atributo para modificar as informações
 // associada a um assembly.
-[assembly: AssemblyTitle("WarHack")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("WarHack - Hack for Warzone2100")]
+[assembly: AssemblyDescription("Tool to change the power of the players")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("WarHack")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyCopyright("© Lucas Vieira 2018. LGPL V3")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

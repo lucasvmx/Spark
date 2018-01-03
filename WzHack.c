@@ -66,20 +66,27 @@ typedef enum message_types
 
 /* Funções pré-definidas */
 typedef BOOL (WINAPI *QFPINA)(HANDLE hProcess, DWORD flag, LPSTR path, PDWORD bufSize);
-BOOL FindProcess(const char *nome, DWORD *pid);
-DWORD GetModuleAddress(const char *nome_executavel, const char *nome_modulo);
-char *GetSubstring(char *str, char k);
-BOOL GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *power, int wz_version);
-BOOL SetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD power, int wz_version);
-BOOL GetWzPpoStartIndex(int major, int minor, int patch, int *start);
-void ShowUsage(char **argv);
-int ShowMessage(types t, const char *string, ...);
-void RunEasterEgg(HANDLE warzoneHandle, int wz_version, unsigned my_id);
+
+#ifdef _WINDLL
+#define WZHACK_API	__declspec(dllexport)
+#else
+#define WZHACK_API
+#endif
+
+BOOL WZHACK_API FindProcess(const char *nome, DWORD *pid);
+DWORD WZHACK_API GetModuleAddress(const char *nome_executavel, const char *nome_modulo);
+char WZHACK_API *GetSubstring(char *str, char k);
+BOOL WZHACK_API GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *power, int wz_version);
+BOOL WZHACK_API SetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD power, int wz_version);
+BOOL WZHACK_API GetWzPpoStartIndex(int major, int minor, int patch, int *start);
+void WZHACK_API ShowUsage(char **argv);
+int WZHACK_API ShowMessage(types t, const char *string, ...);
+void WZHACK_API RunEasterEgg(HANDLE warzoneHandle, int wz_version, unsigned my_id);
 
 /* Estruturas */
 typedef struct warzone_base_address
 {
-	DWORD base;
+	DWORD base;	// Endereço base do executável principal
 } WARZONE_BASE;
 
 typedef struct warzone_player_power_offsets
@@ -356,7 +363,7 @@ BOOL GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *power, int 
 
 	if (bOk)
 	{
-		if (player_id < 0 || player_id > 9)
+		if (player_id < 0 || player_id > 10)
 		{
 			ShowMessage(CRITICAL, "Bad player id: %d\n", player_id);
 		}
@@ -462,16 +469,12 @@ int ShowMessage(types t, const char * string, ...)
 {
 	HANDLE hConsole = NULL;
 	va_list list;
-	char *buffer;
+	char mem_buffer[256];
 	int len = 0;
 	BOOL colors_enabled = TRUE;
 
-	buffer = (char*)malloc(sizeof(char) * 256);
-	if (buffer == NULL)
-		return 0;
-
 	va_start(list, string);
-	len = vsnprintf(buffer, 256, string, list);
+	len = vsnprintf(mem_buffer, sizeof(char) * 256, string, list);
 	va_end(list);
 
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -480,7 +483,7 @@ int ShowMessage(types t, const char * string, ...)
 
 	if (!colors_enabled)
 	{
-		len = fprintf(stdout, buffer);
+		len = fprintf(stdout, mem_buffer);
 	}
 	else 
 	{
@@ -489,13 +492,13 @@ int ShowMessage(types t, const char * string, ...)
 		csbi = (CONSOLE_SCREEN_BUFFER_INFO*)malloc(sizeof(CONSOLE_SCREEN_BUFFER_INFO));
 		if (csbi == NULL)
 		{
-			len = fprintf(stdout, buffer);
+			len = fprintf(stdout, mem_buffer);
 		}
 		else 
 		{
 			if (!GetConsoleScreenBufferInfo(hConsole, csbi))
 			{
-				len = fprintf(stdout, buffer);
+				len = len = fprintf(stdout, mem_buffer);
 				if (csbi)
 					free(csbi);
 			}
@@ -507,7 +510,7 @@ int ShowMessage(types t, const char * string, ...)
 					fprintf(stdout, "[!] ");
 					FlushConsoleInputBuffer(hConsole);
 					SetConsoleTextAttribute(hConsole, csbi->wAttributes);
-					len = fprintf(stdout, buffer);
+					len = fprintf(stdout, mem_buffer);
 				}
 				else if (t == SUCCESS)
 				{
@@ -515,7 +518,7 @@ int ShowMessage(types t, const char * string, ...)
 					fprintf(stdout, "[+] ");
 					FlushConsoleInputBuffer(hConsole);
 					SetConsoleTextAttribute(hConsole, csbi->wAttributes);
-					len = fprintf(stdout, buffer);
+					len = fprintf(stdout, mem_buffer);
 				}
 				else if(t == CRITICAL)
 				{
@@ -523,7 +526,7 @@ int ShowMessage(types t, const char * string, ...)
 					fprintf(stdout, "[!] ");
 					FlushConsoleInputBuffer(hConsole);
 					SetConsoleTextAttribute(hConsole, csbi->wAttributes);
-					len = fprintf(stdout, buffer);					
+					len = fprintf(stdout, mem_buffer);
 				}
 				else if(t == INFO)
 				{
@@ -531,7 +534,7 @@ int ShowMessage(types t, const char * string, ...)
 					fprintf(stdout, "[*] ");
 					FlushConsoleInputBuffer(hConsole);
 					SetConsoleTextAttribute(hConsole, csbi->wAttributes);
-					len = fprintf(stdout, buffer);					
+					len = fprintf(stdout, mem_buffer);
 				}
 				else if(t == DEFAULT)
 				{
@@ -539,7 +542,7 @@ int ShowMessage(types t, const char * string, ...)
 					fprintf(stdout, "[*] ");
 					FlushConsoleInputBuffer(hConsole);
 					SetConsoleTextAttribute(hConsole, csbi->wAttributes);
-					len = fprintf(stdout, buffer);					
+					len = fprintf(stdout, mem_buffer);
 				} else 
 				{
 					printf("Fatal error on %s line %d: invalid param received.\n", __FILE__, __LINE__);
@@ -606,13 +609,11 @@ int main(int argc, char **argv)
 	bool temos_id = false;
 	bool ativar_easter_egg = false;
 	HANDLE hMutex = NULL;
-	
-	fprintf(stdout, "Welcome to WzHack v1.0");
 
 	hMutex = CreateMutexA(NULL, TRUE, "WarHack_Mutex");
 	if (GetLastError() == ERROR_ALREADY_EXISTS)
 	{
-		MessageBoxA(0, "Another instance of War Hack is already running", "Error", MB_ICONERROR);
+		ShowMessage(CRITICAL, "Another instance of War Hack is already running\n");
 		return 1;
 	}
 
@@ -628,6 +629,8 @@ int main(int argc, char **argv)
 		ShowUsage(argv);
 		return 1;
 	}
+
+	ShowMessage(INFO, "Welcome to WzHack v1.0 - By Lucas Vieira de Jesus\n");
 
 	for (int x = 0; x < argc; x++)
 	{
@@ -828,16 +831,16 @@ int main(int argc, char **argv)
 #endif
 			if (valor_energia < (DWORD)energia_desejada)
 			{
-				ShowMessage(INFO, "Energy lower than desired. Changing energy ...");
+				ShowMessage(INFO, "Energy lower than desired. Changing energy ...\n");
 
 				BOOL bResult = SetPlayerPower(uid, warzoneHandle, energia_desejada, version_flag);
 				if (bResult == FALSE)
 				{
-					printf("[error %lu]\n", GetLastError());
+					ShowMessage(CRITICAL, "Error while changing player energy. Code: %lu\n", GetLastError());
 				}
 				else
 				{
-					printf("[ok]\n");
+					ShowMessage(SUCCESS, "Energy change ok\n");
 				}
 			}
 		}
@@ -858,8 +861,7 @@ int main(int argc, char **argv)
 		}
 		else 
 		{
-			/* Se o usuário colocar um valor muito baixo, então isso irá ajudar */
-			Sleep(delay + 10000);
+			Sleep(delay);
 		}
 	}
 	

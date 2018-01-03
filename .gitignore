@@ -13,3 +13,6 @@ vs2017/.vs/
 *.idb
 *.filters
 *.config
+*.dll
+*.exp
+*.lib

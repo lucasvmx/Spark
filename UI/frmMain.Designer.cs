@@ -28,9 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.squitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.downloadWarzoneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutWarHackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -44,15 +47,12 @@
             this.label1 = new System.Windows.Forms.Label();
             this.comboBox_PlayerId = new System.Windows.Forms.ComboBox();
             this.ButtonStart = new System.Windows.Forms.Button();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.TextBoxOutput = new System.Windows.Forms.RichTextBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarEnergy)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarDelay)).BeginInit();
-            this.groupBox2.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -60,10 +60,11 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
+            this.toolsToolStripMenuItem,
             this.aboutToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(668, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(306, 24);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -78,8 +79,24 @@
             // squitToolStripMenuItem
             // 
             this.squitToolStripMenuItem.Name = "squitToolStripMenuItem";
-            this.squitToolStripMenuItem.Size = new System.Drawing.Size(97, 22);
+            this.squitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.squitToolStripMenuItem.Text = "Quit";
+            this.squitToolStripMenuItem.Click += new System.EventHandler(this.OnQuitToolstrip_Clicked);
+            // 
+            // toolsToolStripMenuItem
+            // 
+            this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.downloadWarzoneToolStripMenuItem});
+            this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
+            this.toolsToolStripMenuItem.Text = "Tools";
+            // 
+            // downloadWarzoneToolStripMenuItem
+            // 
+            this.downloadWarzoneToolStripMenuItem.Name = "downloadWarzoneToolStripMenuItem";
+            this.downloadWarzoneToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+            this.downloadWarzoneToolStripMenuItem.Text = "Download Warzone";
+            this.downloadWarzoneToolStripMenuItem.Click += new System.EventHandler(this.OnDownloadWZ_ToolstripClicked);
             // 
             // aboutToolStripMenuItem
             // 
@@ -110,7 +127,7 @@
             this.groupBox1.ForeColor = System.Drawing.Color.Red;
             this.groupBox1.Location = new System.Drawing.Point(12, 42);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(295, 245);
+            this.groupBox1.Size = new System.Drawing.Size(280, 245);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Settings";
@@ -129,7 +146,7 @@
             // 
             this.labelEnergy.AutoSize = true;
             this.labelEnergy.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelEnergy.Location = new System.Drawing.Point(210, 118);
+            this.labelEnergy.Location = new System.Drawing.Point(204, 118);
             this.labelEnergy.Name = "labelEnergy";
             this.labelEnergy.Size = new System.Drawing.Size(0, 24);
             this.labelEnergy.TabIndex = 7;
@@ -212,55 +229,37 @@
             "Player 10"});
             this.comboBox_PlayerId.Location = new System.Drawing.Point(93, 169);
             this.comboBox_PlayerId.Name = "comboBox_PlayerId";
-            this.comboBox_PlayerId.Size = new System.Drawing.Size(121, 23);
+            this.comboBox_PlayerId.Size = new System.Drawing.Size(111, 23);
             this.comboBox_PlayerId.TabIndex = 0;
             // 
             // ButtonStart
             // 
+            this.ButtonStart.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
+            this.ButtonStart.FlatAppearance.MouseOverBackColor = System.Drawing.Color.LightGray;
+            this.ButtonStart.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ButtonStart.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ButtonStart.ForeColor = System.Drawing.Color.Green;
             this.ButtonStart.Location = new System.Drawing.Point(12, 293);
             this.ButtonStart.Name = "ButtonStart";
-            this.ButtonStart.Size = new System.Drawing.Size(295, 42);
+            this.ButtonStart.Size = new System.Drawing.Size(280, 42);
             this.ButtonStart.TabIndex = 3;
             this.ButtonStart.Text = "Start";
             this.ButtonStart.UseVisualStyleBackColor = true;
             this.ButtonStart.Click += new System.EventHandler(this.OnButtonStart_Click);
             // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.TextBoxOutput);
-            this.groupBox2.ForeColor = System.Drawing.Color.Red;
-            this.groupBox2.Location = new System.Drawing.Point(334, 42);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(322, 293);
-            this.groupBox2.TabIndex = 5;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Output";
-            // 
-            // TextBoxOutput
-            // 
-            this.TextBoxOutput.BackColor = System.Drawing.Color.White;
-            this.TextBoxOutput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TextBoxOutput.ForeColor = System.Drawing.Color.Red;
-            this.TextBoxOutput.Location = new System.Drawing.Point(6, 19);
-            this.TextBoxOutput.Name = "TextBoxOutput";
-            this.TextBoxOutput.Size = new System.Drawing.Size(310, 268);
-            this.TextBoxOutput.TabIndex = 0;
-            this.TextBoxOutput.Text = "";
-            // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statusLabel});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 349);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 353);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(668, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(306, 22);
             this.statusStrip1.TabIndex = 6;
             this.statusStrip1.Text = "statusStrip1";
             // 
             // statusLabel
             // 
+            this.statusLabel.ForeColor = System.Drawing.Color.Blue;
             this.statusLabel.Name = "statusLabel";
             this.statusLabel.Size = new System.Drawing.Size(0, 17);
             // 
@@ -268,12 +267,13 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(668, 371);
+            this.ClientSize = new System.Drawing.Size(306, 375);
             this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.ButtonStart);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.menuStrip1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
             this.Name = "frmMain";
@@ -285,7 +285,6 @@
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarEnergy)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarDelay)).EndInit();
-            this.groupBox2.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -308,13 +307,13 @@
         private System.Windows.Forms.Label labelEnergy;
         private System.Windows.Forms.Label labelDelay;
         private System.Windows.Forms.Button ButtonStart;
-        private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.RichTextBox TextBoxOutput;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutWarHackToolStripMenuItem;
         private System.Windows.Forms.CheckBox checkBox_EasterEgg;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel statusLabel;
+        private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem downloadWarzoneToolStripMenuItem;
     }
 }
 
