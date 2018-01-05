@@ -36,15 +36,20 @@
 #include <assert.h>
 
 /* Definições */
-#define OPTION_ENERGY		"-e:"			// Energia desejada
-#define OPTION_DELAY		"-d:"			// Delay em ms
-#define OPTION_PLAYER		"-p:"			// Seu player id
-#define OPTION_EASTER_EGG	"--easter-egg"	// Easter egg
+#define OPTION_ENERGY		"--energy:"			// Energia desejada
+#define OPTION_DELAY		"--delay:"			// Delay em ms
+#define OPTION_PLAYER		"--player:"			// Seu player id
+#define OPTION_EASTER_EGG	"--easter-egg"		// Easter egg
+#define OPT_ENERGY_LEN		strlen(OPTION_ENERGY)
+#define OPT_DELAY_LEN		strlen(OPTION_DELAY)
+#define OPT_PLAYER_LEN		strlen(OPTION_PLAYER)
+#define OPT_EASTEREGG_LEN	strlen(OPTION_EASTER_EGG)
 #define MAX_PLAYERS			11
 
 #define WZ_239		0xA1
 #define WZ_315		0xA2
 #define WZ_323		0xA3
+#define WZ_UNKNOWN	0xFF
 
 #define GREEN	10
 #define BLUE	9
@@ -74,8 +79,11 @@ typedef enum message_types
 } types;
 
 /* Funções pré-definidas */
-typedef BOOL (WINAPI *QFPINA)(HANDLE hProcess, DWORD flag, LPSTR path, PDWORD bufSize);
-typedef HMODULE (WINAPI *LOAD_LIBRARY)(LPCTSTR lpFileName);
+typedef BOOL		(WINAPI *QFPINA)(HANDLE hProcess, DWORD flag, LPSTR path, PDWORD bufSize);
+typedef HMODULE		(WINAPI *LOAD_LIBRARY)(LPCTSTR lpFileName);
+typedef BOOL		(WINAPI *GFVI)(LPCTSTR lptstrFilename,DWORD dwHandle,DWORD dwLen,LPVOID lpData);
+typedef DWORD		(WINAPI *GFVIS)(LPCTSTR lptstrFilename, LPDWORD lpdwHandle);
+typedef BOOL		(WINAPI *VQV)(LPCVOID pBlock, LPCTSTR lpSubBlock, LPVOID *lplpBuffer, PUINT puLen);
 
 BOOL 	WzHack_InjectDLL(HANDLE warzoneHandle);
 BOOL 	WZHACK_API WzHack_FindProcess(const char *nome, DWORD *pid);
@@ -146,12 +154,115 @@ WARZONE_PPO wz_ppo[] =
 };
 
 /* Início do código */
+
+/// <summary>Get the version of warzone 2100</summary>
+/// <param name="wz_filename">Path of warzone2100.exe file</param>
+/// <returns>WZ_323, WZ_315, WZ_239 or WZ_UNKNOWN</returns>
+int WzHack_GetWarzoneVersion(const char *wz_filename)
+{
+	char *buf = NULL;
+	DWORD dwHandle, sz;
+	HMODULE hVersion_DLL = NULL;
+	GFVI fGetFileVersionInfoA = NULL;
+	GFVIS fGetFileVersionInfoSizeA = NULL;
+	VQV fVerQueryValueA = NULL;
+	int major, minor, patch, build;
+	int iversion;
+	
+	hVersion_DLL = LoadLibrary("version.dll");
+	if (hVersion_DLL == NULL)
+	{
+		WzHack_ShowMessage(CRITICAL, "Failed to load version.dll. Error %lu\n", GetLastError());
+		return 1;
+	}
+
+	fGetFileVersionInfoA = (GFVI)GetProcAddress(hVersion_DLL, "GetFileVersionInfoA");
+	if (fGetFileVersionInfoA == NULL)
+	{
+		if (hVersion_DLL)
+			FreeLibrary(hVersion_DLL);
+
+		WzHack_ShowMessage(CRITICAL, "Failed to get function address on version.dll. Error %lu\n", GetLastError());
+		return 2;
+	}
+
+	fGetFileVersionInfoSizeA = (GFVIS)GetProcAddress(hVersion_DLL, "GetFileVersionInfoSizeA");
+	if (fGetFileVersionInfoSizeA == NULL)
+	{
+		if (hVersion_DLL)
+			FreeLibrary(hVersion_DLL);
+
+		WzHack_ShowMessage(CRITICAL, "Failed to get function address on version.dll. Error %lu\n", GetLastError());
+		return 3;
+	}
+
+	fVerQueryValueA = (VQV)GetProcAddress(hVersion_DLL, "VerQueryValueA");
+	if (fVerQueryValueA == NULL)
+	{
+		if (hVersion_DLL)
+			FreeLibrary(hVersion_DLL);
+
+		WzHack_ShowMessage(CRITICAL, "Failed to get function address on version.dll. Error %lu\n", GetLastError());
+		return 4;
+	}
+
+	sz = fGetFileVersionInfoSizeA(wz_filename, &dwHandle);
+	if (0 == sz)
+	{
+		return 5;
+	}
+	buf = (char*)malloc((size_t)sizeof(char) * sz);
+	if (!buf)
+		return 6;
+
+	if (!fGetFileVersionInfoA(wz_filename, dwHandle, sz, &buf[0]))
+	{
+		if (buf)
+			free(buf);
+
+		return 7;
+	}
+
+	VS_FIXEDFILEINFO *pvi;
+	sz = sizeof(VS_FIXEDFILEINFO);
+
+	if (fVerQueryValueA(&buf[0], "\\", (LPVOID*)&pvi, (unsigned int*)&sz) == FALSE)
+	{
+		if (buf)
+			free(buf);
+
+		return 8;
+	}
+	
+	major = pvi->dwProductVersionMS >> 16;
+	minor = pvi->dwFileVersionMS & 0xFFFF;
+	patch = pvi->dwFileVersionLS >> 16;
+	build = pvi->dwFileVersionLS & 0xFFFF;
+	
+	if (major == 3 && minor == 2 && patch == 3 && build == 0)
+		iversion = WZ_323;
+	else if (major == 3 && minor == 1 && patch == 5 && build == 0)
+		iversion = WZ_315;
+	else if (major == 2 && minor == 3 && patch == 9 && build == 0)
+		iversion = WZ_239;
+	else
+		iversion = WZ_UNKNOWN;
+
+	if (buf)
+		free(buf);
+
+	return iversion;
+}
+
+/// <summary>Inject a dll into warzone2100 process</summary>
+/// <param name="warzoneHandle">Handle to warzone2100 process</param>
+/// <returns>TRUE or FALSE</returns>
 BOOL WzHack_InjectDLL(HANDLE warzoneHandle)
 {
 	void *address = NULL;
 	HMODULE hModule = NULL;
 	DWORD size = 0;
-	LOAD_LIBRARY *fLoadLibrary = NULL;
+	LOAD_LIBRARY fLoadLibrary = NULL;
 	HANDLE hRemoteThread = NULL;
 	const char *param = "WzHack.dll";
 	DWORD remoteThreadId;
@@ -169,7 +280,7 @@ BOOL WzHack_InjectDLL(HANDLE warzoneHandle)
 	if(hModule == NULL)
 		return false;
 	
-	fLoadLibrary = (LOAD_LIBRARY*)GetProcAddress(hModule, "LoadLibraryA");
+	fLoadLibrary = (LOAD_LIBRARY)GetProcAddress(hModule, "LoadLibraryA");
 	if(fLoadLibrary == NULL)
 		return FALSE;
 	
@@ -199,13 +310,25 @@ BOOL WzHack_InjectDLL(HANDLE warzoneHandle)
 	if(hRemoteThread == NULL)
 		return FALSE;
 	
+	if (hModule)
+		FreeLibrary(hModule);
+
 	return TRUE;
 }
 
+/// <summary>Returns the start index in WZ_PPO structure to the specified warzone version</summary>
+/// <param name="major">Major version of warzone</param>
+/// <param name="minor">Minor version of warzone</param>
+/// <param name="patch">Patch version of warzone</param>
+/// <param name="start">Pointer to receive the start index. Can't be NULL</param>
+/// <returns>TRUE or FALSE</returns>
 BOOL WzHack_GetWzPpoStartIndex(int major, int minor, int patch, int *start)
 {
 	int local_start = -1;
 	BOOL bOk = FALSE;
+
+	if (start == NULL)
+		return FALSE;
 
 	for (int i = 0; i < (sizeof(wz_ppo) / sizeof(wz_ppo[0])); i++)
 	{
@@ -219,11 +342,20 @@ BOOL WzHack_GetWzPpoStartIndex(int major, int minor, int patch, int *start)
 		}
 	}
 
+	if (IsBadWritePtr(start, sizeof(int)))
+	{
+		return FALSE;
+	}
+
 	*start = local_start;
 
 	return bOk;
 }
 
+/// <summary>Find the specified process in memory</summary>
+/// <param name="nome">Process name</param>
+/// <param name="pid">Pointer to receive the PID of process. Can't be NULL</param>
+/// <returns>TRUE or FALSE</returns>
 BOOL WzHack_FindProcess(const char *nome, DWORD *pid)
 {
 	PROCESSENTRY32 *entradas = NULL;
@@ -284,7 +416,11 @@ BOOL WzHack_FindProcess(const char *nome, DWORD *pid)
 	return FALSE;
 }
 
-DWORD WzHack_GetModuleAddress(const char *nome_executavel, const char *nome_modulo)
+/// <summary>Returns the base address of the module loaded by the specified executable</summary>
+/// <param name="exeName">Executable name. Sample: "foo.exe"</param>
+/// <param name="moduleName">Name of the Module. Sample: "foo.dll"</param>
+/// <returns>TRUE or FALSE</returns>
+DWORD WzHack_GetModuleAddress(const char *exeName, const char *moduleName)
 {
 	PROCESSENTRY32 *entradas = NULL;
 	HANDLE snapHandle = NULL;
@@ -294,7 +430,7 @@ DWORD WzHack_GetModuleAddress(const char *nome_executavel, const char *nome_modu
 	DWORD endereco_base = -1;
 
 	// Primeiro verificamos se o executável está carregado na RAM
-	encontrou = WzHack_FindProcess(nome_executavel, &local_pid);
+	encontrou = WzHack_FindProcess(exeName, &local_pid);
 	if (!encontrou)
 	{
 		// Não podemos prosseguir. Não temos o pid do processo
@@ -319,20 +455,20 @@ DWORD WzHack_GetModuleAddress(const char *nome_executavel, const char *nome_modu
 
 	if (msnapHandle == NULL)
 	{
-		WzHack_ShowMessage(CRITICAL, "Failed to list modules loaded by %s (PID: %lu)\n", nome_executavel, local_pid);
+		WzHack_ShowMessage(CRITICAL, "Failed to list modules loaded by %s (PID: %lu)\n", exeName, local_pid);
 		return FALSE;
 	}
 	
 	if (!Module32First(msnapHandle, modulo))
 	{
-		WzHack_ShowMessage(CRITICAL, "Failed to intialize listing of modules loaded by %s (PID %lu). Error %lu\n", nome_executavel, local_pid,
+		WzHack_ShowMessage(CRITICAL, "Failed to intialize listing of modules loaded by %s (PID %lu). Error %lu\n", exeName, local_pid,
 			GetLastError());
 		return FALSE;
 	}
 
 	do
 	{
-		const char *nome_processo_alvo = nome_modulo;
+		const char *nome_processo_alvo = exeName;
 		const char *nome_processo_atual = modulo->szModule;
 
 		if (strncmp(nome_processo_alvo, nome_processo_atual, strlen(nome_processo_alvo)) == 0)
@@ -702,7 +838,7 @@ int main(int argc, char **argv)
 
 	for (int x = 0; x < argc; x++)
 	{
-		if (strncmp(argv[x], OPTION_ENERGY, 3) == 0)
+		if (strncmp(argv[x], OPTION_ENERGY, OPT_ENERGY_LEN) == 0)
 		{
 			if (temos_energia)
 			{
@@ -716,7 +852,7 @@ int main(int argc, char **argv)
 			energia_desejada = atoi((char const*)sub);
 			temos_energia = true;
 		}
-		else if (strncmp(argv[x], OPTION_DELAY, 3) == 0)
+		else if (strncmp(argv[x], OPTION_DELAY, OPT_DELAY_LEN) == 0)
 		{
 			if (temos_delay)
 			{
@@ -730,7 +866,7 @@ int main(int argc, char **argv)
 			delay = atoi((char const*)sub);
 			temos_delay = true;
 		}
-		else if (strncmp(argv[x], OPTION_PLAYER, 3) == 0)
+		else if (strncmp(argv[x], OPTION_PLAYER, OPT_PLAYER_LEN) == 0)
 		{
 			if (temos_id)
 			{
@@ -746,7 +882,7 @@ int main(int argc, char **argv)
 			if(id >= 0 && id <= 10)
 				temos_id = true;
 		}
-		else if (strncmp(argv[x], OPTION_EASTER_EGG, 12) == 0)
+		else if (strncmp(argv[x], OPTION_EASTER_EGG, OPT_EASTEREGG_LEN) == 0)
 		{
 			if (ativar_easter_egg)
 				WzHack_ShowMessage(CRITICAL, "Duplicated parameter -> '%s'. Ignoring ...\n", OPTION_EASTER_EGG);
@@ -760,10 +896,6 @@ int main(int argc, char **argv)
 		WzHack_ShowMessage(CRITICAL, "Invalid parameters passed to command line.\n");
 		return 1;
 	}
-	
-#ifdef _DEBUG
-	printf("[*] Energy %d\n- Delay: %d ms\n", energia_desejada, delay);
-#endif
 
 	DWORD pid;
 	BOOL warzone = FALSE;
@@ -790,14 +922,10 @@ int main(int argc, char **argv)
 	}
 
 	// Determinar versao do warzone 
-	int major = -1;
-	int minor = -1;
-	int patch = -1;
 	char wz_path[MAX_PATH] = { 0 };
-	char version[32];
 	DWORD qfpi_dwSize = MAX_PATH;
 	QFPINA fQueryFullProcessImageNameA = NULL;
-	
+	int version_flag;
 	HMODULE kernel32 = NULL;
 
 	kernel32 = LoadLibraryA("kernel32.dll");
@@ -819,72 +947,38 @@ int main(int argc, char **argv)
 	{
 		WzHack_ShowMessage(SUCCESS, "Warzone 2100 path: %s\n", wz_path);
 		
-		// Analisar string e encontrar o numero da versão
-		int i = 0;
-		int limite = strlen(wz_path);
-		BOOL versionFound = FALSE;
-
-		// FIXME: Improve method of detecting warzone 2100 version ...
-		while (wz_path[i])
+		version_flag = WzHack_GetWarzoneVersion(wz_path);
+		if (version_flag == WZ_UNKNOWN)
 		{
-			if ((i + 4) < limite)
-			{
-				if (isdigit(wz_path[i]) && (wz_path[i + 1] == '.') 
-					&& isdigit(wz_path[i + 2]) && (wz_path[i + 3] == '.') 
-					&& isdigit(wz_path[i + 4]))
-				{
-					major = wz_path[i];
-					minor = wz_path[i + 2];
-					patch = wz_path[i + 4];
-					
-					snprintf(version, sizeof(char) * 32, "%c", major);
-					major = strtol(version,NULL,10);
-					
-					snprintf(version, sizeof(char) * 32, "%c", minor);
-					minor = strtol(version,NULL,10);
-					
-					snprintf(version, sizeof(char) * 32, "%c", patch);
-					patch = strtol(version,NULL,10);
-
-					snprintf(version, sizeof(char) * 32, "%d.%d.%d", major,minor,patch);
-					versionFound = TRUE;
-					break;
-				}
-			}
-
-			i++;
-		}
-
-		if (versionFound) 
-		{
-			WzHack_ShowMessage(SUCCESS, "Warzone 2100 version %s\n", version);
+			WzHack_ShowMessage(CRITICAL, "[!] Not supported version.\n");
+			exit(1);
 		}
 		else 
 		{
-			WzHack_ShowMessage(CRITICAL, "Failed to determine warzone version.\n");
-			exit(1);
+			switch (version_flag)
+			{
+			case WZ_323:
+				WzHack_ShowMessage(SUCCESS, "Warzone 2100 version: 3.2.3\n");
+				break;
+				
+			case WZ_315:
+				WzHack_ShowMessage(SUCCESS, "Warzone 2100 version: 3.1.5\n");
+				break;
+
+			case WZ_239:
+				WzHack_ShowMessage(SUCCESS, "Warzone 2100 version: 2.3.9\n");
+				break;
+			}
 		}
 	}
 	else
 	{
 		WzHack_ShowMessage(CRITICAL, "Failed to obtain warzone 2100 path. Error %lu\n", GetLastError());
+		exit(1);
 	}
 	
 	if (kernel32)
 		FreeLibrary(kernel32);
-
-	int version_flag;
-	
-	if(major == 3 && minor == 2 && patch == 3)
-		version_flag = WZ_323;
-	else if(major == 2 && minor == 3 && patch == 9)
-		version_flag = WZ_239;
-	else if(major == 3 && minor == 1 && patch == 5)
-		version_flag = WZ_315;
-	else {
-		WzHack_ShowMessage(CRITICAL, "[!] Not supported version.\n");
-		exit(1);
-	}
 	
 	// Loop principal do programa
 	int errors = 0;
@@ -905,17 +999,17 @@ int main(int argc, char **argv)
 				BOOL bResult = WzHack_SetPlayerPower(uid, warzoneHandle, energia_desejada, version_flag);
 				if (bResult == FALSE)
 				{
-					WzHack_ShowMessage(CRITICAL, "Error while changing player energy. Code: %lu\n", GetLastError());
+					WzHack_ShowMessage(CRITICAL, "Error while changing energy of player %u. Code: %lu\n", uid, GetLastError());
 				}
 				else
 				{
-					WzHack_ShowMessage(SUCCESS, "Energy change ok\n");
+					WzHack_ShowMessage(SUCCESS, "Energy changed successfully\n");
 				}
 			}
 		}
 		else
 		{
-			WzHack_ShowMessage(CRITICAL, "Failed to get player %d energy. Error %lu\n", 0, GetLastError());
+			WzHack_ShowMessage(CRITICAL, "Failed to get energy of player %u. Error %lu\n", uid, GetLastError());
 			errors++;
 			Sleep(2000);
 		}
@@ -936,4 +1030,3 @@ int main(int argc, char **argv)
 	
 	return 0;
 }
-
