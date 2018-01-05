@@ -35,7 +35,7 @@
 #include <shlwapi.h>
 #include <assert.h>
 
-/* Defines */
+/* Definições */
 #define OPTION_ENERGY		"-e:"			// Energia desejada
 #define OPTION_DELAY		"-d:"			// Delay em ms
 #define OPTION_PLAYER		"-p:"			// Seu player id
@@ -54,6 +54,12 @@
 #define WHITE	15
 #define CYAN	11
 
+#ifdef _WINDLL
+#define WZHACK_API	__declspec(dllexport)
+#else
+#define WZHACK_API
+#endif
+
 /* Enumerações */
 typedef enum message_types
 {
@@ -62,26 +68,25 @@ typedef enum message_types
 	INFO,
 	DEFAULT,
 	SUCCESS
+#ifdef _DEBUG
+	,DEBUG
+#endif
 } types;
 
 /* Funções pré-definidas */
 typedef BOOL (WINAPI *QFPINA)(HANDLE hProcess, DWORD flag, LPSTR path, PDWORD bufSize);
+typedef HMODULE (WINAPI *LOAD_LIBRARY)(LPCTSTR lpFileName);
 
-#ifdef _WINDLL
-#define WZHACK_API	__declspec(dllexport)
-#else
-#define WZHACK_API
-#endif
-
-BOOL WZHACK_API FindProcess(const char *nome, DWORD *pid);
-DWORD WZHACK_API GetModuleAddress(const char *nome_executavel, const char *nome_modulo);
-char WZHACK_API *GetSubstring(char *str, char k);
-BOOL WZHACK_API GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *power, int wz_version);
-BOOL WZHACK_API SetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD power, int wz_version);
-BOOL WZHACK_API GetWzPpoStartIndex(int major, int minor, int patch, int *start);
-void WZHACK_API ShowUsage(char **argv);
-int WZHACK_API ShowMessage(types t, const char *string, ...);
-void WZHACK_API RunEasterEgg(HANDLE warzoneHandle, int wz_version, unsigned my_id);
+BOOL 	WzHack_InjectDLL(HANDLE warzoneHandle);
+BOOL 	WZHACK_API WzHack_FindProcess(const char *nome, DWORD *pid);
+DWORD 	WZHACK_API WzHack_GetModuleAddress(const char *nome_executavel, const char *nome_modulo);
+char 	WZHACK_API *WzHack_GetSubstring(char *str, char k);
+BOOL 	WZHACK_API WzHack_GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *power, int wz_version);
+BOOL 	WZHACK_API WzHack_SetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD power, int wz_version);
+BOOL 	WZHACK_API WzHack_GetWzPpoStartIndex(int major, int minor, int patch, int *start);
+void 	WzHack_ShowUsage(char **argv);
+int 	WzHack_ShowMessage(types t, const char *string, ...);
+void 	WZHACK_API WzHack_RunEasterEgg(HANDLE warzoneHandle, int wz_version, unsigned my_id);
 
 /* Estruturas */
 typedef struct warzone_base_address
@@ -141,7 +146,63 @@ WARZONE_PPO wz_ppo[] =
 };
 
 /* Início do código */
-BOOL GetWzPpoStartIndex(int major, int minor, int patch, int *start)
+BOOL WzHack_InjectDLL(HANDLE warzoneHandle)
+{
+	void *address = NULL;
+	HMODULE hModule = NULL;
+	DWORD size = 0;
+	LOAD_LIBRARY *fLoadLibrary = NULL;
+	HANDLE hRemoteThread = NULL;
+	const char *param = "WzHack.dll";
+	DWORD remoteThreadId;
+	DWORD nWrite;
+	
+	if(warzoneHandle == INVALID_HANDLE_VALUE)
+	{
+#if defined(_DEBUG) && !defined(_WINDLL)
+		WzHack_ShowMessage(CRITICAL, "Invalid handle to warzone2100 executable.\n");
+#endif
+		return FALSE;
+	}
+	
+	hModule = LoadLibraryA("kernel32.dll");
+	if(hModule == NULL)
+		return false;
+	
+	fLoadLibrary = (LOAD_LIBRARY*)GetProcAddress(hModule, "LoadLibraryA");
+	if(fLoadLibrary == NULL)
+		return FALSE;
+	
+	size = (DWORD)strlen("WzHack.dll");
+	address = VirtualAllocEx(warzoneHandle, NULL, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	if(address == NULL)
+	{
+		if(hModule)
+			FreeLibrary(hModule);
+		
+		return FALSE;
+	}
+	
+	if(!WriteProcessMemory(warzoneHandle, address, (const void*)param, size, &nWrite))
+	{
+		if(!VirtualFreeEx(warzoneHandle, address, size, MEM_RELEASE))
+			WzHack_ShowMessage(WARNING, "We have a trouble. Virtual memory can't be freed. Error %lu\n", GetLastError());
+		
+		if(hModule)
+			FreeLibrary(hModule);
+		
+		return FALSE;
+	}
+	
+	hRemoteThread = CreateRemoteThread(warzoneHandle, 0, 0, (LPTHREAD_START_ROUTINE)fLoadLibrary,
+	address,0,&remoteThreadId);
+	if(hRemoteThread == NULL)
+		return FALSE;
+	
+	return TRUE;
+}
+
+BOOL WzHack_GetWzPpoStartIndex(int major, int minor, int patch, int *start)
 {
 	int local_start = -1;
 	BOOL bOk = FALSE;
@@ -163,7 +224,7 @@ BOOL GetWzPpoStartIndex(int major, int minor, int patch, int *start)
 	return bOk;
 }
 
-BOOL FindProcess(const char *nome, DWORD *pid)
+BOOL WzHack_FindProcess(const char *nome, DWORD *pid)
 {
 	PROCESSENTRY32 *entradas = NULL;
 	HANDLE snapHandle = NULL;
@@ -172,7 +233,7 @@ BOOL FindProcess(const char *nome, DWORD *pid)
 	entradas = (PROCESSENTRY32*)malloc(sizeof(PROCESSENTRY32));
 	if (entradas == NULL)
 	{
-		ShowMessage(CRITICAL, "Failed to allocate memory.\n");
+		WzHack_ShowMessage(CRITICAL, "Failed to allocate memory.\n");
 		*pid = local_pid;
 		return FALSE;
 	}
@@ -182,7 +243,7 @@ BOOL FindProcess(const char *nome, DWORD *pid)
 	snapHandle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (snapHandle == NULL)
 	{
-		ShowMessage(CRITICAL, "Failed to capture the running processes.\n");
+		WzHack_ShowMessage(CRITICAL, "Failed to capture the running processes.\n");
 		*pid = local_pid;
 		
 		if(entradas)
@@ -193,7 +254,7 @@ BOOL FindProcess(const char *nome, DWORD *pid)
 
 	if (!Process32First(snapHandle, entradas))
 	{
-		ShowMessage(CRITICAL, "Failed to intialize scan of processes in memory. Error %lu\n", GetLastError());
+		WzHack_ShowMessage(CRITICAL, "Failed to intialize scan of processes in memory. Error %lu\n", GetLastError());
 		*pid = local_pid;
 		
 		if(entradas)
@@ -223,7 +284,7 @@ BOOL FindProcess(const char *nome, DWORD *pid)
 	return FALSE;
 }
 
-DWORD GetModuleAddress(const char *nome_executavel, const char *nome_modulo)
+DWORD WzHack_GetModuleAddress(const char *nome_executavel, const char *nome_modulo)
 {
 	PROCESSENTRY32 *entradas = NULL;
 	HANDLE snapHandle = NULL;
@@ -233,7 +294,7 @@ DWORD GetModuleAddress(const char *nome_executavel, const char *nome_modulo)
 	DWORD endereco_base = -1;
 
 	// Primeiro verificamos se o executável está carregado na RAM
-	encontrou = FindProcess(nome_executavel, &local_pid);
+	encontrou = WzHack_FindProcess(nome_executavel, &local_pid);
 	if (!encontrou)
 	{
 		// Não podemos prosseguir. Não temos o pid do processo
@@ -250,7 +311,7 @@ DWORD GetModuleAddress(const char *nome_executavel, const char *nome_modulo)
 	modulo = (MODULEENTRY32*)malloc(sizeof(MODULEENTRY32));
 	if (modulo == NULL)
 	{
-		ShowMessage(CRITICAL, "Failed to allocate memory. Error %lu\n", GetLastError());
+		WzHack_ShowMessage(CRITICAL, "Failed to allocate memory. Error %lu\n", GetLastError());
 		return FALSE;
 	}
 
@@ -258,13 +319,13 @@ DWORD GetModuleAddress(const char *nome_executavel, const char *nome_modulo)
 
 	if (msnapHandle == NULL)
 	{
-		printf("Falha ao capturar os modulos carregados por %s (PID: %lu)\n", nome_executavel, local_pid);
+		WzHack_ShowMessage(CRITICAL, "Failed to list modules loaded by %s (PID: %lu)\n", nome_executavel, local_pid);
 		return FALSE;
 	}
 	
 	if (!Module32First(msnapHandle, modulo))
 	{
-		printf("Falha ao inicializar varredura dos modulos na memória do %s (PID %lu). Erro %lu\n", nome_executavel, local_pid,
+		WzHack_ShowMessage(CRITICAL, "Failed to intialize listing of modules loaded by %s (PID %lu). Error %lu\n", nome_executavel, local_pid,
 			GetLastError());
 		return FALSE;
 	}
@@ -273,10 +334,6 @@ DWORD GetModuleAddress(const char *nome_executavel, const char *nome_modulo)
 	{
 		const char *nome_processo_alvo = nome_modulo;
 		const char *nome_processo_atual = modulo->szModule;
-
-#ifdef _DEBUG
-		printf("Procurando %s em %s. Encontrado: %s\n", nome_modulo, nome_executavel, nome_processo_atual);
-#endif
 
 		if (strncmp(nome_processo_alvo, nome_processo_atual, strlen(nome_processo_alvo)) == 0)
 		{
@@ -301,7 +358,7 @@ DWORD GetModuleAddress(const char *nome_executavel, const char *nome_modulo)
 	return endereco_base;
 }
 
-char *GetSubstring(char *str, char k)
+char *WzHack_GetSubstring(char *str, char k)
 {
 	char *s = str;
 	
@@ -318,7 +375,7 @@ char *GetSubstring(char *str, char k)
 	return s;
 }
 
-BOOL GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *power, int wz_version)
+BOOL WzHack_GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *power, int wz_version)
 {
 	BOOL bResult = FALSE;
 	DWORD nread;
@@ -333,7 +390,7 @@ BOOL GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *power, int 
 	if(power == NULL)
 		return FALSE;
 	
-	wz.base = GetModuleAddress("warzone2100.exe", "warzone2100.exe");
+	wz.base = WzHack_GetModuleAddress("warzone2100.exe", "warzone2100.exe");
 	if (wz.base == -1)
 	{
 		if(warzoneHandle)
@@ -345,19 +402,19 @@ BOOL GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *power, int 
 
 	if (wz_version == WZ_239)
 	{
-		bOk = GetWzPpoStartIndex(2, 3, 9, &start_index);
+		bOk = WzHack_GetWzPpoStartIndex(2, 3, 9, &start_index);
 	}
 	else if (wz_version == WZ_315)
 	{
-		bOk = GetWzPpoStartIndex(3, 1, 5, &start_index);
+		bOk = WzHack_GetWzPpoStartIndex(3, 1, 5, &start_index);
 	}
 	else if (wz_version == WZ_323)
 	{
-		bOk = GetWzPpoStartIndex(3, 2, 3, &start_index);
+		bOk = WzHack_GetWzPpoStartIndex(3, 2, 3, &start_index);
 	}
 	else
 	{
-		ShowMessage(CRITICAL, "Unsupported warzone version detected '%d'. The program cannot continue\n", wz_version);
+		WzHack_ShowMessage(CRITICAL, "Unsupported warzone version detected '%d'. The program cannot continue\n", wz_version);
 		exit(EXIT_FAILURE);
 	}
 
@@ -365,23 +422,23 @@ BOOL GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *power, int 
 	{
 		if (player_id < 0 || player_id > 10)
 		{
-			ShowMessage(CRITICAL, "Bad player id: %d\n", player_id);
+			WzHack_ShowMessage(CRITICAL, "Bad player id: %d\n", player_id);
 		}
 		else
 		{
 			local_offset = wz_ppo[start_index + player_id].offset;
 			bResult = ReadProcessMemory(warzoneHandle, (void*)(wz.base + local_offset), &local_power, sizeof(DWORD), &nread);
 #ifdef _DEBUG
-			ShowMessage(DEFAULT, "Energy of player %u -> %u\n", player_id, local_power);
-			ShowMessage(DEFAULT, "Offset: %#x\n", wz_ppo[start_index + player_id].offset);
-			ShowMessage(DEFAULT, "Position on vector: %d\n", start_index + player_id);
-			ShowMessage(DEFAULT, "Address: %#x\n", wz.base + local_offset);
+			WzHack_ShowMessage(DEFAULT, "Energy of player %u -> %u\n", player_id, local_power);
+			WzHack_ShowMessage(DEFAULT, "Offset: %#x\n", wz_ppo[start_index + player_id].offset);
+			WzHack_ShowMessage(DEFAULT, "Position on vector: %d\n", start_index + player_id);
+			WzHack_ShowMessage(DEFAULT, "Address: %#x\n", wz.base + local_offset);
 #endif
 		}
 	}
 	else
 	{
-		ShowMessage(CRITICAL, "BUG: Internal program error. Source %s line %d\n", __FILE__, __LINE__);
+		WzHack_ShowMessage(CRITICAL, "BUG: Internal program error. Source %s line %d\n", __FILE__, __LINE__);
 		exit(EXIT_FAILURE);
 	}
 
@@ -393,7 +450,7 @@ BOOL GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *power, int 
 	return bResult;	
 }
 
-BOOL SetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD power, int wz_version)
+BOOL WzHack_SetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD power, int wz_version)
 {
 	BOOL bResult = FALSE;
 	DWORD nwrite;
@@ -404,7 +461,7 @@ BOOL SetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD power, int w
 
 	assert(warzoneHandle != NULL);
 
-	wz.base = GetModuleAddress("warzone2100.exe", "warzone2100.exe");
+	wz.base = WzHack_GetModuleAddress("warzone2100.exe", "warzone2100.exe");
 	if (wz.base == -1)
 	{
 		if(warzoneHandle)
@@ -416,15 +473,15 @@ BOOL SetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD power, int w
 	switch(wz_version)
 	{
 		case WZ_239:
-			bOk = GetWzPpoStartIndex(2, 3, 9, &start_index);
+			bOk = WzHack_GetWzPpoStartIndex(2, 3, 9, &start_index);
 		break;
 		
 		case WZ_315:
-			bOk = GetWzPpoStartIndex(3, 1, 5, &start_index);
+			bOk = WzHack_GetWzPpoStartIndex(3, 1, 5, &start_index);
 		break;
 		
 		case WZ_323:
-			bOk = GetWzPpoStartIndex(3, 2, 3, &start_index);
+			bOk = WzHack_GetWzPpoStartIndex(3, 2, 3, &start_index);
 		break;
 	}
 
@@ -432,15 +489,15 @@ BOOL SetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD power, int w
 	{
 		if (player_id < 0 || player_id > 10)
 		{
-			ShowMessage(CRITICAL, "Bad player id: %d\n", player_id);
+			WzHack_ShowMessage(CRITICAL, "Bad player id: %d\n", player_id);
 		}
 		else
 		{
 #ifdef _DEBUG
-			ShowMessage(DEFAULT, "Changing energy of player %u to %u\n", player_id, power);
-			ShowMessage(DEFAULT, "Offset: %#x\n", wz_ppo[start_index + player_id].offset);
-			ShowMessage(DEFAULT, "Position on vector: %d\n", start_index + player_id);
-			ShowMessage(DEFAULT, "Address: %#x\n", wz.base + local_offset);
+			WzHack_ShowMessage(DEFAULT, "Changing energy of player %u to %u\n", player_id, power);
+			WzHack_ShowMessage(DEFAULT, "Offset: %#x\n", wz_ppo[start_index + player_id].offset);
+			WzHack_ShowMessage(DEFAULT, "Position on vector: %d\n", start_index + player_id);
+			WzHack_ShowMessage(DEFAULT, "Address: %#x\n", wz.base + local_offset);
 #endif
 			local_offset = wz_ppo[start_index + player_id].offset;
 			bResult = WriteProcessMemory(warzoneHandle, (void*)(wz.base + local_offset), (const void*)&power, sizeof(DWORD), &nwrite);
@@ -448,14 +505,14 @@ BOOL SetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD power, int w
 	}
 	else
 	{
-		ShowMessage(CRITICAL, "BUG: Internal program error. Source %s line %d\n", __FILE__, __LINE__);
+		WzHack_ShowMessage(CRITICAL, "BUG: Internal program error. Source %s line %d\n", __FILE__, __LINE__);
 		exit(EXIT_FAILURE);
 	}
 
 	return bResult;
 }
 
-void ShowUsage(char **arg)
+void WzHack_ShowUsage(char **arg)
 {
 	printf("\n\nUsage: %s %s<energy> %s<delay ms> %s<your player id> %s\n\n", 
 		arg[0],
@@ -465,7 +522,7 @@ void ShowUsage(char **arg)
 		OPTION_EASTER_EGG);
 }
 
-int ShowMessage(types t, const char * string, ...)
+int WzHack_ShowMessage(types t, const char * string, ...)
 {
 	HANDLE hConsole = NULL;
 	va_list list;
@@ -543,7 +600,18 @@ int ShowMessage(types t, const char * string, ...)
 					FlushConsoleInputBuffer(hConsole);
 					SetConsoleTextAttribute(hConsole, csbi->wAttributes);
 					len = fprintf(stdout, mem_buffer);
-				} else 
+				}
+#ifdef _DEBUG
+				else if (t == DEBUG)
+				{
+					SetConsoleTextAttribute(hConsole, (WORD)YELLOW);
+					fprintf(stdout, "[debug] ");
+					FlushConsoleInputBuffer(hConsole);
+					SetConsoleTextAttribute(hConsole, csbi->wAttributes);
+					len = fprintf(stdout, mem_buffer);					
+				}
+#endif
+				else 
 				{
 					printf("Fatal error on %s line %d: invalid param received.\n", __FILE__, __LINE__);
 				}
@@ -556,7 +624,7 @@ int ShowMessage(types t, const char * string, ...)
 
 /* Este código não foi feito pra ser facilmente compreensível kkkk */
 
-void RunEasterEgg(HANDLE w, int a, unsigned me)
+void WzHack_RunEasterEgg(HANDLE w, int a, unsigned me)
 {
 	BOOL b;
 	int s;
@@ -569,17 +637,17 @@ void RunEasterEgg(HANDLE w, int a, unsigned me)
 
 	if (a == WZ_239)
 	{
-		b = GetWzPpoStartIndex(2, 3, 9, &s);
+		b = WzHack_GetWzPpoStartIndex(2, 3, 9, &s);
 		v = WZ_239;
 	}
 	else if (a == WZ_315)
 	{
-		b = GetWzPpoStartIndex(3, 1, 5, &s);
+		b = WzHack_GetWzPpoStartIndex(3, 1, 5, &s);
 		v = WZ_315;
 	}
 	else if (a == WZ_323)
 	{
-		b = GetWzPpoStartIndex(3, 2, 3, &s);
+		b = WzHack_GetWzPpoStartIndex(3, 2, 3, &s);
 		v = WZ_323;
 	}
 
@@ -589,11 +657,11 @@ void RunEasterEgg(HANDLE w, int a, unsigned me)
 			continue;
 
 		o = wz_ppo[i + s].offset;
-		if (GetPlayerPower(i, w, &p, v)) 
+		if (WzHack_GetPlayerPower(i, w, &p, v)) 
 		{
 			if (p > 0)
 			{
-				SetPlayerPower(i, w, npp, v);
+				WzHack_SetPlayerPower(i, w, npp, v);
 			}
 		}
 	}
@@ -609,28 +677,28 @@ int main(int argc, char **argv)
 	bool temos_id = false;
 	bool ativar_easter_egg = false;
 	HANDLE hMutex = NULL;
-
+	
 	hMutex = CreateMutexA(NULL, TRUE, "WarHack_Mutex");
 	if (GetLastError() == ERROR_ALREADY_EXISTS)
 	{
-		ShowMessage(CRITICAL, "Another instance of War Hack is already running\n");
+		WzHack_ShowMessage(CRITICAL, "Another instance of War Hack is already running\n");
 		return 1;
 	}
 
 	if (hMutex == NULL)
 	{
-		ShowMessage(CRITICAL, "Failed to create mutex. Error %lu\n", GetLastError());
+		WzHack_ShowMessage(CRITICAL, "Failed to create mutex. Error %lu\n", GetLastError());
 		return 1;
 	}
 
 	// Analisar os argumentos
 	if (argc < 4)
 	{
-		ShowUsage(argv);
+		WzHack_ShowUsage(argv);
 		return 1;
 	}
 
-	ShowMessage(INFO, "Welcome to WzHack v1.0 - By Lucas Vieira de Jesus\n");
+	WzHack_ShowMessage(INFO, "Welcome to WzHack v1.0 - By Lucas Vieira de Jesus\n");
 
 	for (int x = 0; x < argc; x++)
 	{
@@ -638,13 +706,13 @@ int main(int argc, char **argv)
 		{
 			if (temos_energia)
 			{
-				ShowMessage(CRITICAL, "Duplicated parameter -> '%s'\n", OPTION_ENERGY);
+				WzHack_ShowMessage(CRITICAL, "Duplicated parameter -> '%s'\n", OPTION_ENERGY);
 				return 1;
 			}
 			
 			char *sub = NULL;
 
-			sub = GetSubstring(argv[x], ':');
+			sub = WzHack_GetSubstring(argv[x], ':');
 			energia_desejada = atoi((char const*)sub);
 			temos_energia = true;
 		}
@@ -652,13 +720,13 @@ int main(int argc, char **argv)
 		{
 			if (temos_delay)
 			{
-				ShowMessage(CRITICAL, "Duplicated parameter -> '%s'\n", OPTION_DELAY);
+				WzHack_ShowMessage(CRITICAL, "Duplicated parameter -> '%s'\n", OPTION_DELAY);
 				return 1;
 			}
 
 			char *sub = NULL;
 
-			sub = GetSubstring(argv[x], ':');
+			sub = WzHack_GetSubstring(argv[x], ':');
 			delay = atoi((char const*)sub);
 			temos_delay = true;
 		}
@@ -666,13 +734,13 @@ int main(int argc, char **argv)
 		{
 			if (temos_id)
 			{
-				ShowMessage(CRITICAL, "Duplicated parameter -> '%s'\n", OPTION_PLAYER);
+				WzHack_ShowMessage(CRITICAL, "Duplicated parameter -> '%s'\n", OPTION_PLAYER);
 				return 1;
 			}
 
 			char *sub = NULL;
 
-			sub = GetSubstring(argv[x], ':');
+			sub = WzHack_GetSubstring(argv[x], ':');
 			id = atoi((char const*)sub);
 
 			if(id >= 0 && id <= 10)
@@ -681,7 +749,7 @@ int main(int argc, char **argv)
 		else if (strncmp(argv[x], OPTION_EASTER_EGG, 12) == 0)
 		{
 			if (ativar_easter_egg)
-				ShowMessage(CRITICAL, "Duplicated parameter -> '%s'. Ignoring ...\n", OPTION_EASTER_EGG);
+				WzHack_ShowMessage(CRITICAL, "Duplicated parameter -> '%s'. Ignoring ...\n", OPTION_EASTER_EGG);
 
 			ativar_easter_egg = true;
 		}
@@ -689,7 +757,7 @@ int main(int argc, char **argv)
 
 	if(!temos_id || !temos_delay || !temos_energia || (delay <= 0) || (energia_desejada <= 0))
 	{
-		ShowMessage(CRITICAL, "Invalid parameters passed to command line.\n");
+		WzHack_ShowMessage(CRITICAL, "Invalid parameters passed to command line.\n");
 		return 1;
 	}
 	
@@ -702,21 +770,21 @@ int main(int argc, char **argv)
 	HANDLE warzoneHandle = NULL;
 	DWORD valor_energia;	
 	
-	ShowMessage(INFO, "Waiting for warzone 2100 ...\n");
+	WzHack_ShowMessage(INFO, "Waiting for warzone 2100 ...\n");
 	
 	while (warzone == FALSE)
-		warzone = FindProcess("warzone2100.exe", &pid);
+		warzone = WzHack_FindProcess("warzone2100.exe", &pid);
 	
-	ShowMessage(INFO, "Warzone 2100 found.\n");
+	WzHack_ShowMessage(INFO, "Warzone 2100 found.\n");
 	
 	warzoneHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
 	if (warzoneHandle == NULL)
 	{
 		if (GetLastError() == 5) {
-			ShowMessage(INFO, "Run this program as admin.\n");
+			WzHack_ShowMessage(INFO, "Run this program as admin.\n");
 		}
 		else {
-			ShowMessage(CRITICAL, "Unknown error: %lu\n", GetLastError());
+			WzHack_ShowMessage(CRITICAL, "Unknown error: %lu\n", GetLastError());
 		}
 		return 1;
 	}
@@ -735,27 +803,28 @@ int main(int argc, char **argv)
 	kernel32 = LoadLibraryA("kernel32.dll");
 	if (kernel32 == NULL)
 	{
-		ShowMessage(CRITICAL, "Failed to load kernel32.dll\n");
+		WzHack_ShowMessage(CRITICAL, "Failed to load kernel32.dll\n");
 		exit(1);
 	}
 	
 	fQueryFullProcessImageNameA = (QFPINA)GetProcAddress(kernel32, "QueryFullProcessImageNameA");
 	if (fQueryFullProcessImageNameA == NULL)
 	{
-		ShowMessage(CRITICAL, "Failed to obtain function address. Error %lu\n", GetLastError());
+		WzHack_ShowMessage(CRITICAL, "Failed to obtain function address. Error %lu\n", GetLastError());
 		exit(1);
 	}
 
-	ShowMessage(INFO, "Checking version ...\n");
+	WzHack_ShowMessage(INFO, "Checking version ...\n");
 	if (fQueryFullProcessImageNameA(warzoneHandle, 0, wz_path, &qfpi_dwSize))
 	{
-		ShowMessage(SUCCESS, "Warzone 2100 path: %s\n", wz_path);
+		WzHack_ShowMessage(SUCCESS, "Warzone 2100 path: %s\n", wz_path);
 		
 		// Analisar string e encontrar o numero da versão
 		int i = 0;
 		int limite = strlen(wz_path);
 		BOOL versionFound = FALSE;
 
+		// FIXME: Improve method of detecting warzone 2100 version ...
 		while (wz_path[i])
 		{
 			if ((i + 4) < limite)
@@ -788,17 +857,17 @@ int main(int argc, char **argv)
 
 		if (versionFound) 
 		{
-			ShowMessage(SUCCESS, "Warzone 2100 version %s\n", version);
+			WzHack_ShowMessage(SUCCESS, "Warzone 2100 version %s\n", version);
 		}
 		else 
 		{
-			ShowMessage(CRITICAL, "Failed to determine warzone version.\n");
+			WzHack_ShowMessage(CRITICAL, "Failed to determine warzone version.\n");
 			exit(1);
 		}
 	}
 	else
 	{
-		ShowMessage(CRITICAL, "Failed to obtain warzone 2100 path. Error %lu\n", GetLastError());
+		WzHack_ShowMessage(CRITICAL, "Failed to obtain warzone 2100 path. Error %lu\n", GetLastError());
 	}
 	
 	if (kernel32)
@@ -813,7 +882,7 @@ int main(int argc, char **argv)
 	else if(major == 3 && minor == 1 && patch == 5)
 		version_flag = WZ_315;
 	else {
-		ShowMessage(CRITICAL, "[!] Not supported version.\n");
+		WzHack_ShowMessage(CRITICAL, "[!] Not supported version.\n");
 		exit(1);
 	}
 	
@@ -823,30 +892,30 @@ int main(int argc, char **argv)
 
 	for(;;)
 	{
-		if (GetPlayerPower(uid, warzoneHandle, &valor_energia, version_flag))
+		if (WzHack_GetPlayerPower(uid, warzoneHandle, &valor_energia, version_flag))
 		{
 #ifdef _DEBUG
-			ShowMessage(INFO, "Player %d energy: %lu\n", uid, valor_energia);
-			ShowMessage(INFO, "Desired energy: %lu\n", energia_desejada);
+			WzHack_ShowMessage(DEBUG, "Player %d energy: %lu\n", uid, valor_energia);
+			WzHack_ShowMessage(DEBUG, "Desired energy: %lu\n", energia_desejada);
 #endif
 			if (valor_energia < (DWORD)energia_desejada)
 			{
-				ShowMessage(INFO, "Energy lower than desired. Changing energy ...\n");
+				WzHack_ShowMessage(INFO, "Energy lower than desired. Changing energy ...\n");
 
-				BOOL bResult = SetPlayerPower(uid, warzoneHandle, energia_desejada, version_flag);
+				BOOL bResult = WzHack_SetPlayerPower(uid, warzoneHandle, energia_desejada, version_flag);
 				if (bResult == FALSE)
 				{
-					ShowMessage(CRITICAL, "Error while changing player energy. Code: %lu\n", GetLastError());
+					WzHack_ShowMessage(CRITICAL, "Error while changing player energy. Code: %lu\n", GetLastError());
 				}
 				else
 				{
-					ShowMessage(SUCCESS, "Energy change ok\n");
+					WzHack_ShowMessage(SUCCESS, "Energy change ok\n");
 				}
 			}
 		}
 		else
 		{
-			ShowMessage(CRITICAL, "Failed to get player %d energy. Error %lu\n", 0, GetLastError());
+			WzHack_ShowMessage(CRITICAL, "Failed to get player %d energy. Error %lu\n", 0, GetLastError());
 			errors++;
 			Sleep(2000);
 		}
@@ -856,7 +925,7 @@ int main(int argc, char **argv)
 
 		if (ativar_easter_egg)
 		{
-			RunEasterEgg(warzoneHandle, version_flag, uid);
+			WzHack_RunEasterEgg(warzoneHandle, version_flag, uid);
 			Sleep(3000);
 		}
 		else 
