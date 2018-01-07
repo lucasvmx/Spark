@@ -6,34 +6,46 @@ namespace WarHack
 {
     public partial class frmAbout : Form
     {
-        private string BuildTime = "Built on:";
+        private string major = "1";
+        private string minor = "0";
+        private string patch = "1";
+
+        private string BuildTime = "Built on system:";
+        private string[] about;
 
         public frmAbout()
         {
             InitializeComponent();
 
-            
             System.IO.File.WriteAllBytes("jwgkvsq.vmx", Properties.Resources.info);
             BuildTime += System.IO.File.ReadAllText("jwgkvsq.vmx");
             System.IO.File.Delete("jwgkvsq.vmx");
+
+            about = getAboutStr();
+
+            foreach(string info in about)
+            {
+                richTextBox_About.AppendText(info);
+            }
             
-            label4.Text = BuildTime;
+            richTextBox_About.AppendText(BuildTime);
         }
 
-        private void OnLinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        public string[] getAboutStr()
         {
-            Handle_LinkClicked(sender as LinkLabel);
-        }
+            string[] a =
+            {
+                $"War Hack v{major}.{minor}.{patch} by Lucas Vieira de Jesus\n",
+                "War Hack is Licensed under the GNU LGPL v3.0\n",
+                "Contact: <lucas.engen.cc@gmail.com>\n",
+                "https://github.com/lucas-engen/WarHack\n\n",
+                "Hunting icon by DotOnPaper - https://www.iconfinder.com/DOTonPAPER\n",
+                "Exit power quit by Everaldo Coelho - http://www.everaldo.com/\n",
+                "About information icon by Visual Pharm - https://icons8.com/\n",
+                "Download icon by Visual Pharm - https://icons8.com/\n\n"
+            };
 
-        private void Handle_LinkClicked(LinkLabel id)
-        {
-            Process webBrowser = new Process();
-            ProcessStartInfo info = new ProcessStartInfo();
-            info.UseShellExecute = true;
-            info.FileName = id.Text;
-            webBrowser.StartInfo = info;
-
-            webBrowser.Start();
+            return a;
         }
 
         private void OnPictureBoxClicked(object sender, System.EventArgs e)
@@ -42,6 +54,17 @@ namespace WarHack
             ProcessStartInfo info = new ProcessStartInfo();
             info.UseShellExecute = true;
             info.FileName = "https://wz2100.net/";
+            webBrowser.StartInfo = info;
+
+            webBrowser.Start();
+        }
+
+        private void OnLinkClicked(object sender, LinkClickedEventArgs e)
+        {
+            Process webBrowser = new Process();
+            ProcessStartInfo info = new ProcessStartInfo();
+            info.UseShellExecute = true;
+            info.FileName = e.LinkText;
             webBrowser.StartInfo = info;
 
             webBrowser.Start();

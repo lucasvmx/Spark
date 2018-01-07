@@ -99,6 +99,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="if_Hunting1_2315994.ico" />
+    <None Include="Images\warzone2100logo.png" />
+    <None Include="Images\if_exit_3226.ico" />
+    <None Include="Images\if_Information_27854.ico" />
+    <None Include="Images\if_download2_172461.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

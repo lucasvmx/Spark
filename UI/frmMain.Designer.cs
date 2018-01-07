@@ -33,7 +33,6 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.squitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.downloadWarzoneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutWarHackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -49,6 +48,7 @@
             this.ButtonStart = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.downloadWarzoneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarEnergy)).BeginInit();
@@ -78,6 +78,7 @@
             // 
             // squitToolStripMenuItem
             // 
+            this.squitToolStripMenuItem.Image = global::WarHack.Properties.Resources.if_exit_3226;
             this.squitToolStripMenuItem.Name = "squitToolStripMenuItem";
             this.squitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.squitToolStripMenuItem.Text = "Quit";
@@ -91,13 +92,6 @@
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
             // 
-            // downloadWarzoneToolStripMenuItem
-            // 
-            this.downloadWarzoneToolStripMenuItem.Name = "downloadWarzoneToolStripMenuItem";
-            this.downloadWarzoneToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
-            this.downloadWarzoneToolStripMenuItem.Text = "Download Warzone";
-            this.downloadWarzoneToolStripMenuItem.Click += new System.EventHandler(this.OnDownloadWZ_ToolstripClicked);
-            // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -108,6 +102,7 @@
             // 
             // aboutWarHackToolStripMenuItem
             // 
+            this.aboutWarHackToolStripMenuItem.Image = global::WarHack.Properties.Resources.if_Information_27854;
             this.aboutWarHackToolStripMenuItem.Name = "aboutWarHackToolStripMenuItem";
             this.aboutWarHackToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.aboutWarHackToolStripMenuItem.Text = "About War Hack";
@@ -262,6 +257,14 @@
             this.statusLabel.ForeColor = System.Drawing.Color.Blue;
             this.statusLabel.Name = "statusLabel";
             this.statusLabel.Size = new System.Drawing.Size(0, 17);
+            // 
+            // downloadWarzoneToolStripMenuItem
+            // 
+            this.downloadWarzoneToolStripMenuItem.Image = global::WarHack.Properties.Resources.if_download2_172461;
+            this.downloadWarzoneToolStripMenuItem.Name = "downloadWarzoneToolStripMenuItem";
+            this.downloadWarzoneToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+            this.downloadWarzoneToolStripMenuItem.Text = "Download Warzone";
+            this.downloadWarzoneToolStripMenuItem.Click += new System.EventHandler(this.OnDownloadWZ_ToolstripClicked);
             // 
             // frmMain
             // 

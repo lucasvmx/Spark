@@ -46,6 +46,10 @@
 #define OPT_EASTEREGG_LEN	strlen(OPTION_EASTER_EGG)
 #define MAX_PLAYERS			11
 
+#define MAJOR	1
+#define MINOR	0
+#define PATCH	1
+
 #define WZ_239		0xA1
 #define WZ_315		0xA2
 #define WZ_323		0xA3
@@ -80,7 +84,6 @@ typedef enum message_types
 
 /* Funções pré-definidas */
 typedef BOOL		(WINAPI *QFPINA)(HANDLE hProcess, DWORD flag, LPSTR path, PDWORD bufSize);
-typedef HMODULE		(WINAPI *LOAD_LIBRARY)(LPCTSTR lpFileName);
 typedef BOOL		(WINAPI *GFVI)(LPCTSTR lptstrFilename,DWORD dwHandle,DWORD dwLen,LPVOID lpData);
 typedef DWORD		(WINAPI *GFVIS)(LPCTSTR lptstrFilename, LPDWORD lpdwHandle);
 typedef BOOL		(WINAPI *VQV)(LPCVOID pBlock, LPCTSTR lpSubBlock, LPVOID *lplpBuffer, PUINT puLen);
@@ -207,19 +210,31 @@ int WzHack_GetWarzoneVersion(const char *wz_filename)
 	}
 
 	sz = fGetFileVersionInfoSizeA(wz_filename, &dwHandle);
-	if (0 == sz)
+	if (sz == 0)
 	{
+		if (hVersion_DLL)
+			FreeLibrary(hVersion_DLL);
+		
 		return 5;
 	}
+	
 	buf = (char*)malloc((size_t)sizeof(char) * sz);
 	if (!buf)
+	{
+		if (hVersion_DLL)
+			FreeLibrary(hVersion_DLL);
+		
 		return 6;
+	}
 
 	if (!fGetFileVersionInfoA(wz_filename, dwHandle, sz, &buf[0]))
 	{
 		if (buf)
 			free(buf);
 
+		if (hVersion_DLL)
+			FreeLibrary(hVersion_DLL);
+		
 		return 7;
 	}
 
@@ -230,7 +245,10 @@ int WzHack_GetWarzoneVersion(const char *wz_filename)
 	{
 		if (buf)
 			free(buf);
-
+		
+		if (hVersion_DLL)
+			FreeLibrary(hVersion_DLL);
+		
 		return 8;
 	}
 	
@@ -251,6 +269,9 @@ int WzHack_GetWarzoneVersion(const char *wz_filename)
 	if (buf)
 		free(buf);
 
+	if (hVersion_DLL)
+		FreeLibrary(hVersion_DLL);
+		
 	return iversion;
 }
 
@@ -259,32 +280,47 @@ int WzHack_GetWarzoneVersion(const char *wz_filename)
 /// <returns>TRUE or FALSE</returns>
 BOOL WzHack_InjectDLL(HANDLE warzoneHandle)
 {
-	void *address = NULL;
+	LPVOID address = NULL;
 	HMODULE hModule = NULL;
 	DWORD size = 0;
-	LOAD_LIBRARY fLoadLibrary = NULL;
+	LPVOID addr_LoadLib = NULL;
 	HANDLE hRemoteThread = NULL;
-	const char *param = "WzHack.dll";
-	DWORD remoteThreadId;
-	DWORD nWrite;
-	
-	if(warzoneHandle == INVALID_HANDLE_VALUE)
+	const char *dllName = "WzHack.dll";
+	char full_dll_path[MAX_PATH];
+	char current_path[MAX_PATH];
+	DWORD path_len;
+
+	if(warzoneHandle == INVALID_HANDLE_VALUE || warzoneHandle == NULL)
 	{
 #if defined(_DEBUG) && !defined(_WINDLL)
-		WzHack_ShowMessage(CRITICAL, "Invalid handle to warzone2100 executable.\n");
+		WzHack_ShowMessage(DEBUG, "Invalid handle to warzone2100 executable.\n");
 #endif
 		return FALSE;
 	}
 	
-	hModule = LoadLibraryA("kernel32.dll");
+	if ((path_len = GetCurrentDirectoryA(MAX_PATH * sizeof(char), current_path)) == 0)
+	{
+		return FALSE;
+	}
+
+	if (current_path[path_len - 1] == '\\')
+		snprintf(full_dll_path, MAX_PATH * sizeof(char), "%s%s", current_path, dllName);
+	else
+		snprintf(full_dll_path, MAX_PATH * sizeof(char), "%s\\%s", current_path, dllName);
+
+#ifdef _DEBUG
+	WzHack_ShowMessage(DEBUG, "(%s:%d) Injecting: %s\n", __FILE__, __LINE__, full_dll_path);
+#endif
+
+	hModule = GetModuleHandleA("kernel32.dll");
 	if(hModule == NULL)
 		return false;
 	
-	fLoadLibrary = (LOAD_LIBRARY)GetProcAddress(hModule, "LoadLibraryA");
-	if(fLoadLibrary == NULL)
+	addr_LoadLib = (LPVOID)GetProcAddress(hModule, "LoadLibraryA");
+	if(addr_LoadLib == NULL)
 		return FALSE;
 	
-	size = (DWORD)strlen("WzHack.dll");
+	size = (DWORD)strlen(full_dll_path);
 	address = VirtualAllocEx(warzoneHandle, NULL, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 	if(address == NULL)
 	{
@@ -294,7 +330,7 @@ BOOL WzHack_InjectDLL(HANDLE warzoneHandle)
 		return FALSE;
 	}
 	
-	if(!WriteProcessMemory(warzoneHandle, address, (const void*)param, size, &nWrite))
+	if(!WriteProcessMemory(warzoneHandle, address, (const void*)full_dll_path, (SIZE_T)size, NULL))
 	{
 		if(!VirtualFreeEx(warzoneHandle, address, size, MEM_RELEASE))
 			WzHack_ShowMessage(WARNING, "We have a trouble. Virtual memory can't be freed. Error %lu\n", GetLastError());
@@ -305,13 +341,15 @@ BOOL WzHack_InjectDLL(HANDLE warzoneHandle)
 		return FALSE;
 	}
 	
-	hRemoteThread = CreateRemoteThread(warzoneHandle, 0, 0, (LPTHREAD_START_ROUTINE)fLoadLibrary,
-	address,0,&remoteThreadId);
+	hRemoteThread = CreateRemoteThread(warzoneHandle, NULL, NULL, (LPTHREAD_START_ROUTINE)addr_LoadLib, address,0,NULL);
 	if(hRemoteThread == NULL)
 		return FALSE;
-	
+
 	if (hModule)
 		FreeLibrary(hModule);
+
+	if (hRemoteThread)
+		CloseHandle(hRemoteThread);
 
 	return TRUE;
 }
@@ -435,7 +473,7 @@ DWORD WzHack_GetModuleAddress(const char *exeName, const char *moduleName)
 	{
 		// Não podemos prosseguir. Não temos o pid do processo
 #ifdef _DEBUG
-		printf("Failed to find %s. Error %lu\n", nome_executavel, GetLastError());
+		WzHack_ShowMessage(SUCCESS, "(%s:%d) Failed to find %s. Error %lu\n", __FILE__, __LINE__, exeName, GetLastError());
 #endif
 		return FALSE;
 	}
@@ -481,8 +519,14 @@ DWORD WzHack_GetModuleAddress(const char *exeName, const char *moduleName)
 	} while (Module32Next(msnapHandle, modulo));
 
 #ifdef _DEBUG
-	printf("Falhou? -> %s\n", (falhou) ? "sim" : "nao");
-	printf("Endereco base: %#x\n", endereco_base);
+	static int v = 0;
+
+	if (v == 0) 
+	{
+		WzHack_ShowMessage(DEBUG, "(%s:%d) WzHack_GetModuleAddress failed? -> %s\n", __FILE__, __LINE__, (falhou) ? "yes" : "no");
+		WzHack_ShowMessage(DEBUG, "(%s:%d) Base address: %#x\n", __FILE__, __LINE__, endereco_base);
+		v++;
+	}
 #endif
 
 	if (modulo)
@@ -565,10 +609,10 @@ BOOL WzHack_GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *powe
 			local_offset = wz_ppo[start_index + player_id].offset;
 			bResult = ReadProcessMemory(warzoneHandle, (void*)(wz.base + local_offset), &local_power, sizeof(DWORD), &nread);
 #ifdef _DEBUG
-			WzHack_ShowMessage(DEFAULT, "Energy of player %u -> %u\n", player_id, local_power);
-			WzHack_ShowMessage(DEFAULT, "Offset: %#x\n", wz_ppo[start_index + player_id].offset);
-			WzHack_ShowMessage(DEFAULT, "Position on vector: %d\n", start_index + player_id);
-			WzHack_ShowMessage(DEFAULT, "Address: %#x\n", wz.base + local_offset);
+			WzHack_ShowMessage(DEBUG, "(%s:%d) Energy of player %u -> %u\n", __FILE__, __LINE__, player_id, local_power);
+			WzHack_ShowMessage(DEBUG, "(%s:%d) Offset: %#x\n", __FILE__, __LINE__, wz_ppo[start_index + player_id].offset);
+			WzHack_ShowMessage(DEBUG, "(%s:%d) Position on vector: %d\n", __FILE__, __LINE__, start_index + player_id);
+			WzHack_ShowMessage(DEBUG, "(%s:%d) Address: %#x\n", __FILE__, __LINE__, wz.base + local_offset);
 #endif
 		}
 	}
@@ -630,10 +674,10 @@ BOOL WzHack_SetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD power
 		else
 		{
 #ifdef _DEBUG
-			WzHack_ShowMessage(DEFAULT, "Changing energy of player %u to %u\n", player_id, power);
-			WzHack_ShowMessage(DEFAULT, "Offset: %#x\n", wz_ppo[start_index + player_id].offset);
-			WzHack_ShowMessage(DEFAULT, "Position on vector: %d\n", start_index + player_id);
-			WzHack_ShowMessage(DEFAULT, "Address: %#x\n", wz.base + local_offset);
+			WzHack_ShowMessage(DEBUG, "(%s:%d) Setting energy of player %u to %u\n", __FILE__, __LINE__, player_id, power);
+			WzHack_ShowMessage(DEBUG, "(%s:%d) Offset: %#x\n", __FILE__, __LINE__, wz_ppo[start_index + player_id].offset);
+			WzHack_ShowMessage(DEBUG, "(%s:%d) Position on vector: %d\n", __FILE__, __LINE__, start_index + player_id);
+			WzHack_ShowMessage(DEBUG, "(%s:%d) Address: %#x\n", __FILE__, __LINE__, wz.base + local_offset);
 #endif
 			local_offset = wz_ppo[start_index + player_id].offset;
 			bResult = WriteProcessMemory(warzoneHandle, (void*)(wz.base + local_offset), (const void*)&power, sizeof(DWORD), &nwrite);
@@ -803,6 +847,7 @@ void WzHack_RunEasterEgg(HANDLE w, int a, unsigned me)
 	}
 }
 
+#ifndef _WINDLL
 int main(int argc, char **argv)
 {
 	int energia_desejada = -1;
@@ -834,7 +879,8 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	WzHack_ShowMessage(INFO, "Welcome to WzHack v1.0 - By Lucas Vieira de Jesus\n");
+	WzHack_ShowMessage(INFO, "Welcome to WzHack v%d.%d.%d - By Lucas Vieira de Jesus\n",
+		MAJOR,MINOR,PATCH);
 
 	for (int x = 0; x < argc; x++)
 	{
@@ -980,7 +1026,8 @@ int main(int argc, char **argv)
 	if (kernel32)
 		FreeLibrary(kernel32);
 	
-	// Loop principal do programa
+	/* Loop principal do programa */
+	
 	int errors = 0;
 	unsigned uid = (unsigned)id;
 
@@ -988,14 +1035,14 @@ int main(int argc, char **argv)
 	{
 		if (WzHack_GetPlayerPower(uid, warzoneHandle, &valor_energia, version_flag))
 		{
-#ifdef _DEBUG
-			WzHack_ShowMessage(DEBUG, "Player %d energy: %lu\n", uid, valor_energia);
-			WzHack_ShowMessage(DEBUG, "Desired energy: %lu\n", energia_desejada);
+#if defined(_DEBUG)
+			WzHack_ShowMessage(DEBUG, "(%s:%d) Player %d energy: %lu\n", __FILE__, __LINE__, uid, valor_energia);
+			WzHack_ShowMessage(DEBUG, "(%s:%d) Desired energy: %lu\n", __FILE__, __LINE__, energia_desejada);
 #endif
 			if (valor_energia < (DWORD)energia_desejada)
 			{
 				WzHack_ShowMessage(INFO, "Energy lower than desired. Changing energy ...\n");
-
+				
 				BOOL bResult = WzHack_SetPlayerPower(uid, warzoneHandle, energia_desejada, version_flag);
 				if (bResult == FALSE)
 				{
@@ -1030,3 +1077,11 @@ int main(int argc, char **argv)
 	
 	return 0;
 }
+#else 
+
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+{
+	return TRUE;
+}
+
+#endif 

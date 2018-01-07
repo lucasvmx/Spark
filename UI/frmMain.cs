@@ -114,8 +114,8 @@ namespace WarHack
                 with_easter_egg = false;
 
             // Build command line
-            Arguments = "-d:" + (trackBarDelay.Value * 1000) + " -p:" + id;
-            Arguments += " -e:" + (trackBarEnergy.Value * 10000);
+            Arguments = "--delay:" + (trackBarDelay.Value * 1000) + " --player:" + id;
+            Arguments += " --energy:" + (trackBarEnergy.Value * 10000);
 
             if (with_easter_egg)
                 Arguments += " --easter-egg";
@@ -145,6 +145,7 @@ namespace WarHack
                 {
                     WzHack_Process.Kill();
                 }
+
             } catch(Exception)
             {
 

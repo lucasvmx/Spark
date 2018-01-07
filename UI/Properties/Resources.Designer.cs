@@ -61,6 +61,36 @@ namespace WarHack.Properties {
         }
         
         /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap if_download2_172461 {
+            get {
+                object obj = ResourceManager.GetObject("if_download2_172461", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap if_exit_3226 {
+            get {
+                object obj = ResourceManager.GetObject("if_exit_3226", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap if_Information_27854 {
+            get {
+                object obj = ResourceManager.GetObject("if_Information_27854", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Consulta um recurso localizado do tipo System.Byte[].
         /// </summary>
         internal static byte[] info {
@@ -76,6 +106,16 @@ namespace WarHack.Properties {
         internal static System.Drawing.Bitmap warzone2100_large_400x400 {
             get {
                 object obj = ResourceManager.GetObject("warzone2100.large_400x400", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap warzone2100logo {
+            get {
+                object obj = ResourceManager.GetObject("warzone2100logo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
