@@ -1,5 +1,1 @@
-- Interface gráfica desenvolvida
-- Projeto integrado ao C++
-- Versão 0.1 Alfa lançada
-- Alguns bugs menores corrigidos
-- FIXME: trocar a checkbox por radiobox na janela de configurações
+- Correção no versionamento do programa

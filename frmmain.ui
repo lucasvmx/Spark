@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>WarHack v0.1 Alfa</string>
+   <string>WarHack v1.1 Alfa</string>
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
