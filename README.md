@@ -13,11 +13,3 @@
   * Suportar o Linux (x86 e x64)
   * Alterar a aliança dos jogadores
   * Alterar a quantidade de energia necessária para construir uma estrutura
-  
-#### Observações
-  * Se for contribuir com este projeto, por favor, utilize o inglês (ou português) para colocar comentários e apenas o inglês para criar nomes de função. As mensagens do programa também devem estar em inglês. Futuramente, as mensagens do programa poderão ser traduzidas com mais facilidade do inglês para as demais línguas.
-  
-
-  
-  
-
