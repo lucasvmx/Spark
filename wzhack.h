@@ -32,6 +32,9 @@
 
 /* Definições */
 #define MAX_PLAYERS			11
+#define WZ_239_MAX_POWER    100000
+#define WZ_315_MAX_POWER    1000000
+#define WZ_323_MAX_POWER    WZ_315_MAX_POWER
 
 #define MAJOR	1
 #define MINOR	0

@@ -353,13 +353,12 @@ BOOL WzHack_FindProcess(const char *nome, DWORD *pid)
 /// <returns>TRUE or FALSE</returns>
 DWORD WzHack_GetModuleAddress(const char *exeName, const char *moduleName)
 {
-    struct tagMODULEENTRY32 *entradas = NULL;
-	HANDLE snapHandle = NULL;
 	DWORD local_pid = -1;
 	BOOL encontrou = TRUE;
-	BOOL falhou = TRUE;
 	DWORD endereco_base = -1;
+    BOOL falhou = FALSE;
 
+    (void)moduleName;
 	// Primeiro verificamos se o executável está carregado na RAM
 	encontrou = WzHack_FindProcess(exeName, &local_pid);
 	if (!encontrou)
@@ -464,7 +463,7 @@ BOOL WzHack_GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *powe
 		return FALSE;
 	
 	wz.base = WzHack_GetModuleAddress("warzone2100.exe", "warzone2100.exe");
-	if (wz.base == -1)
+    if (wz.base == (DWORD)-1)
 	{
 		if(warzoneHandle)
 			CloseHandle(warzoneHandle);
@@ -697,7 +696,7 @@ void WzHack_RunEasterEgg(HANDLE w, int a, unsigned me)
 	DWORD npp = 0;
 
 	assert(w != NULL);
-
+	
 	if (a == WZ_239)
 	{
 		b = WzHack_GetWzPpoStartIndex(2, 3, 9, &s);

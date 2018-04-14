@@ -55,5 +55,6 @@ extern int globalId;
 extern int globalDelay;
 extern bool globalZero;
 extern bool globalSupport;
+extern bool globalHighEnergy;
 
 #endif // FRMSETTINGS_H

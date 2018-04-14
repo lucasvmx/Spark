@@ -28,6 +28,7 @@
 #include "frmabout.h"
 #include "ui_frmabout.h"
 #include <QMovie>
+#include <windows.h>
 
 frmAbout::frmAbout(QWidget *parent) :
     QWidget(parent),
@@ -35,6 +36,7 @@ frmAbout::frmAbout(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setFixedSize(this->width(),this->height());
+    this->connectSignals();
 
     QMovie *movie = new QMovie(":/images/lulzsec.gif");
     ui->movieLabel->setMovie(movie);
@@ -44,4 +46,16 @@ frmAbout::frmAbout(QWidget *parent) :
 frmAbout::~frmAbout()
 {
     delete ui;
+}
+
+void frmAbout::connectSignals()
+{
+    QObject::connect(ui->buttonDownloadWarzone, SIGNAL(clicked(bool)),this,SLOT(OnButtonDownloadWarzone_Clicked(bool)));
+}
+
+void frmAbout::OnButtonDownloadWarzone_Clicked(bool bClicked)
+{
+    (void)bClicked;
+
+    ShellExecuteW(0,L"open", L"https://sourceforge.net/projects/warzone2100/",NULL,NULL,0);
 }

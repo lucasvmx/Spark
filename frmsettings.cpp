@@ -33,6 +33,7 @@ int globalId = -1;
 int globalDelay = -1;
 bool globalZero = false;
 bool globalSupport = false;
+bool globalHighEnergy = false;
 
 frmSettings::frmSettings(QWidget *parent) :
     QWidget(parent),
@@ -61,16 +62,19 @@ void frmSettings::OnButtonSave_Clicked(bool b)
     int delay = -1;
     bool zero_energy = false;
     bool support_player = false;
+    bool high_energy = false;
 
     playerId = ui->comboBox->currentIndex();
     delay = ui->horizontalSlider->value();
     zero_energy = ui->checkBox->isChecked();
     support_player = ui->checkBox_2->isChecked();
+    high_energy = ui->checkBox_3->isChecked();
 
     globalId = playerId;
     globalDelay = delay;
     globalZero = zero_energy;
     globalSupport = support_player;
+    globalHighEnergy = high_energy;
 
     QMessageBox::information(this, "WarHack", "Configurações salvas!");
     this->close();

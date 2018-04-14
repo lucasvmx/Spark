@@ -41,6 +41,10 @@ class frmAbout : public QWidget
 public:
     explicit frmAbout(QWidget *parent = 0);
     ~frmAbout();
+    void connectSignals();
+
+public slots:
+    void OnButtonDownloadWarzone_Clicked(bool bClicked);
 
 private:
     Ui::frmAbout *ui;

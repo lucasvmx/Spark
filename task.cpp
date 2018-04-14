@@ -53,9 +53,18 @@ void task::run()
     char warzone_path[MAX_PATH];
     const char *wz_version_name = "";
     DWORD written = MAX_PATH;
+    DWORD myPower;
+    unsigned playerToFavor = globalId;
 
     /* Precisamos encontrar o warzone 2100 na memória */
 
+    if(!globalZero && !globalSupport && !globalHighEnergy)
+    {
+        emit update( "Você não configurou o hack!<br>");
+        return;
+    }
+
+    srand((unsigned int)GetTickCount());
     emit update("Aguardando por warzone2100.exe ...<br>");
 
     do {
@@ -127,10 +136,37 @@ void task::run()
         wz_version_name = "Warzone 2100 3.2.3<br>";
 
     emit update(wz_version_name);
-    emit update( "Hackeando ...<br>");
+    emit update( "Procedimentos iniciados ...<br>");
 
     if(globalZero)
     {
+        while(true)
+        {
+            if(this->isInterruptionRequested())
+            {
+                break;
+            }
+
+            if(WzHack_FindProcess("warzone2100.exe", NULL) == FALSE)
+            {
+                emit update( "O warzone 2100 foi fechado.");
+                return;
+            }
+
+            WzHack_RunEasterEgg(hWarzone,wz_version,globalId);
+            if(globalSupport) {
+                WzHack_SetPlayerPower(globalId,hWarzone,100000,wz_version);
+            }
+
+            Sleep(globalDelay * 1000);
+        }
+    }
+
+    if(globalSupport)
+    {
+        /* Iremos favorecer um jogador específico */
+
+        /* TODO: Aprimorar algoritmo de favorecimento de jogador */
         while(true)
         {
             if(this->isInterruptionRequested())
@@ -141,72 +177,85 @@ void task::run()
 
             if(WzHack_FindProcess("warzone2100.exe", NULL) == FALSE)
             {
-                emit update( "O warzone 2100 foi fechado.");
+                emit update( "O warzone 2100 foi fechado<br>");
                 return;
             }
 
-            WzHack_RunEasterEgg(hWarzone,wz_version,globalId);
-            Sleep(globalDelay * 1000);
-        }
-    } else
-    {
-        if(globalSupport)
-        {
-            DWORD myPower;
-            unsigned playerToFavor = globalId;
-
-            /* Iremos favorecer um jogador específico */
-
-            /* TODO: Aprimorar algoritmo de favorecimento de jogador */
-            while(true)
+            for(unsigned i = 0; i < MAX_PLAYERS; i++)
             {
-                if(this->isInterruptionRequested())
+                if(i == playerToFavor)
                 {
-                    emit update( "Tarefa interrompida<br>" );
-                    return;
-                }
-
-                if(WzHack_FindProcess("warzone2100.exe", NULL) == FALSE)
-                {
-                    emit update( "O warzone 2100 foi fechado<br>");
-                    return;
-                }
-
-                for(unsigned i = 0; i < MAX_PLAYERS; i++)
-                {
-                    if(i == playerToFavor)
+                    static bool bShow = false;
+                    BOOL havePower = WzHack_GetPlayerPower(i,hWarzone,&myPower,wz_version);
+                    if(havePower)
                     {
-                        BOOL havePower = WzHack_GetPlayerPower(i,hWarzone,&myPower,wz_version);
-                        if(havePower)
+                        if(myPower <= 0)
                         {
-                            if(myPower <= 0)
-                            {
-                                bool bShow = false;
+                            if(!bShow)
+                                update( "Aguardando jogador começar a partida ...<br>");
 
-                                if(!bShow)
-                                    update( "Aguardando jogador começar a partida ...<br>");
-
-                                bShow = true;
-                            }
-
-                            if(myPower < 60000 && myPower > 0)
-                            {
-                                update(QString::asprintf("A sua energia foi alterada para %lu<br>", myPower * 2));
-                                WzHack_SetPlayerPower(i,hWarzone,myPower * 2,wz_version);
-                            }
+                            bShow = true;
                         }
-                    } else
-                    {
-                        WzHack_SetPlayerPower(i, hWarzone, 3000,wz_version);
-                    }
-                }
 
-                /* O delay global é ignorado aqui, pois pode afetar a eficácia deste algoritmo */
-                Sleep(2000);
+                        if(myPower < 60000 && myPower > 0)
+                        {
+                            WzHack_SetPlayerPower(i,hWarzone,myPower * 2,wz_version);
+                            update(QString::asprintf("A sua energia foi alterada para %lu<br>", myPower * 2));
+
+                            if(bShow)
+                                bShow = false;
+                        }
+                    }
+                } else
+                {
+                    if(globalZero)
+                        WzHack_SetPlayerPower(i, hWarzone,0,wz_version);
+                    else
+                        WzHack_SetPlayerPower(i,hWarzone,rand() % 3000 + 1000,wz_version);
+                }
             }
-        } else {
-            emit update( "Por favor, escolha uma das opções de hacking");
+
+            /* O delay global é ignorado aqui, pois pode afetar a eficácia deste algoritmo */
+            Sleep(2000);
         }
     }
+
+    if(globalHighEnergy)
+    {
+        BOOL bHavePower = FALSE;
+
+        for(;;)
+        {
+            if(this->isInterruptionRequested())
+            {
+                emit update( "Tarefa interrompida<br>");
+                return;
+            }
+
+            if(WzHack_FindProcess("warzone2100.exe", NULL) == FALSE)
+            {
+                emit update( "O warzone 2100 foi fechado<br>");
+                return;
+            }
+
+            for(unsigned i = 0; i < MAX_PLAYERS; i++)
+            {
+                bHavePower = WzHack_GetPlayerPower(playerToFavor,hWarzone,&myPower,wz_version);
+                if(bHavePower)
+                {
+                    if(wz_version < WZ_315) {
+                        if(myPower < WZ_239_MAX_POWER)
+                            WzHack_SetPlayerPower(playerToFavor,hWarzone,WZ_239_MAX_POWER,wz_version);
+                    } else {
+                        if(myPower < WZ_315_MAX_POWER)
+                            WzHack_SetPlayerPower(playerToFavor,hWarzone,WZ_315_MAX_POWER,wz_version);
+                    }
+                }
+            }
+
+            Sleep(globalDelay * 1000);
+        }
+    }
+
     emit update( "Tarefa terminada.<br>");
 }
