@@ -17,3 +17,8 @@ vs2017/.vs/
 *.exp
 *.lib
 commit.txt
+debug
+release
+x64
+x86
+.qmake.stash

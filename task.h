@@ -38,6 +38,8 @@ public:
     task();
     void run();
 
+private:
+	QString BooleanToStr(bool value);
 signals:
     void update(QString text);
 };

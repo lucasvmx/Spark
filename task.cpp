@@ -30,6 +30,9 @@
 #include "frmmain.h"
 #include "frmsettings.h"
 #include <windows.h>
+#if defined(_DEBUG) || defined(QT_DEBUG)
+#include <QDebug>
+#endif
 
 typedef BOOL (WINAPI *QFPIN)(
   _In_    HANDLE hProcess,
@@ -57,6 +60,11 @@ void task::run()
     unsigned playerToFavor = globalId;
 
     /* Precisamos encontrar o warzone 2100 na memória */
+
+#if defined(_DEBUG) || defined(QT_DEBUG)
+	qDebug() << "zero:" << BooleanToStr(globalZero) << "High: " << BooleanToStr(globalHighEnergy) << "Global: " << BooleanToStr(globalSupport);
+	qDebug() << "Player: " << playerToFavor;
+#endif
 
     if(!globalZero && !globalSupport && !globalHighEnergy)
     {
@@ -153,9 +161,12 @@ void task::run()
                 return;
             }
 
-            WzHack_RunEasterEgg(hWarzone,wz_version,globalId);
+            WzHack_RunEasterEgg(hWarzone,wz_version,playerToFavor);
             if(globalSupport) {
-                WzHack_SetPlayerPower(globalId,hWarzone,100000,wz_version);
+                if(wz_version < WZ_315)
+                    WzHack_SetPlayerPower(playerToFavor,hWarzone,WZ_239_MAX_POWER,wz_version);
+                else
+                    WzHack_SetPlayerPower(playerToFavor,hWarzone,WZ_315_MAX_POWER,wz_version);
             }
 
             Sleep(globalDelay * 1000);
@@ -238,24 +249,34 @@ void task::run()
                 return;
             }
 
-            for(unsigned i = 0; i < MAX_PLAYERS; i++)
+            bHavePower = WzHack_GetPlayerPower(playerToFavor,hWarzone,&myPower,wz_version);
+            if(bHavePower)
             {
-                bHavePower = WzHack_GetPlayerPower(playerToFavor,hWarzone,&myPower,wz_version);
-                if(bHavePower)
-                {
-                    if(wz_version < WZ_315) {
-                        if(myPower < WZ_239_MAX_POWER)
-                            WzHack_SetPlayerPower(playerToFavor,hWarzone,WZ_239_MAX_POWER,wz_version);
-                    } else {
-                        if(myPower < WZ_315_MAX_POWER)
-                            WzHack_SetPlayerPower(playerToFavor,hWarzone,WZ_315_MAX_POWER,wz_version);
-                    }
+                if(wz_version < WZ_315) {
+                    if(myPower < WZ_239_MAX_POWER)
+                        WzHack_SetPlayerPower(playerToFavor,hWarzone,WZ_239_MAX_POWER,wz_version);
+                } else {
+                    if(myPower < WZ_315_MAX_POWER)
+                        WzHack_SetPlayerPower(playerToFavor,hWarzone,WZ_315_MAX_POWER,wz_version);
                 }
-            }
+			}
+			else {
+#ifdef QT_DEBUG || defined(_DEBUG)
+				qDebug() << "Falha ao obter energia do jogador: " << GetLastError();
+#endif
+			}
 
             Sleep(globalDelay * 1000);
         }
     }
 
     emit update( "Tarefa terminada.<br>");
+}
+
+QString task::BooleanToStr(bool value)
+{
+	if (value)
+		return "true";
+
+	return "false";
 }

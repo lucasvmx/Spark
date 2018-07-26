@@ -1,1 +1,4 @@
-- Correção no versionamento do programa
+- Agora é possível saber quantas unidades os jogadores possuem
+- Solução para o Visual Studio adicionada ao projeto
+- Correção do erro de ID para cada jogador
+- Agora também é possível saber quantas estruturas cada jogador construiu

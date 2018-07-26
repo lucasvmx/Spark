@@ -447,6 +447,7 @@ char *WzHack_GetSubstring(char *str, char k)
 	return s;
 }
 
+// OBS: Independentemente do slot selecionado, seremos sempre o jogador 0
 BOOL WzHack_GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *power, int wz_version)
 {
 	BOOL bResult = FALSE;
@@ -499,10 +500,11 @@ BOOL WzHack_GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *powe
 		else
 		{
 			local_offset = wz_off[start_index + player_id].power_offset;
-			bResult = ReadProcessMemory(warzoneHandle, (void*)(wz.base + local_offset), &local_power, sizeof(DWORD), &nread);
+			bResult = ReadProcessMemory(warzoneHandle, (void*)(wz.base + local_offset), &local_power, sizeof(DWORD), (SIZE_T*)&nread);
 #ifdef _DEBUG
+            WzHack_ShowMessage(DEBUG, "(%s:%d) PPO start index: %u\n", __FILE__, __LINE__, start_index);
 			WzHack_ShowMessage(DEBUG, "(%s:%d) Energy of player %u -> %u\n", __FILE__, __LINE__, player_id, local_power);
-			WzHack_ShowMessage(DEBUG, "(%s:%d) Offset: %#x\n", __FILE__, __LINE__, wz_off[start_index + player_id].offset);
+			WzHack_ShowMessage(DEBUG, "(%s:%d) Offset: %#x\n", __FILE__, __LINE__, wz_off[start_index + player_id].power_offset);
 			WzHack_ShowMessage(DEBUG, "(%s:%d) Position on vector: %d\n", __FILE__, __LINE__, start_index + player_id);
 			WzHack_ShowMessage(DEBUG, "(%s:%d) Address: %#x\n", __FILE__, __LINE__, wz.base + local_offset);
 #endif
@@ -567,12 +569,12 @@ BOOL WzHack_SetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD power
 		{
 #ifdef _DEBUG
 			WzHack_ShowMessage(DEBUG, "(%s:%d) Setting energy of player %u to %u\n", __FILE__, __LINE__, player_id, power);
-			WzHack_ShowMessage(DEBUG, "(%s:%d) Offset: %#x\n", __FILE__, __LINE__, wz_off[start_index + player_id].offset);
+			WzHack_ShowMessage(DEBUG, "(%s:%d) Offset: %#x\n", __FILE__, __LINE__, wz_off[start_index + player_id].power_offset);
 			WzHack_ShowMessage(DEBUG, "(%s:%d) Position on vector: %d\n", __FILE__, __LINE__, start_index + player_id);
 			WzHack_ShowMessage(DEBUG, "(%s:%d) Address: %#x\n", __FILE__, __LINE__, wz.base + local_offset);
 #endif
 			local_offset = wz_off[start_index + player_id].power_offset;
-			bResult = WriteProcessMemory(warzoneHandle, (void*)(wz.base + local_offset), (const void*)&power, sizeof(DWORD), &nwrite);
+			bResult = WriteProcessMemory(warzoneHandle, (void*)(wz.base + local_offset), (const void*)&power, sizeof(DWORD), (SIZE_T*)&nwrite);
 		}
 	}
 	else
@@ -666,6 +668,10 @@ int WzHack_ShowMessage(types t, const char *string, ...)
 #ifdef _DEBUG
 				else if (t == DEBUG)
 				{
+#if defined(_WIN32) || defined(Q_OS_WIN)
+					MessageBoxA(0, mem_buffer, "Caption", MB_ICONERROR);
+					OutputDebugStringA(mem_buffer);
+#endif
 					SetConsoleTextAttribute(hConsole, (WORD)YELLOW);
 					fprintf(stdout, "[debug] ");
 					FlushConsoleInputBuffer(hConsole);
@@ -694,6 +700,8 @@ void WzHack_RunEasterEgg(HANDLE w, int a, unsigned me)
 	DWORD p;
 	int v;
 	DWORD npp = 0;
+    DWORD nu;
+    DWORD nobs;
 
 	assert(w != NULL);
 	
@@ -718,7 +726,17 @@ void WzHack_RunEasterEgg(HANDLE w, int a, unsigned me)
 		if (i == me)
 			continue;
 
-        /* TODO: Include code to check the number of units of a player */
+        if(WzHack_GetPlayerNumberOfUnits(i,w,v,&nu)) {
+#ifdef _DEBUG
+            WzHack_ShowMessage(DEBUG, "Player %u has %u units\n",i,nu);
+#endif
+        }
+        if(WzHack_GetNumberOfBuiltStructures(i,w,v,&nobs))
+        {
+#ifdef _DEBUG
+            WzHack_ShowMessage(DEBUG, "Player %u built %u structures\n",i,nobs);
+#endif
+        }
 
 		o = wz_off[i + s].power_offset;
 		if (WzHack_GetPlayerPower(i, w, &p, v)) 
@@ -729,4 +747,102 @@ void WzHack_RunEasterEgg(HANDLE w, int a, unsigned me)
 			}
 		}
 	}
+}
+
+BOOL WZHACK_API WzHack_GetPlayerNumberOfUnits(unsigned player_id, HANDLE warzoneHandle, int wz_version, DWORD *number_of_units)
+{
+	BOOL bOk = FALSE;
+	WARZONE_BASE wz;
+	int start_index;
+	DWORD units;
+	DWORD nread;
+
+	if (player_id < 0 || player_id > 10)
+	{
+#ifdef _DEBUG
+		WzHack_ShowMessage(DEBUG, "(%s:%d) bad player id %u", __FILE__, __LINE__, player_id);
+#endif
+		return FALSE;
+	}
+
+	wz.base = WzHack_GetModuleAddress("warzone2100.exe", "warzone2100.exe");
+	if (wz.base == -1) 
+	{
+		if (warzoneHandle)
+			CloseHandle(warzoneHandle);
+
+		return FALSE;
+	}
+
+	switch (wz_version)
+	{
+	case WZ_239:
+	case WZ_315:
+        WzHack_ShowMessage(WARNING, "Version without support yet: %d\n", wz_version);
+		break;
+
+	case WZ_323:
+		bOk = WzHack_GetWzPpoStartIndex(3, 2, 3, &start_index);
+		break;
+	}
+
+	if (bOk)
+	{
+        bOk = ReadProcessMemory(warzoneHandle, (LPCVOID*)wz.base + wz_off[start_index + player_id].units_offset, (void*)&units, sizeof(DWORD), (SIZE_T*)&nread);
+		if (bOk)
+            *number_of_units = units;
+		else
+            *number_of_units = 0;
+	}
+
+	return bOk;
+}
+
+BOOL WZHACK_API WzHack_GetNumberOfBuiltStructures(unsigned player_id, HANDLE warzoneHandle, int wz_version, DWORD *number_of_built_structures)
+{
+    BOOL bOk = FALSE;
+    WARZONE_BASE wz;
+    int start_index;
+    DWORD structures;
+    DWORD nread;
+
+    if (player_id < 0 || player_id > 10)
+    {
+#ifdef _DEBUG
+        WzHack_ShowMessage(DEBUG, "(%s:%d) bad player id %u", __FILE__, __LINE__, player_id);
+#endif
+        return FALSE;
+    }
+
+    wz.base = WzHack_GetModuleAddress("warzone2100.exe", "warzone2100.exe");
+    if (wz.base == -1)
+    {
+        if (warzoneHandle)
+            CloseHandle(warzoneHandle);
+
+        return FALSE;
+    }
+
+    switch (wz_version)
+    {
+    case WZ_239:
+    case WZ_315:
+        WzHack_ShowMessage(WARNING, "Version not supported yet: %d\n", wz_version);
+        break;
+
+    case WZ_323:
+        bOk = WzHack_GetWzPpoStartIndex(3, 2, 3, &start_index);
+        break;
+    }
+
+    if (bOk)
+    {
+        bOk = ReadProcessMemory(warzoneHandle, (LPCVOID*)wz.base + wz_off[start_index + player_id].structures_offset, (void*)&structures, sizeof(DWORD), (SIZE_T*)&nread);
+        if (bOk)
+            *number_of_built_structures = structures;
+        else
+            *number_of_built_structures = 0;
+    }
+
+    return bOk;
 }

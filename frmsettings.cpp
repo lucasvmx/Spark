@@ -70,7 +70,12 @@ void frmSettings::OnButtonSave_Clicked(bool b)
     support_player = ui->checkBox_2->isChecked();
     high_energy = ui->checkBox_3->isChecked();
 
-    globalId = playerId;
+    /*
+        Independentemente do slot em que estamos, nosso id sempre será o 0
+        Os demais id'serão sempre reservados para a IA
+    */
+
+    globalId = playerId - playerId;
     globalDelay = delay;
     globalZero = zero_energy;
     globalSupport = support_player;
