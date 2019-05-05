@@ -34,20 +34,20 @@ extern "C" {
 #include "wzhack.h"
 }
 
-void CheckForOtherInstance()
+static void CheckForOtherInstance()
 {
-    HANDLE hMutex = NULL;
+    HANDLE hMutex = nullptr;
 
-    hMutex = CreateMutexA(NULL, TRUE, "WarHack_Mutex");
+    hMutex = CreateMutexA(nullptr, TRUE, "WarHack_Mutex");
     if (GetLastError() == ERROR_ALREADY_EXISTS)
     {
-        QMessageBox::critical(0, "Error", "Another instance of War Hack is already running");
+        QMessageBox::critical(nullptr, "Error", "Another instance of War Hack is already running");
         exit(-1);
     }
 
-    if (hMutex == NULL)
+    if (hMutex == nullptr)
     {
-        QMessageBox::critical(0, "Error", QString::asprintf("Failed to create mutex: %lu", GetLastError()));
+        QMessageBox::critical(nullptr, "Error", QString::asprintf("Failed to create mutex: %lu", GetLastError()));
         exit(0);
     }
 }

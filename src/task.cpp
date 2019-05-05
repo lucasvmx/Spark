@@ -48,16 +48,16 @@ task::task()
 
 void task::run()
 {
-    DWORD pid = -1;
+    DWORD pid = 0;
     HANDLE hWarzone = INVALID_HANDLE_VALUE;
     int wz_version;
-    QFPIN fQueryFullProcessImageNameA = NULL;
-    HMODULE hKernel32 = NULL;
+    QFPIN fQueryFullProcessImageNameA = nullptr;
+    HMODULE hKernel32 = nullptr;
     char warzone_path[MAX_PATH];
     const char *wz_version_name = "";
     DWORD written = MAX_PATH;
     DWORD myPower;
-    unsigned playerToFavor = globalId;
+    unsigned playerToFavor = static_cast<unsigned>(globalId);
 
     /* Precisamos encontrar o warzone 2100 na memória */
 
@@ -72,7 +72,8 @@ void task::run()
         return;
     }
 
-    srand((unsigned int)GetTickCount());
+    srand(static_cast<unsigned>(GetTickCount()));
+
     emit update("Aguardando por warzone2100.exe ...<br>");
 
     do {
@@ -83,7 +84,7 @@ void task::run()
         }
 
         WzHack_FindProcess("warzone2100.exe",&pid);
-    } while(pid == (DWORD)-1);
+    } while(pid == 0);
 
     emit update(QString::asprintf("Warzone 2100 encontrado. PID: %lu<br>",pid));
 
@@ -96,9 +97,9 @@ void task::run()
 
     /* Precisamos saber aonde está o warzone2100 */
 
-    fQueryFullProcessImageNameA = (QFPIN)GetProcAddress(hKernel32,"QueryFullProcessImageNameA");
+    fQueryFullProcessImageNameA = reinterpret_cast<QFPIN>(GetProcAddress(hKernel32,"QueryFullProcessImageNameA"));
 
-    if(fQueryFullProcessImageNameA == NULL)
+    if(fQueryFullProcessImageNameA == nullptr)
     {
         if(hKernel32)
             FreeLibrary(hKernel32);
@@ -115,7 +116,7 @@ void task::run()
 
     SecureZeroMemory(warzone_path,sizeof(warzone_path));
 
-    if(!fQueryFullProcessImageNameA(hWarzone,0,(LPTSTR)warzone_path,&written))
+    if(!fQueryFullProcessImageNameA(hWarzone,0,reinterpret_cast<LPTSTR>(warzone_path),&written))
     {
         emit update(QString::asprintf("Falha ao obter caminho do warzone 2100: %lu<br>", GetLastError()));
 
@@ -155,7 +156,7 @@ void task::run()
                 break;
             }
 
-            if(WzHack_FindProcess("warzone2100.exe", NULL) == FALSE)
+            if(WzHack_FindProcess("warzone2100.exe", nullptr) == FALSE)
             {
                 emit update( "O warzone 2100 foi fechado.");
                 return;
@@ -169,7 +170,7 @@ void task::run()
                     WzHack_SetPlayerPower(playerToFavor,hWarzone,WZ_315_MAX_POWER,wz_version);
             }
 
-            Sleep(globalDelay * 1000);
+            Sleep(static_cast<DWORD>(globalDelay * 1000));
         }
     }
 
@@ -186,7 +187,7 @@ void task::run()
                 return;
             }
 
-            if(WzHack_FindProcess("warzone2100.exe", NULL) == FALSE)
+            if(WzHack_FindProcess("warzone2100.exe", nullptr) == FALSE)
             {
                 emit update( "O warzone 2100 foi fechado<br>");
                 return;
@@ -243,7 +244,7 @@ void task::run()
                 return;
             }
 
-            if(WzHack_FindProcess("warzone2100.exe", NULL) == FALSE)
+            if(WzHack_FindProcess("warzone2100.exe", nullptr) == FALSE)
             {
                 emit update( "O warzone 2100 foi fechado<br>");
                 return;
@@ -261,12 +262,12 @@ void task::run()
                 }
 			}
 			else {
-#ifdef QT_DEBUG || defined(_DEBUG)
+#if defined(QT_DEBUG) || defined(_DEBUG)
 				qDebug() << "Falha ao obter energia do jogador: " << GetLastError();
 #endif
 			}
 
-            Sleep(globalDelay * 1000);
+            Sleep(static_cast<DWORD>(globalDelay * 1000));
         }
     }
 

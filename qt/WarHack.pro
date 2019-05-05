@@ -10,7 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = WarHack
 TEMPLATE = app
-win32:RC_ICONS += images/warzone2100_o3C_icon.ico
+win32:RC_ICONS += ../resource/images/warzone2100_icon.ico
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -28,24 +28,24 @@ Release:DEFINES += _RELEASE
 
 
 SOURCES += \
-        main.cpp \
-        frmmain.cpp \
-    wzhack.cpp \
-    frmsettings.cpp \
-    task.cpp \
-    frmabout.cpp
+        ../src/main.cpp \
+        ../src/frmmain.cpp \
+    ../src/wzhack.cpp \
+    ../src/frmsettings.cpp \
+    ../src/task.cpp \
+    ../src/frmabout.cpp
 
 HEADERS += \
-        frmmain.h \
-    wzhack.h \
-    frmsettings.h \
-    task.h \
-    frmabout.h
+        ../src/frmmain.h \
+    ../src/wzhack.h \
+    ../src/frmsettings.h \
+    ../src/task.h \
+    ../src/frmabout.h
 
 FORMS += \
-        frmmain.ui \
-    frmsettings.ui \
-    frmabout.ui
+        ../ui/frmmain.ui \
+    ../ui/frmsettings.ui \
+    ../ui/frmabout.ui
 
 RESOURCES += \
-    resources.qrc
+    ../resource/resources.qrc

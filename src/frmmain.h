@@ -40,7 +40,7 @@ class frmMain : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit frmMain(QWidget *parent = 0);
+    explicit frmMain(QWidget *parent = nullptr);
     ~frmMain();
     void connectAllSignals();
 

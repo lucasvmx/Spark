@@ -35,9 +35,7 @@ bool globalZero = false;
 bool globalSupport = false;
 bool globalHighEnergy = false;
 
-frmSettings::frmSettings(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::frmSettings)
+frmSettings::frmSettings(QWidget *parent) : QWidget(parent), ui(new Ui::frmSettings)
 {
     ui->setupUi(this);
     this->connectAllSignals();
@@ -63,6 +61,8 @@ void frmSettings::OnButtonSave_Clicked(bool b)
     bool zero_energy = false;
     bool support_player = false;
     bool high_energy = false;
+
+    Q_UNUSED(b);
 
     playerId = ui->comboBox->currentIndex();
     delay = ui->horizontalSlider->value();

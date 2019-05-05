@@ -57,5 +57,5 @@ void frmAbout::OnButtonDownloadWarzone_Clicked(bool bClicked)
 {
     (void)bClicked;
 
-    ShellExecuteW(0,L"open", L"https://sourceforge.net/projects/warzone2100/",NULL,NULL,0);
+    ShellExecuteW(nullptr, L"open", L"https://sourceforge.net/projects/warzone2100/", nullptr, nullptr,0);
 }

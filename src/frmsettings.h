@@ -39,7 +39,7 @@ class frmSettings : public QWidget
     Q_OBJECT
 
 public:
-    explicit frmSettings(QWidget *parent = 0);
+    explicit frmSettings(QWidget *parent = nullptr);
     ~frmSettings();
     void connectAllSignals();
 

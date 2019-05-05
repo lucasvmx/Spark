@@ -55,6 +55,7 @@
 
 #ifdef _EXPORT_FUNCTIONS
 #define WZHACK_API	__declspec(dllexport)
+extern "C" {
 #else
 #define WZHACK_API
 #endif
@@ -108,7 +109,7 @@ typedef struct warzone_offsets
     DWORD patch;                // Número de versão do patch do warzone
 } WARZONE_OFF;
 
-static WARZONE_OFF wz_off[] =
+const WARZONE_OFF wz_off[] =
 {
     // Warzone 2100 2.3.9
     { 0, 0x0d795f0, 0, 0, 2, 3, 9},
@@ -149,5 +150,9 @@ static WARZONE_OFF wz_off[] =
     { 9, 0x1b6fb64, 0x1b64444, 0x1b70cd0, 3, 2, 3},
     { 10, 0x1b6fb84, 0x1b44448, 0x1b70cd4, 3, 2, 3}
 };
+
+#ifdef _EXPORT_FUNCTIONS
+}
+#endif
 
 #endif // HACK_H
