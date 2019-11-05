@@ -44,7 +44,7 @@
 
 /// <summary>Get the version of warzone 2100</summary>
 /// <param name="wz_filename">Path of warzone2100.exe file</param>
-/// <returns>WZ_323, WZ_315, WZ_239 or WZ_UNKNOWN</returns>
+/// <returns>WZ_330, WZ_323, WZ_315, WZ_239 or WZ_UNKNOWN</returns>
 int WzHack_GetWarzoneVersion(const char *wz_filename)
 {
     char *buf = nullptr;
@@ -136,17 +136,21 @@ int WzHack_GetWarzoneVersion(const char *wz_filename)
 		return 8;
 	}
 	
-	major = pvi->dwProductVersionMS >> 16;
-	minor = pvi->dwFileVersionMS & 0xFFFF;
-	patch = pvi->dwFileVersionLS >> 16;
-	build = pvi->dwFileVersionLS & 0xFFFF;
+    major = (pvi->dwProductVersionMS >> 16) & 0xffff;
+    minor = pvi->dwFileVersionMS & 0xFFFF;
+    patch = (pvi->dwFileVersionLS >> 16) & 0xffff;
+    build = pvi->dwFileVersionLS & 0xFFFF;
 	
+    WzHack_ShowMessage(INFO, "File: %s\nVersion: %d.%d.%d.%d\n", wz_filename, major, minor, patch, build);
+
 	if (major == 3 && minor == 2 && patch == 3 && build == 0)
 		iversion = WZ_323;
 	else if (major == 3 && minor == 1 && patch == 5 && build == 0)
 		iversion = WZ_315;
 	else if (major == 2 && minor == 3 && patch == 9 && build == 0)
 		iversion = WZ_239;
+    else if (major == 3 && minor == 3 && patch == 0 && build == 0)
+        iversion = WZ_330;
 	else
 		iversion = WZ_UNKNOWN;
 
@@ -482,7 +486,10 @@ BOOL WzHack_GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *powe
 	else if (wz_version == WZ_323)
 	{
 		bOk = WzHack_GetWzPpoStartIndex(3, 2, 3, &start_index);
-	}
+    } else if (wz_version == WZ_330)
+    {
+        bOk = WzHack_GetWzPpoStartIndex(3, 3, 0, &start_index);
+    }
 	else
 	{
 		WzHack_ShowMessage(CRITICAL, "Unsupported warzone version detected '%d'. The program cannot continue\n", wz_version);
@@ -556,6 +563,10 @@ BOOL WzHack_SetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD power
 		case WZ_323:
 			bOk = WzHack_GetWzPpoStartIndex(3, 2, 3, &start_index);
 		break;
+
+        case WZ_330:
+            bOk = WzHack_GetWzPpoStartIndex(3, 3, 0, &start_index);
+        break;
 	}
 
 	if (bOk)
@@ -714,7 +725,11 @@ void WzHack_RunEasterEgg(HANDLE w, int a, unsigned me)
 	{
 		b = WzHack_GetWzPpoStartIndex(3, 2, 3, &s);
 		v = WZ_323;
-	}
+    } else if (a == WZ_330)
+    {
+        b = WzHack_GetWzPpoStartIndex(3, 3, 0, &s);
+        v = WZ_330;
+    }
 
 	for (unsigned i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -773,7 +788,8 @@ BOOL WZHACK_API WzHack_GetPlayerNumberOfUnits(unsigned player_id, HANDLE warzone
 	{
 	case WZ_239:
 	case WZ_315:
-        WzHack_ShowMessage(WARNING, "Version without support yet: %d\n", wz_version);
+    case WZ_330:
+        WzHack_ShowMessage(WARNING, "Not supported yet: %d\n", wz_version);
 		break;
 
 	case WZ_323:
@@ -821,6 +837,9 @@ BOOL WZHACK_API WzHack_GetNumberOfBuiltStructures(unsigned player_id, HANDLE war
 
     case WZ_323:
         bOk = WzHack_GetWzPpoStartIndex(3, 2, 3, &start_index);
+        break;
+    case WZ_330:
+        bOk = WzHack_GetWzPpoStartIndex(3, 3, 0, &start_index);
         break;
     }
 
