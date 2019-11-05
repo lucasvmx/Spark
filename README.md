@@ -19,5 +19,9 @@ Simples hack para o jogo Warzone 2100
 #### Autor
 Lucas Vieira de Jesus (lucas.engen.cc@gmail.com)
 
+#### Importante
+Crie uma variável de ambiente chamada _QTDIR_ e configure de modo que a
+pasta raíz esteja um nível acima da pasta bin. Exemplo: **C:\Qt\5.12.1\mingw73_64**
+
 ### Screenshot do jogo
 ![game-screenshot](https://cdn.portableapps.com/Warzone2100Portable.png)

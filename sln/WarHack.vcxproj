@@ -214,7 +214,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>_DEBUG _DEBUG_WIN32</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG_WIN32</PreprocessorDefinitions>
     </ClCompile>
     <QtMoc>
       <Define>_DEBUG _DEBUG_WIN32</Define>
@@ -226,23 +226,23 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="frmabout.cpp" />
-    <ClCompile Include="frmmain.cpp" />
-    <ClCompile Include="frmsettings.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="task.cpp" />
-    <ClCompile Include="wzhack.cpp" />
+    <ClCompile Include="../src/frmabout.cpp" />
+    <ClCompile Include="../src/frmmain.cpp" />
+    <ClCompile Include="../src/frmsettings.cpp" />
+    <ClCompile Include="../src/main.cpp" />
+    <ClCompile Include="../src/task.cpp" />
+    <ClCompile Include="../src/wzhack.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="frmabout.h">
+    <QtMoc Include="../src/frmabout.h">
     </QtMoc>
-    <QtMoc Include="frmmain.h">
+    <QtMoc Include="../src/frmmain.h">
     </QtMoc>
-    <QtMoc Include="frmsettings.h">
+    <QtMoc Include="../src/frmsettings.h">
     </QtMoc>
-    <QtMoc Include="task.h">
+    <QtMoc Include="../src/task.h">
     </QtMoc>
-    <ClInclude Include="wzhack.h" />
+    <ClInclude Include="../src/wzhack.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">
@@ -266,11 +266,11 @@
     <ClInclude Include="ui_frmsettings.h" />
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="frmabout.ui">
+    <QtUic Include="../ui/frmabout.ui">
     </QtUic>
-    <QtUic Include="frmmain.ui">
+    <QtUic Include="../ui/frmmain.ui">
     </QtUic>
-    <QtUic Include="frmsettings.ui">
+    <QtUic Include="../ui/frmsettings.ui">
     </QtUic>
   </ItemGroup>
   <ItemGroup>
