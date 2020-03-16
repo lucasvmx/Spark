@@ -62,7 +62,7 @@ void frmSettings::OnButtonSave_Clicked(bool b)
     bool support_player = false;
     bool high_energy = false;
 
-    Q_UNUSED(b);
+    (void)b;
 
     playerId = ui->comboBox->currentIndex();
     delay = ui->horizontalSlider->value();
@@ -75,7 +75,7 @@ void frmSettings::OnButtonSave_Clicked(bool b)
         Os demais id'serão sempre reservados para a IA
     */
 
-    globalId = playerId - playerId;
+    globalId = playerId;
     globalDelay = delay;
     globalZero = zero_energy;
     globalSupport = support_player;

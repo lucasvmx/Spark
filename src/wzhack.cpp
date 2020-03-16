@@ -125,7 +125,7 @@ int WzHack_GetWarzoneVersion(const char *wz_filename)
 	VS_FIXEDFILEINFO *pvi;
 	sz = sizeof(VS_FIXEDFILEINFO);
 
-    if (fVerQueryValueA(&buf[0], "\\", reinterpret_cast<LPVOID*>(&pvi), reinterpret_cast<unsigned int*>(&sz)) == FALSE)
+    if (fVerQueryValueA(&buf[0], TEXT("\\"), reinterpret_cast<LPVOID*>(&pvi), reinterpret_cast<unsigned int*>(&sz)) == FALSE)
 	{
 		if (buf)
 			free(buf);
@@ -135,11 +135,15 @@ int WzHack_GetWarzoneVersion(const char *wz_filename)
 		
 		return 8;
 	}
-	
-    major = (pvi->dwProductVersionMS >> 16) & 0xffff;
-    minor = pvi->dwFileVersionMS & 0xFFFF;
+
+    // Check the signature
+    if(pvi->dwSignature != 0xfeef04bd)
+        return 9;
+
+    major = (pvi->dwFileVersionMS >> 16) & 0xffff;
+    minor = (pvi->dwFileVersionMS) & 0xffff;
     patch = (pvi->dwFileVersionLS >> 16) & 0xffff;
-    build = pvi->dwFileVersionLS & 0xFFFF;
+    build = (pvi->dwFileVersionLS) & 0xffff;
 	
     WzHack_ShowMessage(INFO, "File: %s\nVersion: %d.%d.%d.%d\n", wz_filename, major, minor, patch, build);
 
@@ -149,7 +153,7 @@ int WzHack_GetWarzoneVersion(const char *wz_filename)
 		iversion = WZ_315;
 	else if (major == 2 && minor == 3 && patch == 9 && build == 0)
 		iversion = WZ_239;
-    else if (major == 3 && minor == 3 && patch == 0 && build == 0)
+    else if (major == 3 && minor == 0 && patch == 0 && build == 14915)
         iversion = WZ_330;
 	else
 		iversion = WZ_UNKNOWN;
@@ -282,12 +286,12 @@ BOOL WzHack_GetWzPpoStartIndex(unsigned major, unsigned minor, unsigned patch, i
 /// <returns>TRUE or FALSE</returns>
 BOOL WzHack_FindProcess(const char *nome, DWORD *pid)
 {
-    struct tagPROCESSENTRY32 *entradas = nullptr;
+    struct tagPROCESSENTRY32 *entries = nullptr;
     HANDLE snapHandle = nullptr;
     DWORD local_pid = 0;
 
-    entradas = reinterpret_cast<struct tagPROCESSENTRY32*>(malloc(sizeof(struct tagPROCESSENTRY32)));
-    if (entradas == nullptr)
+    entries = reinterpret_cast<struct tagPROCESSENTRY32*>(malloc(sizeof(struct tagPROCESSENTRY32)));
+    if (entries == nullptr)
 	{
 		WzHack_ShowMessage(CRITICAL, "Failed to allocate memory.\n");
         if(pid != nullptr)
@@ -296,7 +300,7 @@ BOOL WzHack_FindProcess(const char *nome, DWORD *pid)
 		return FALSE;
 	}
 
-    entradas->dwSize = sizeof(struct tagPROCESSENTRY32);
+    entries->dwSize = sizeof(struct tagPROCESSENTRY32);
 	
 	snapHandle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (snapHandle == nullptr)
@@ -305,20 +309,20 @@ BOOL WzHack_FindProcess(const char *nome, DWORD *pid)
         if(pid != nullptr)
             *pid = local_pid;
 		
-		if(entradas)
-			free(entradas);
+        if(entries)
+            free(entries);
 		
 		return FALSE;
 	}
 
-	if (!Process32First(snapHandle, entradas))
+    if (!Process32First(snapHandle, entries))
 	{
 		WzHack_ShowMessage(CRITICAL, "Failed to intialize scan of processes in memory. Error %lu\n", GetLastError());
         if(pid != nullptr)
             *pid = local_pid;
 		
-		if(entradas)
-			free(entradas);
+        if(entries)
+            free(entries);
 		
 		return FALSE;
 	}
@@ -326,20 +330,20 @@ BOOL WzHack_FindProcess(const char *nome, DWORD *pid)
 	do
 	{
         const char *target = nome;
-        const char *current = entradas->szExeFile;
+        const char *current = entries->szExeFile;
 
         if (strncmp(target, current, strlen(target)) == 0)
 		{
             if(pid != nullptr)
-                *pid = entradas->th32ProcessID;
+                *pid = entries->th32ProcessID;
 
 			return TRUE;
 		}
 
-	} while (Process32Next(snapHandle, entradas));
+    } while (Process32Next(snapHandle, entries));
 
-	if(entradas)
-		free(entradas);
+    if(entries)
+        free(entries);
 	
     SetLastError(ERROR_FILE_NOT_FOUND);
 
@@ -356,14 +360,17 @@ BOOL WzHack_FindProcess(const char *nome, DWORD *pid)
 DWORD WzHack_GetModuleAddress(const char *exeName, const char *moduleName)
 {
     DWORD local_pid = 0;
-	BOOL encontrou = TRUE;
-    DWORD endereco_base = 0;
-    BOOL falhou = FALSE;
+    BOOL bFound = TRUE;
+    DWORD base_address = 0;
+    BOOL failed = FALSE;
+    HANDLE msnapHandle = nullptr;
+    MODULEENTRY32 module;
 
     (void)moduleName;
+
 	// Primeiro verificamos se o executável está carregado na RAM
-	encontrou = WzHack_FindProcess(exeName, &local_pid);
-	if (!encontrou)
+    bFound = WzHack_FindProcess(exeName, &local_pid);
+    if (!bFound)
 	{
 		// Não podemos prosseguir. Não temos o pid do processo
 #ifdef _DEBUG
@@ -373,16 +380,6 @@ DWORD WzHack_GetModuleAddress(const char *exeName, const char *moduleName)
 	}
 
 	// Agora tiramos um snapshot de todos os modulos carregados pelo executável em questão...
-    MODULEENTRY32 *modulo = nullptr;
-    HANDLE msnapHandle = nullptr;
-
-    modulo = reinterpret_cast<struct tagMODULEENTRY32*>(malloc(sizeof(struct tagMODULEENTRY32)));
-    if (modulo == nullptr)
-	{
-		WzHack_ShowMessage(CRITICAL, "Failed to allocate memory. Error %lu\n", GetLastError());
-		return FALSE;
-	}
-
 	msnapHandle = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, local_pid);
 
     if (msnapHandle == nullptr)
@@ -390,8 +387,12 @@ DWORD WzHack_GetModuleAddress(const char *exeName, const char *moduleName)
 		WzHack_ShowMessage(CRITICAL, "Failed to list modules loaded by %s (PID: %lu)\n", exeName, local_pid);
 		return FALSE;
 	}
-	
-	if (!Module32First(msnapHandle, modulo))
+
+    SecureZeroMemory(&module, sizeof(module));
+
+    module.dwSize = sizeof(MODULEENTRY32);
+
+    if (!Module32First(msnapHandle, &module))
 	{
 		WzHack_ShowMessage(CRITICAL, "Failed to intialize listing of modules loaded by %s (PID %lu). Error %lu\n", exeName, local_pid,
 			GetLastError());
@@ -399,37 +400,37 @@ DWORD WzHack_GetModuleAddress(const char *exeName, const char *moduleName)
 	}
 
 	do
-	{
-		const char *nome_processo_alvo = exeName;
-		const char *nome_processo_atual = modulo->szModule;
+    {
+        if (strncmp(exeName, module.szModule, strlen(module.szModule)) == 0)
+        {
+            if(IsBadReadPtr(module.modBaseAddr, sizeof(module.modBaseAddr)))
+            {
+                WzHack_ShowMessage(CRITICAL, "We can't read the pointer at address: %p\n", module.modBaseAddr);
+                return FALSE;
+            }
 
-		if (strncmp(nome_processo_alvo, nome_processo_atual, strlen(nome_processo_alvo)) == 0)
-		{
-            endereco_base = *reinterpret_cast<DWORD*>(modulo->modBaseAddr);
-			falhou = FALSE;
-			break;
+            base_address = static_cast<DWORD>(*module.modBaseAddr);
+            WzHack_ShowMessage(DEBUG, "Address: %08x\n", base_address);
+            failed = FALSE;
+            break;
 		}
-
-	} while (Module32Next(msnapHandle, modulo));
+    } while (Module32Next(msnapHandle, &module));
 
 #ifdef _DEBUG
 	static int v = 0;
 
 	if (v == 0) 
 	{
-		WzHack_ShowMessage(DEBUG, "(%s:%d) WzHack_GetModuleAddress failed? -> %s\n", __FILE__, __LINE__, (falhou) ? "yes" : "no");
-		WzHack_ShowMessage(DEBUG, "(%s:%d) Base address: %#x\n", __FILE__, __LINE__, endereco_base);
+        WzHack_ShowMessage(DEBUG, "(%s:%d) WzHack_GetModuleAddress failed? -> %s\n", __FILE__, __LINE__, (failed) ? "yes" : "no");
+        WzHack_ShowMessage(DEBUG, "(%s:%d) Base address: %#x\n", __FILE__, __LINE__, base_address);
 		v++;
 	}
 #endif
 
-	if (modulo)
-		free(modulo);
-
 	if (msnapHandle)
 		CloseHandle(msnapHandle);
 
-	return endereco_base;
+    return base_address;
 }
 
 char *WzHack_GetSubstring(char *str, char k)
@@ -541,7 +542,10 @@ BOOL WzHack_SetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD power
 
     assert(warzoneHandle != nullptr);
 
-	wz.base = WzHack_GetModuleAddress("warzone2100.exe", "warzone2100.exe");
+    SecureZeroMemory(&wz, sizeof(WARZONE_BASE));
+
+    wz.base = WzHack_GetModuleAddress("warzone2100.exe", "warzone2100.exe");
+
     if (wz.base == 0)
 	{
 		if(warzoneHandle)
@@ -601,12 +605,12 @@ int WzHack_ShowMessage(types t, const char *string, ...)
 {
     HANDLE hConsole = nullptr;
 	va_list list;
-	char mem_buffer[256];
+    char mem_buffer[256];
 	int len = 0;
 	BOOL colors_enabled = TRUE;
 
 	va_start(list, string);
-    len = vsnprintf(mem_buffer, sizeof(char) * 256, string, list);
+    len = vsnprintf(mem_buffer, ARRAYSIZE(mem_buffer), string, list);
 	va_end(list);
 
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -698,6 +702,8 @@ int WzHack_ShowMessage(types t, const char *string, ...)
 		}
 	}
 
+    fflush(stdout);
+
 	return len;
 }
 
@@ -733,10 +739,8 @@ void WzHack_RunEasterEgg(HANDLE w, int a, unsigned me)
 
 	for (unsigned i = 0; i < MAX_PLAYERS; i++)
 	{
-		if (i == me)
-			continue;
-
-        if(WzHack_GetPlayerNumberOfUnits(i,w,v,&nu)) {
+        if(WzHack_GetPlayerNumberOfUnits(i,w,v,&nu))
+        {
 #ifdef _DEBUG
             WzHack_ShowMessage(DEBUG, "Player %u has %u units\n",i,nu);
 #endif
@@ -751,10 +755,10 @@ void WzHack_RunEasterEgg(HANDLE w, int a, unsigned me)
         o = wz_off[i + static_cast<unsigned>(s)].power_offset;
 		if (WzHack_GetPlayerPower(i, w, &p, v)) 
 		{
-			if (p > 0)
-			{
-				WzHack_SetPlayerPower(i, w, npp, v);
-			}
+            if(!(i == me))
+                WzHack_SetPlayerPower(i, w, npp, v);
+            else
+                WzHack_SetPlayerPower(me, w, 3000, v);
 		}
 	}
 }

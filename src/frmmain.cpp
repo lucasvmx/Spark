@@ -35,9 +35,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-extern "C" {
 #include "wzhack.h"
-}
 
 static task *hack_task = nullptr;
 
@@ -85,7 +83,7 @@ void frmMain::OnButtonStartClicked(bool x)
 
 void frmMain::OnButtonSettingsClicked(bool x)
 {
-    UNREFERENCED_PARAMETER(x);
+    UNREFERENCED_PARAMETER(x)
     static frmSettings *settings = nullptr;
 
     if(settings != nullptr && settings->isVisible())
@@ -99,13 +97,13 @@ void frmMain::OnButtonSettingsClicked(bool x)
 
 void frmMain::OnAction_AboutQtTriggered(bool x)
 {
-    UNREFERENCED_PARAMETER(x);
+    UNREFERENCED_PARAMETER(x)
     QApplication::aboutQt();
 }
 
 void frmMain::OnAction_QuitTriggered(bool x)
 {
-    UNREFERENCED_PARAMETER(x);
+    UNREFERENCED_PARAMETER(x)
     this->close();
 }
 

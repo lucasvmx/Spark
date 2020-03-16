@@ -79,6 +79,9 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WarHack</TargetName>
     <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IgnoreImportLibrary>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(SolutionDir)..\build\$(Configuration);$(QTDIR)\include\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;$(QTDIR)\include;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtCore;release;\include;$(QTDIR)\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -261,9 +264,9 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">release\moc_predefs.h;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </CustomBuild>
-    <ClInclude Include="ui_frmabout.h" />
-    <ClInclude Include="ui_frmmain.h" />
-    <ClInclude Include="ui_frmsettings.h" />
+    <ClInclude Include="../build/$(Configuration)/ui_frmabout.h" />
+    <ClInclude Include="../build/$(Configuration)/ui_frmmain.h" />
+    <ClInclude Include="../build/$(Configuration)/ui_frmsettings.h" />
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="../ui/frmabout.ui">

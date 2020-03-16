@@ -56,7 +56,7 @@ void task::run()
     char warzone_path[MAX_PATH];
     const char *wz_version_name = "";
     DWORD written = MAX_PATH;
-    DWORD myPower;
+    DWORD myPower = 0;
     unsigned playerToFavor = static_cast<unsigned>(globalId);
 
     /* Precisamos encontrar o warzone 2100 na memória */
@@ -107,7 +107,7 @@ void task::run()
         return;
     }
 
-    hWarzone = OpenProcess(PROCESS_ALL_ACCESS,FALSE,pid);
+    hWarzone = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
     if(!hWarzone)
     {
         emit update("Falha ao hackear o warzone 2100<br>");
@@ -118,7 +118,7 @@ void task::run()
 
     if(!fQueryFullProcessImageNameA(hWarzone,0,reinterpret_cast<LPTSTR>(warzone_path),&written))
     {
-        emit update(QString::asprintf("Falha ao obter caminho do warzone 2100: %lu<br>", GetLastError()));
+        emit update(QString("Falha ao obter caminho do warzone 2100: %1<br>").arg(GetLastError()));
 
         if(hKernel32)
             FreeLibrary(hKernel32);
@@ -143,6 +143,12 @@ void task::run()
         wz_version_name = "Warzone 2100 3.1.5<br>";
     else if(wz_version == WZ_323)
         wz_version_name = "Warzone 2100 3.2.3<br>";
+    else if(wz_version == WZ_330)
+        wz_version_name = "Warzone 2100 3.3.0<br>";
+    else {
+        emit update(QString("%1:%2) Erro crítico!").arg(__FILE__).arg(__LINE__));
+        this->requestInterruption();
+    }
 
     emit update(wz_version_name);
     emit update( "Procedimentos iniciados ...<br>");
@@ -152,8 +158,12 @@ void task::run()
         while(true)
         {
             if(this->isInterruptionRequested())
-            {
                 break;
+
+            if(hWarzone == INVALID_HANDLE_VALUE) {
+                emit update("O handle para o processo é inválido<br>");
+                requestInterruption();
+                continue;
             }
 
             if(WzHack_FindProcess("warzone2100.exe", nullptr) == FALSE)
@@ -162,12 +172,13 @@ void task::run()
                 return;
             }
 
-            WzHack_RunEasterEgg(hWarzone,wz_version,playerToFavor);
+            WzHack_RunEasterEgg(hWarzone, wz_version, playerToFavor);
+
             if(globalSupport) {
                 if(wz_version < WZ_315)
-                    WzHack_SetPlayerPower(playerToFavor,hWarzone,WZ_239_MAX_POWER,wz_version);
+                    WzHack_SetPlayerPower(playerToFavor, hWarzone, WZ_239_MAX_POWER,wz_version);
                 else
-                    WzHack_SetPlayerPower(playerToFavor,hWarzone,WZ_315_MAX_POWER,wz_version);
+                    WzHack_SetPlayerPower(playerToFavor, hWarzone, WZ_315_MAX_POWER,wz_version);
             }
 
             Sleep(static_cast<DWORD>(globalDelay * 1000));
@@ -187,6 +198,12 @@ void task::run()
                 return;
             }
 
+            if(hWarzone == INVALID_HANDLE_VALUE) {
+                emit update("O handle para o processo é inválido<br>");
+                requestInterruption();
+                continue;
+            }
+			
             if(WzHack_FindProcess("warzone2100.exe", nullptr) == FALSE)
             {
                 emit update( "O warzone 2100 foi fechado<br>");
@@ -211,7 +228,7 @@ void task::run()
 
                         if(myPower < 60000 && myPower > 0)
                         {
-                            WzHack_SetPlayerPower(i,hWarzone,myPower * 2,wz_version);
+                            WzHack_SetPlayerPower(i, hWarzone, myPower * 2,wz_version);
                             update(QString::asprintf("A sua energia foi alterada para %lu<br>", myPower * 2));
 
                             if(bShow)
@@ -227,7 +244,7 @@ void task::run()
                 }
             }
 
-            /* O delay global é ignorado aqui, pois pode afetar a eficácia deste algoritmo */
+            /* O delay global é ignorado aqui para não afetar a eficácia deste algoritmo */
             Sleep(2000);
         }
     }
@@ -244,21 +261,27 @@ void task::run()
                 return;
             }
 
+            if(hWarzone == INVALID_HANDLE_VALUE) {
+                emit update("O handle para o processo é inválido<br>");
+                requestInterruption();
+                continue;
+            }
+			
             if(WzHack_FindProcess("warzone2100.exe", nullptr) == FALSE)
             {
                 emit update( "O warzone 2100 foi fechado<br>");
                 return;
             }
 
-            bHavePower = WzHack_GetPlayerPower(playerToFavor,hWarzone,&myPower,wz_version);
+            bHavePower = WzHack_GetPlayerPower(playerToFavor, hWarzone, &myPower, wz_version);
             if(bHavePower)
-            {
+            {				
                 if(wz_version < WZ_315) {
                     if(myPower < WZ_239_MAX_POWER)
-                        WzHack_SetPlayerPower(playerToFavor,hWarzone,WZ_239_MAX_POWER,wz_version);
+                        WzHack_SetPlayerPower(playerToFavor, hWarzone, WZ_239_MAX_POWER,wz_version);
                 } else {
                     if(myPower < WZ_315_MAX_POWER)
-                        WzHack_SetPlayerPower(playerToFavor,hWarzone,WZ_315_MAX_POWER,wz_version);
+                        WzHack_SetPlayerPower(playerToFavor, hWarzone, WZ_315_MAX_POWER,wz_version);
                 }
 			}
 			else {

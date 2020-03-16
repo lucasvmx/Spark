@@ -29,10 +29,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <windows.h>
-
-extern "C" {
 #include "wzhack.h"
-}
 
 static void CheckForOtherInstance()
 {
