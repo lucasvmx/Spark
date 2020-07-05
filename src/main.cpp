@@ -5,6 +5,8 @@
         * 2.3.9
         * 3.1.5
         * 3.2.3
+        * 3.3.0
+        * 3.4.0
 
     Características:
         * Energia infinita
@@ -21,8 +23,9 @@
     Autor:
         Lucas Vieira de Jesus <lucas.engen.cc@gmail.com>
 
-    Testado no:
-        Microsoft Windows [versão 10.0.16299.125] x64
+    Plataformas de teste:
+        * Microsoft Windows [versão 10.0.16299.125] x64
+        * Microsoft Windows [versão 10.0.18363.900] x64
 */
 
 #include "frmmain.h"
