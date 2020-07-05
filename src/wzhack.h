@@ -45,6 +45,7 @@
 #define WZ_315		0xA2
 #define WZ_323		0xA3
 #define WZ_330      0xA4
+#define WZ_340      0xA5
 #define WZ_UNKNOWN	0xFF
 
 #define GREEN	10
