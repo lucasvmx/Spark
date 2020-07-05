@@ -110,13 +110,14 @@ void task::run()
     hWarzone = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
     if(!hWarzone)
     {
-        emit update("Falha ao hackear o warzone 2100<br>");
+        emit update("Falha ao abrir processo<br>");
         return;
     }
 
+    /* Inicializa a memória com zeros */
     SecureZeroMemory(warzone_path,sizeof(warzone_path));
 
-    if(!fQueryFullProcessImageNameA(hWarzone,0,reinterpret_cast<LPTSTR>(warzone_path),&written))
+    if(!fQueryFullProcessImageNameA(hWarzone, 0, reinterpret_cast<LPTSTR>(warzone_path), &written))
     {
         emit update(QString("Falha ao obter caminho do warzone 2100: %1<br>").arg(GetLastError()));
 
@@ -238,9 +239,9 @@ void task::run()
                 } else
                 {
                     if(globalZero)
-                        WzHack_SetPlayerPower(i, hWarzone,0,wz_version);
+                        WzHack_SetPlayerPower(i, hWarzone, 0, wz_version);
                     else
-                        WzHack_SetPlayerPower(i,hWarzone,rand() % 3000 + 1000,wz_version);
+                        WzHack_SetPlayerPower(i, hWarzone, rand() % 3000 + 1000, wz_version);
                 }
             }
 
@@ -275,13 +276,16 @@ void task::run()
 
             bHavePower = WzHack_GetPlayerPower(playerToFavor, hWarzone, &myPower, wz_version);
             if(bHavePower)
-            {				
+            {
+#ifdef _DEBUG
+                qDebug() << "Energia do jogador " << playerToFavor << ":" << myPower;
+#endif
                 if(wz_version < WZ_315) {
                     if(myPower < WZ_239_MAX_POWER)
-                        WzHack_SetPlayerPower(playerToFavor, hWarzone, WZ_239_MAX_POWER,wz_version);
+                        WzHack_SetPlayerPower(playerToFavor, hWarzone, WZ_239_MAX_POWER, wz_version);
                 } else {
                     if(myPower < WZ_315_MAX_POWER)
-                        WzHack_SetPlayerPower(playerToFavor, hWarzone, WZ_315_MAX_POWER,wz_version);
+                        WzHack_SetPlayerPower(playerToFavor, hWarzone, WZ_315_MAX_POWER, wz_version);
                 }
 			}
 			else {

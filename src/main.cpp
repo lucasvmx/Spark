@@ -47,6 +47,9 @@ static void CheckForOtherInstance()
         QMessageBox::critical(nullptr, "Error", QString::asprintf("Failed to create mutex: %lu", GetLastError()));
         exit(0);
     }
+
+    // Carrega as funcões da DLL
+    LoadDLLFunctions();
 }
 
 int main(int argc, char *argv[])
