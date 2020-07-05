@@ -11,10 +11,10 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>WarHack v1.1 Alfa</string>
+   <string>WarHack v1.1</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
+   <iconset resource="../resource/resources.qrc">
     <normaloff>:/images/warzone2100.png</normaloff>:/images/warzone2100.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -195,7 +195,7 @@ QGroupBox::title {
   </action>
   <action name="actionQuit_2">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resource/resources.qrc">
      <normaloff>:/images/if_Log Out_27856.ico</normaloff>:/images/if_Log Out_27856.ico</iconset>
    </property>
    <property name="text">
@@ -204,7 +204,7 @@ QGroupBox::title {
   </action>
   <action name="actionAbout_Qt">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resource/resources.qrc">
      <normaloff>:/images/if_qt_337140.ico</normaloff>:/images/if_qt_337140.ico</iconset>
    </property>
    <property name="text">
@@ -213,7 +213,7 @@ QGroupBox::title {
   </action>
   <action name="actionAbout_WarHack">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resource/resources.qrc">
      <normaloff>:/images/if_Blue_ball_132060.ico</normaloff>:/images/if_Blue_ball_132060.ico</iconset>
    </property>
    <property name="text">
@@ -223,7 +223,9 @@ QGroupBox::title {
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="resources.qrc"/>
+  <include location="../resource/resources.qrc"/>
+  <include location="../resource/resources.qrc"/>
+  <include location="../resource/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>287</width>
-    <height>308</height>
+    <width>313</width>
+    <height>342</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>WarHack - Settings</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
+   <iconset resource="../resource/resources.qrc">
     <normaloff>:/images/if_advancedsettings_17814.ico</normaloff>:/images/if_advancedsettings_17814.ico</iconset>
   </property>
   <property name="styleSheet">
@@ -38,8 +38,14 @@
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">
        <widget class="QLabel" name="label_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
-         <string>Seu id:</string>
+         <string>Id:</string>
         </property>
        </widget>
       </item>
@@ -158,6 +164,16 @@ QComboBox QAbstractItemView {
           <string>Jogador 9</string>
          </property>
         </item>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QLabel" name="label_4">
+        <property name="styleSheet">
+         <string notr="true">color: rgb(255, 0, 0);</string>
+        </property>
+        <property name="text">
+         <string>Mantenha este valor se quiser ser o jogador favorecido</string>
+        </property>
        </widget>
       </item>
      </layout>
@@ -333,7 +349,9 @@ QPushButton:hover {
   </layout>
  </widget>
  <resources>
-  <include location="resources.qrc"/>
+  <include location="../resource/resources.qrc"/>
+  <include location="../resource/resources.qrc"/>
+  <include location="../resource/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

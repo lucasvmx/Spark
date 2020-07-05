@@ -1,2 +1,0 @@
-﻿- Correções de warnings do compilador
-- Mudanças na estrutura do projeto

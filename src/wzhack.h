@@ -29,6 +29,7 @@
 #define HACK_H
 
 #include <windows.h>
+#include <psapi.h>
 
 /* Definições */
 #define MAX_PLAYERS			11
@@ -61,6 +62,15 @@ extern "C" {
 #define WZHACK_API
 #endif
 
+// Retorna o número de elementos de um array 2D
+#define arrayCount(A) (sizeof(A)/sizeof(A[0]))
+
+// Tamanho do buffer interno
+#define BUFLEN 1024
+
+// Nome do processo do warzone 2100
+#define WZ_PROCESS  "warzone2100.exe"
+
 /* Enumerações */
 typedef enum message_types
 {
@@ -79,11 +89,12 @@ typedef BOOL		(WINAPI *QFPINA)(HANDLE hProcess, DWORD flag, LPSTR path, PDWORD b
 typedef BOOL		(WINAPI *GFVI)(LPCTSTR lptstrFilename,DWORD dwHandle,DWORD dwLen,LPVOID lpData);
 typedef DWORD		(WINAPI *GFVIS)(LPCTSTR lptstrFilename, LPDWORD lpdwHandle);
 typedef BOOL		(WINAPI *VQV)(LPCVOID pBlock, LPCTSTR lpSubBlock, LPVOID *lplpBuffer, PUINT puLen);
+typedef BOOL        (WINAPI *GMI)(HANDLE hProcess, HMODULE hModule, LPMODULEINFO lpmodinfo, DWORD cb);
 
 int     WzHack_GetWarzoneVersion(const char *wz_filename);
 BOOL 	WzHack_InjectDLL(HANDLE warzoneHandle);
 BOOL 	WZHACK_API WzHack_FindProcess(const char *nome, DWORD *pid);
-DWORD 	WZHACK_API WzHack_GetModuleAddress(const char *nome_executavel, const char *nome_modulo);
+DWORD   WZHACK_API WzHack_GetModuleAddress(HANDLE hWarzone, const char *processName, BOOL *bOK);
 char 	WZHACK_API *WzHack_GetSubstring(char *str, char k);
 BOOL 	WZHACK_API WzHack_GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *power, int wz_version);
 BOOL 	WZHACK_API WzHack_SetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD power, int wz_version);
@@ -92,12 +103,7 @@ int 	WzHack_ShowMessage(types t, const char *string, ...);
 void 	WZHACK_API WzHack_RunEasterEgg(HANDLE warzoneHandle, int wz_version, unsigned my_id);
 BOOL	WZHACK_API WzHack_GetPlayerNumberOfUnits(unsigned player_id, HANDLE warzoneHandle, int wz_version, DWORD *number_of_units);
 BOOL    WZHACK_API WzHack_GetNumberOfBuiltStructures(unsigned player_id, HANDLE warzoneHandle, int wz_version, DWORD *number_of_built_structures);
-
-/* Estruturas */
-typedef struct warzone_base_address
-{
-    DWORD base;	// Endereço base do executável principal
-} WARZONE_BASE;
+void    LoadDLLFunctions();
 
 typedef struct warzone_offsets
 {
@@ -110,7 +116,7 @@ typedef struct warzone_offsets
     DWORD patch;                // Número de versão do patch do warzone
 } WARZONE_OFF;
 
-const WARZONE_OFF wz_off[] =
+static const WARZONE_OFF wz_off[] =
 {
     // Warzone 2100 2.3.9
     { 0, 0x0d795f0, 0, 0, 2, 3, 9},
