@@ -377,7 +377,15 @@ DWORD WzHack_GetModuleAddress(HANDLE hWarzone, const char *processName, BOOL *bO
         if(strncmp(baseName, processName, strlen(processName)) == 0)
         {
             WzHack_ShowMessage(INFO, "Address: %#p\n", hModule);
+#ifdef WIN64
+            /*
+             * Tendo em vista que as versões lançadas do warzone 2100 até o momento são 32bit
+             * então não é necessário que haja uma release 64bit deste programa
+            */
+            return reinterpret_cast<DWORD64>(hModule);
+#else
             return reinterpret_cast<DWORD>(hModule);
+#endif
         }
     }
 
