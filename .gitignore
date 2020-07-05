@@ -16,10 +16,13 @@ vs2017/.vs/
 *.dll
 *.exp
 *.lib
-commit.txt
+*.txt
 debug
 release
 x64
 x86
 .qmake.stash
 build
+maps
+*.pro.user.*
+.vscode
