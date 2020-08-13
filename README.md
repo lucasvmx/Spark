@@ -8,7 +8,7 @@ Simples hack para o jogo Warzone 2100 (Trainer)
 #### Descrição
 
   * Altera a energia de todos os jogadores
-  * Suporta as versões 2.3.9, 3.1.5, 3.2.3 e 3.3.0
+  * Suporta as versões 2.3.9, 3.1.5, 3.2.3, 3.3.0 e 3.4.0
   * Possui um módulo que zera a energia de todos os outros jogadores, exceto a sua.
   
 #### Projetos futuros
