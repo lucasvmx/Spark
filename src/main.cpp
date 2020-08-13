@@ -41,7 +41,7 @@ static void CheckForOtherInstance()
     hMutex = CreateMutexA(nullptr, TRUE, "WarHack_Mutex");
     if (GetLastError() == ERROR_ALREADY_EXISTS)
     {
-        QMessageBox::critical(nullptr, "Error", "Another instance of War Hack is already running");
+        QMessageBox::critical(nullptr, "Error", "Outra instância já está em execução");
         exit(-1);
     }
 

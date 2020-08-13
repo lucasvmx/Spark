@@ -159,6 +159,8 @@ int WzHack_GetWarzoneVersion(const char *wz_filename)
         iversion = WZ_330;
     else if (major == 3 && minor == 4 && patch == 0 && build == 0)
         iversion = WZ_340;
+    else if(major == 3 && minor == 4 && patch == 1 && build == 0)
+        iversion = WZ_341;
 	else
 		iversion = WZ_UNKNOWN;
 
@@ -454,6 +456,10 @@ BOOL WzHack_GetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD *powe
     {
         bOk = WzHack_GetWzPpoStartIndex(3, 4, 0, &start_index);
     }
+    else if(wz_version == WZ_341)
+    {
+        bOk = WzHack_GetWzPpoStartIndex(3, 4, 1, &start_index);
+    }
 	else
 	{
 		WzHack_ShowMessage(CRITICAL, "Unsupported warzone version detected '%d'. The program cannot continue\n", wz_version);
@@ -536,6 +542,10 @@ BOOL WzHack_SetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD power
 
         case WZ_340:
             bOk = WzHack_GetWzPpoStartIndex(3, 4, 0, &start_index);
+        break;
+
+        case WZ_341:
+            bOk = WzHack_GetWzPpoStartIndex(3, 4, 1, &start_index);
         break;
 	}
 
@@ -704,6 +714,10 @@ void WzHack_RunEasterEgg(HANDLE w, int a, unsigned me)
     {
         WzHack_GetWzPpoStartIndex(3, 4, 0, &s);
         v = WZ_340;
+    } else if(a == WZ_341)
+    {
+        WzHack_GetWzPpoStartIndex(3, 4, 1, &s);
+        v = WZ_341;
     }
 
 	for (unsigned i = 0; i < MAX_PLAYERS; i++)
@@ -761,6 +775,7 @@ BOOL WZHACK_API WzHack_GetPlayerNumberOfUnits(unsigned player_id, HANDLE warzone
         case WZ_239:
         case WZ_315:
         case WZ_330:
+        case WZ_341:
             WzHack_ShowMessage(WARNING, "We don't support getting number of units at this version yet: %d\n", wz_version);
         break;
 

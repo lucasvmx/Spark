@@ -37,15 +37,12 @@
 #define WZ_315_MAX_POWER    1000000
 #define WZ_323_MAX_POWER    WZ_315_MAX_POWER
 
-#define MAJOR	1
-#define MINOR	0
-#define PATCH	1
-
 #define WZ_239		0xA1
 #define WZ_315		0xA2
 #define WZ_323		0xA3
 #define WZ_330      0xA4
 #define WZ_340      0xA5
+#define WZ_341      0xA6
 #define WZ_UNKNOWN	0xFF
 
 #define GREEN	10
@@ -182,7 +179,20 @@ static const WARZONE_OFF wz_off[] =
     { 7, 0x07adf54, 0x07aa750, 0, 3, 4, 0},
     { 8, 0x07adf84, 0x07aa754, 0, 3, 4, 0},
     { 9, 0x07adfb4, 0x07aa758, 0, 3, 4, 0},
-    { 10, 0x07adfe4, 0x07aa75c, 0, 3, 4, 0}
+    { 10, 0x07adfe4, 0x07aa75c, 0, 3, 4, 0},
+
+    // Warzone 2100 3.4.1
+    { 0, 0x7b7ebc, 0, 0, 3, 4, 1},
+    { 1, 0x7b7eec, 0, 0, 3, 4, 1},
+    { 2, 0x7b7f1c, 0, 0, 3, 4, 1},
+    { 3, 0x7b774c, 0, 0, 3, 4, 1},
+    { 4, 0x7b7f7c, 0, 0, 3, 4, 1},
+    { 5, 0x7b7fac, 0, 0, 3, 4, 1},
+    { 6, 0x7b7fdc, 0, 0, 3, 4, 1},
+    { 7, 0x7b800c, 0, 0, 3, 4, 1},
+    { 8, 0x7b803c, 0, 0, 3, 4, 1},
+    { 9, 0x7b806c, 0, 0, 3, 4, 1},
+    { 10, 0x7b809c, 0, 0, 3, 4, 1}
 };
 
 #ifdef _EXPORT_FUNCTIONS

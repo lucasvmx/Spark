@@ -148,6 +148,8 @@ void task::run()
         wz_version_name = "Warzone 2100 3.3.0<br>";
     else if(wz_version == WZ_340)
         wz_version_name = "Warzone 2100 3.4.0<br>";
+    else if(wz_version == WZ_341)
+        wz_version_name = "Warzone 2100 3.4.1<br>";
     else {
         emit update(QString("(%1:%2) Erro crítico! Versão desconhecida").arg(__FILE__).arg(__LINE__));
         this->requestInterruption();

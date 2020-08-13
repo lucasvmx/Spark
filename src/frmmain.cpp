@@ -36,6 +36,7 @@
 #include <stdarg.h>
 
 #include "wzhack.h"
+#include "version.h"
 
 static task *hack_task = nullptr;
 
@@ -46,6 +47,11 @@ frmMain::frmMain(QWidget *parent) :
     ui->setupUi(this);
     hack_task = new task();
     this->connectAllSignals();
+    if(PATCH > 0)
+        this->setWindowTitle(QString("WarHack v%1.%2.%3").arg(MAJOR).arg(MINOR).arg(PATCH));
+    else
+        this->setWindowTitle(QString("WarHack v%1.%2").arg(MAJOR).arg(MINOR));
+
     this->setFixedWidth(this->width());
     this->setFixedHeight(this->height());
 }

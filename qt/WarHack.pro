@@ -39,6 +39,7 @@ SOURCES += \
 
 HEADERS += \
         ../src/frmmain.h \
+	../src/version.h \
     ../src/wzhack.h \
     ../src/frmsettings.h \
     ../src/task.h \
