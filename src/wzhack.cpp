@@ -38,12 +38,16 @@
 #include <shlobj.h>
 #include <shlwapi.h>
 #include <assert.h>
+#include <stdint.h>
+#include "lib/libhack/hack.h"
 #include "wzhack.h"
 
 static GFVI fGetFileVersionInfoA = nullptr;
 static GFVIS fGetFileVersionInfoSizeA = nullptr;
 static VQV fVerQueryValueA = nullptr;
 static GMI fGetModuleInformation = nullptr;
+
+libhack_handle *hack = nullptr;
 
 /* Início do código */
 
@@ -380,7 +384,7 @@ DWORD WzHack_GetModuleAddress(HANDLE hWarzone, const char *processName, BOOL *bO
 
         if(strncmp(baseName, processName, strlen(processName)) == 0)
         {
-            WzHack_ShowMessage(INFO, "Address: %#p\n", hModule);
+            WzHack_ShowMessage(INFO, "hModule address: %#x\n", hModule);
 #ifdef WIN64
             /*
              * Tendo em vista que as versões lançadas do warzone 2100 até o momento são 32bit
@@ -777,7 +781,7 @@ BOOL WZHACK_API WzHack_GetPlayerNumberOfUnits(unsigned player_id, HANDLE warzone
         case WZ_330:
         case WZ_341:
             WzHack_ShowMessage(WARNING, "We don't support getting number of units at this version yet: %d\n", wz_version);
-        break;
+            return FALSE;
 
         case WZ_323:
             bOk = WzHack_GetWzPpoStartIndex(3, 2, 3, &start_index);
@@ -825,8 +829,9 @@ BOOL WZHACK_API WzHack_GetNumberOfBuiltStructures(unsigned player_id, HANDLE war
     {
         case WZ_239:
         case WZ_315:
-            WzHack_ShowMessage(WARNING, "Version not supported yet: %d\n", wz_version);
-        break;
+        case WZ_341:
+            WzHack_ShowMessage(WARNING, "This version does not support getting number of strucutures built: %d\n", wz_version);
+            return FALSE;
 
         case WZ_323:
             bOk = WzHack_GetWzPpoStartIndex(3, 2, 3, &start_index);
@@ -851,4 +856,114 @@ BOOL WZHACK_API WzHack_GetNumberOfBuiltStructures(unsigned player_id, HANDLE war
     }
 
     return bOk;
+}
+
+BOOL WZHACK_API WzHack_SetPlayerMaxPowerStorage(unsigned player_id, HANDLE warzoneHandle, int wz_version, int storage)
+{
+    BOOL bOk;
+    DWORD baseAddr;
+    DWORD storageAddr = 0;
+    int major, minor, patch, start;
+
+    if (player_id > 10)
+    {
+#ifdef _DEBUG
+        WzHack_ShowMessage(DEBUG, "(%s:%d) bad player id %u", __FILE__, __LINE__, player_id);
+#endif
+        return FALSE;
+    }
+
+    baseAddr = WzHack_GetModuleAddress(warzoneHandle, WZ_PROCESS, &bOk);
+    if(!bOk)
+        return FALSE;
+
+    // Extrai os números da versão
+    major = wz_version / 100;
+    minor = (wz_version / 10) % 10;
+    patch = wz_version % 10;
+
+    WzHack_GetWzPpoStartIndex(major, minor, patch, &start);
+
+    // Obtém o endereço aonde está localizado o power storage
+    storageAddr = baseAddr + (wz_off[start + player_id].power_offset + 0x18);
+
+    return WriteProcessMemory(warzoneHandle, (void*)storageAddr, (const void*)storage, sizeof(int), nullptr);
+}
+
+BOOL WZHACK_API WzHack_SetPlayerExtractedPower(unsigned player, int wz_version, int extracted)
+{
+    int start;
+    int major, minor, patch;
+    DWORD extractedAddr;
+
+    // Extrai os números da versão
+    major = wz_version / 100;
+    minor = (wz_version / 10) % 10;
+    patch = wz_version % 10;
+
+    // Obtém o index de início
+    WzHack_GetWzPpoStartIndex(major, minor, patch, &start);
+
+    // Inicializa a libhack (caso não tenha sido inicializada)
+    if(!hack)
+    {
+        hack = libhack_init(WZ_PROCESS);
+        if(!hack) {
+            fprintf(stderr, "Failed to initialize libhack\n");
+            FatalExit(1);
+        }
+    }
+
+    if(!libhack_open_process(hack) && (GetLastError() != ERROR_ALREADY_INITIALIZED))
+        return FALSE;
+
+    // Calcula o endereço
+    extractedAddr = libhack_get_base_addr64(hack) + wz_off[start + player].power_offset + 0x20;
+
+    // Atualiza a quantidade de energia gasta
+    libhack_write_int_to_addr64(hack, static_cast<DWORD64>(extractedAddr), extracted);
+
+    // Libera a memória alocada
+    libhack_free(hack);
+
+    return TRUE;
+}
+
+BOOL WZHACK_API WzHack_SetPlayerWastedPower(unsigned player, int wz_version, int wasted)
+{
+    int start;
+    int major, minor, patch;
+    DWORD wastedAddr;
+
+    // Extrai os números da versão
+    major = wz_version / 100;
+    minor = (wz_version / 10) % 10;
+    patch = wz_version % 10;
+
+    // Obtém o index de início
+    WzHack_GetWzPpoStartIndex(major, minor, patch, &start);
+
+    // Inicializa a libhack
+    if(!hack)
+    {
+        hack = libhack_init(WZ_PROCESS);
+        if(!hack) {
+            fprintf(stderr, "Failed to initialize libhack\n");
+            FatalExit(1);
+        }
+    }
+
+    if(!libhack_open_process(hack) && (GetLastError() != ERROR_ALREADY_INITIALIZED))
+        return FALSE;
+
+    // Calcula o endereço
+    wastedAddr = libhack_get_base_addr64(hack) + wz_off[start + player].power_offset + 0x28;
+
+    // Atualiza a quantidade de energia gasta
+    libhack_write_int_to_addr64(hack, static_cast<DWORD64>(wastedAddr), wasted);
+
+    // Libera a memória alocada
+    libhack_free(hack);
+
+    return TRUE;
 }

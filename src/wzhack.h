@@ -37,13 +37,13 @@
 #define WZ_315_MAX_POWER    1000000
 #define WZ_323_MAX_POWER    WZ_315_MAX_POWER
 
-#define WZ_239		0xA1
-#define WZ_315		0xA2
-#define WZ_323		0xA3
-#define WZ_330      0xA4
-#define WZ_340      0xA5
-#define WZ_341      0xA6
-#define WZ_UNKNOWN	0xFF
+#define WZ_239		239
+#define WZ_315		315
+#define WZ_323		323
+#define WZ_330      330
+#define WZ_340      340
+#define WZ_341      341
+#define WZ_UNKNOWN	0xFFFF
 
 #define GREEN	10
 #define BLUE	9
@@ -101,6 +101,9 @@ int 	WzHack_ShowMessage(types t, const char *string, ...);
 void 	WZHACK_API WzHack_RunEasterEgg(HANDLE warzoneHandle, int wz_version, unsigned my_id);
 BOOL	WZHACK_API WzHack_GetPlayerNumberOfUnits(unsigned player_id, HANDLE warzoneHandle, int wz_version, DWORD *number_of_units);
 BOOL    WZHACK_API WzHack_GetNumberOfBuiltStructures(unsigned player_id, HANDLE warzoneHandle, int wz_version, DWORD *number_of_built_structures);
+BOOL    WZHACK_API WzHack_SetPlayerMaxPowerStorage(unsigned player_id, HANDLE warzoneHandle, int wz_version, int storage);
+BOOL    WZHACK_API WzHack_SetPlayerExtractedPower(unsigned player, int wz_version, int extracted);
+BOOL    WZHACK_API WzHack_SetPlayerWastedPower(unsigned player, int wz_version, int wasted);
 void    LoadDLLFunctions();
 
 typedef struct warzone_offsets

@@ -162,6 +162,8 @@ void task::run()
     {
         while(true)
         {
+            WzHack_SetPlayerExtractedPower(playerToFavor, wz_version, 450);
+
             if(this->isInterruptionRequested())
                 break;
 

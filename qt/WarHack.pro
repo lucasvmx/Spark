@@ -27,7 +27,7 @@ Release:DEFINES += _RELEASE
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 
-LIBS += -lpsapi
+LIBS += -L../src/lib -lpsapi -lhack
 
 SOURCES += \
         ../src/main.cpp \
@@ -35,7 +35,7 @@ SOURCES += \
     ../src/wzhack.cpp \
     ../src/frmsettings.cpp \
     ../src/task.cpp \
-    ../src/frmabout.cpp
+	../src/frmabout.cpp
 
 HEADERS += \
         ../src/frmmain.h \
@@ -43,7 +43,10 @@ HEADERS += \
     ../src/wzhack.h \
     ../src/frmsettings.h \
     ../src/task.h \
-    ../src/frmabout.h
+	../src/frmabout.h \
+	../src/lib/libhack/hack.h \
+	../src/lib/libhack/log.h \
+	../src/lib/libhack/process.h
 
 FORMS += \
         ../ui/frmmain.ui \
