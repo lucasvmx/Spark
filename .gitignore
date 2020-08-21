@@ -26,3 +26,5 @@ build
 maps
 *.pro.user.*
 .vscode
+build-debug
+build-release
