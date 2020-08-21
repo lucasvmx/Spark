@@ -20,7 +20,7 @@
 #ifdef DLL_EXPORT
 #define LIBHACK_API __declspec(dllexport)
 #else
-#define LIBHACK_API __declspec(dllexport)
+#define LIBHACK_API __declspec(dllimport)
 #endif
 #endif
 

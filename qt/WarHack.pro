@@ -26,9 +26,6 @@ Release:DEFINES += _RELEASE
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-
-LIBS += -L../src/lib -lpsapi -lhack
-
 SOURCES += \
         ../src/main.cpp \
         ../src/frmmain.cpp \
@@ -38,15 +35,15 @@ SOURCES += \
 	../src/frmabout.cpp
 
 HEADERS += \
+	../libs/libhack/consts.h \
+	../libs/libhack/hack.h \
+	../libs/libhack/process.h \
         ../src/frmmain.h \
 	../src/version.h \
     ../src/wzhack.h \
     ../src/frmsettings.h \
     ../src/task.h \
-	../src/frmabout.h \
-	../src/lib/libhack/hack.h \
-	../src/lib/libhack/log.h \
-	../src/lib/libhack/process.h
+	../src/frmabout.h
 
 FORMS += \
         ../ui/frmmain.ui \
@@ -55,3 +52,8 @@ FORMS += \
 
 RESOURCES += \
     ../resource/resources.qrc
+
+win32: LIBS += -L$$PWD/../libs/libhack -lhack -lpsapi
+
+INCLUDEPATH += $$PWD/../libs/libhack
+DEPENDPATH += $$PWD/../libs/libhack

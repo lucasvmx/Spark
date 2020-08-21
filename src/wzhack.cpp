@@ -39,9 +39,9 @@
 #include <shlwapi.h>
 #include <assert.h>
 #include <stdint.h>
-#include "libs/libhack/hack.h"
-#include "libs/libhack/process.h"
-#include "libs/libhack/consts.h"
+#include "../libs/libhack/hack.h"
+#include "../libs/libhack/process.h"
+#include "../libs/libhack/consts.h"
 #include "wzhack.h"
 
 /**

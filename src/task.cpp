@@ -179,7 +179,7 @@ void task::run()
                 return;
             }
 
-            WzHack_RunEasterEgg(hWarzone, wz_version, playerToFavor);
+            //WzHack_RunEasterEgg(hWarzone, wz_version, playerToFavor);
 
             if(globalSupport) {
                 if(wz_version < WZ_315)
