@@ -64,9 +64,11 @@ extern "C" {
 #define arrayCount(A) (sizeof(A)/sizeof(A[0]))
 
 // Tamanho do buffer interno
+#ifndef BUFLEN
 #define BUFLEN 1024
+#endif
 
-// Nome do processo do warzone 2100
+/* Nome do processo do warzone 2100 */
 #define WZ_PROCESS  "warzone2100.exe"
 
 /* Enumerações */
@@ -98,12 +100,15 @@ BOOL 	WZHACK_API WzHack_GetPlayerPower(unsigned player_id, HANDLE warzoneHandle,
 BOOL 	WZHACK_API WzHack_SetPlayerPower(unsigned player_id, HANDLE warzoneHandle, DWORD power, int wz_version);
 BOOL 	WZHACK_API WzHack_GetWzPpoStartIndex(unsigned major, unsigned minor, unsigned patch, int *start);
 int 	WzHack_ShowMessage(types t, const char *string, ...);
-void 	WZHACK_API WzHack_RunEasterEgg(HANDLE warzoneHandle, int wz_version, unsigned my_id);
 BOOL	WZHACK_API WzHack_GetPlayerNumberOfUnits(unsigned player_id, HANDLE warzoneHandle, int wz_version, DWORD *number_of_units);
 BOOL    WZHACK_API WzHack_GetNumberOfBuiltStructures(unsigned player_id, HANDLE warzoneHandle, int wz_version, DWORD *number_of_built_structures);
 BOOL    WZHACK_API WzHack_SetPlayerMaxPowerStorage(unsigned player_id, HANDLE warzoneHandle, int wz_version, int storage);
 BOOL    WZHACK_API WzHack_SetPlayerExtractedPower(unsigned player, int wz_version, int extracted);
 BOOL    WZHACK_API WzHack_SetPlayerWastedPower(unsigned player, int wz_version, int wasted);
+void    WZHACK_API GetVersionFromWzVer(int wz_version, int *major, int *minor, int *patch);
+BOOL    WZHACK_API IsNumberOfUnitsSupported(int wz_version);
+BOOL    WZHACK_API IsNumberOfStructsSupported(int wz_version);
+void    WZHACK_API WzHack_EraseEnergyFromAI(int wz_version);
 void    LoadDLLFunctions();
 
 typedef struct warzone_offsets

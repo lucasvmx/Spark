@@ -39,17 +39,83 @@
 #include <shlwapi.h>
 #include <assert.h>
 #include <stdint.h>
-#include "lib/libhack/hack.h"
+#include "libs/libhack/hack.h"
+#include "libs/libhack/process.h"
+#include "libs/libhack/consts.h"
 #include "wzhack.h"
 
+/**
+ * @brief Alias para GetFileVersionInfoA
+ */
 static GFVI fGetFileVersionInfoA = nullptr;
+
+/**
+ * @brief Alias para GetFileVersionInfoSizeA
+ */
 static GFVIS fGetFileVersionInfoSizeA = nullptr;
+
+/**
+ * @brief Alias para VerQueryValueA
+ */
 static VQV fVerQueryValueA = nullptr;
+
+/**
+ * @brief Alias para GetModuleInformation
+ */
 static GMI fGetModuleInformation = nullptr;
 
+/**
+ * @brief Inicializa a API
+ * @param process_name Nome do processo
+ * @return true se não der erro
+ */
+static bool WzHack_Initialize(const char *process_name);
+
+/**
+ * @brief WzHack_Cleanup
+ * @return
+ */
+static bool WzHack_Cleanup();
+
+/**
+ * @brief Determina se a API foi inicializada
+ * @return
+ */
+static bool IsWzHackInitialized();
+
 libhack_handle *hack = nullptr;
+static bool wzhack_initialized = false;
 
 /* Início do código */
+
+static bool WzHack_Initialize(const char *process_name)
+{
+    if(!IsWzHackInitialized())
+    {
+        // Inicializa a libhack
+        hack = libhack_init(process_name);
+        if(!hack)
+        {
+            fprintf(stderr, "Failed to initialize libhack: %lu\n", GetLastError());
+            FatalAppExitA(0, "Falha ao inicializar a biblioteca libhack");
+        }
+    }
+
+    return true;
+}
+
+static bool WzHack_Cleanup()
+{
+    if(IsWzHackInitialized())
+        libhack_free(hack);
+
+    return true;
+}
+
+static bool IsWzHackInitialized()
+{
+    return wzhack_initialized;
+}
 
 void LoadDLLFunctions()
 {
@@ -153,19 +219,10 @@ int WzHack_GetWarzoneVersion(const char *wz_filename)
 	
     WzHack_ShowMessage(INFO, "File: %s\nVersion: %d.%d.%d.%d\n", wz_filename, major, minor, patch, build);
 
-	if (major == 3 && minor == 2 && patch == 3 && build == 0)
-		iversion = WZ_323;
-	else if (major == 3 && minor == 1 && patch == 5 && build == 0)
-		iversion = WZ_315;
-	else if (major == 2 && minor == 3 && patch == 9 && build == 0)
-		iversion = WZ_239;
-    else if (major == 3 && minor == 3 && patch == 0 && build == 0)
-        iversion = WZ_330;
-    else if (major == 3 && minor == 4 && patch == 0 && build == 0)
-        iversion = WZ_340;
-    else if(major == 3 && minor == 4 && patch == 1 && build == 0)
-        iversion = WZ_341;
-	else
+    // Builds version number
+    iversion = (major * 100) + (minor * 10) + patch;
+
+    if(iversion > WZ_341)
 		iversion = WZ_UNKNOWN;
 
 	if (buf)
@@ -206,7 +263,7 @@ BOOL WzHack_InjectDLL(HANDLE warzoneHandle)
 		snprintf(full_dll_path, MAX_PATH * sizeof(char), "%s\\%s", current_path, dllName);
 
 #ifdef _DEBUG
-	WzHack_ShowMessage(DEBUG, "(%s:%d) Injecting: %s\n", __FILE__, __LINE__, full_dll_path);
+    WzHack_ShowMessage(DEBUG, "(%s:%d) injecting: %s\n", __FILE__, __LINE__, full_dll_path);
 #endif
 
 	hModule = GetModuleHandleA("kernel32.dll");
@@ -230,7 +287,7 @@ BOOL WzHack_InjectDLL(HANDLE warzoneHandle)
     if(!WriteProcessMemory(warzoneHandle, address, reinterpret_cast<LPCVOID>(full_dll_path), static_cast<SIZE_T>(size), nullptr))
 	{
 		if(!VirtualFreeEx(warzoneHandle, address, size, MEM_RELEASE))
-			WzHack_ShowMessage(WARNING, "We have a trouble. Virtual memory can't be freed. Error %lu\n", GetLastError());
+            WzHack_ShowMessage(WARNING, "We're in trouble. Virtual memory can't be freed. Error %lu\n", GetLastError());
 		
 		if(hModule)
 			FreeLibrary(hModule);
@@ -238,7 +295,7 @@ BOOL WzHack_InjectDLL(HANDLE warzoneHandle)
 		return FALSE;
 	}
 
-    hRemoteThread = CreateRemoteThread(warzoneHandle, nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(addr_LoadLib), address,0, nullptr);
+    hRemoteThread = CreateRemoteThread(warzoneHandle, nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(addr_LoadLib), address, 0, nullptr);
     if(hRemoteThread == nullptr)
 		return FALSE;
 
@@ -687,68 +744,6 @@ int WzHack_ShowMessage(types t, const char *string, ...)
 	return len;
 }
 
-/* Este código não foi feito pra ser facilmente compreensível kkkk */
-
-void WzHack_RunEasterEgg(HANDLE w, int a, unsigned me)
-{
-    int s = 0, v = 0;
-    DWORD p, npp = 0, nu, nobs;
-
-    assert(w != nullptr);
-	
-	if (a == WZ_239)
-	{
-        WzHack_GetWzPpoStartIndex(2, 3, 9, &s);
-		v = WZ_239;
-	}
-	else if (a == WZ_315)
-	{
-        WzHack_GetWzPpoStartIndex(3, 1, 5, &s);
-		v = WZ_315;
-	}
-	else if (a == WZ_323)
-	{
-        WzHack_GetWzPpoStartIndex(3, 2, 3, &s);
-		v = WZ_323;
-    } else if (a == WZ_330)
-    {
-        WzHack_GetWzPpoStartIndex(3, 3, 0, &s);
-        v = WZ_330;
-    } else if(a == WZ_340)
-    {
-        WzHack_GetWzPpoStartIndex(3, 4, 0, &s);
-        v = WZ_340;
-    } else if(a == WZ_341)
-    {
-        WzHack_GetWzPpoStartIndex(3, 4, 1, &s);
-        v = WZ_341;
-    }
-
-	for (unsigned i = 0; i < MAX_PLAYERS; i++)
-	{
-        if(WzHack_GetPlayerNumberOfUnits(i,w,v,&nu))
-        {
-#ifdef _DEBUG
-            WzHack_ShowMessage(DEBUG, "Player %u has %u units\n",i,nu);
-#endif
-        }
-        if(WzHack_GetNumberOfBuiltStructures(i,w,v,&nobs))
-        {
-#ifdef _DEBUG
-            WzHack_ShowMessage(DEBUG, "Player %u built %u structures\n",i,nobs);
-#endif
-        }
-
-		if (WzHack_GetPlayerPower(i, w, &p, v)) 
-		{
-            if(!(i == me))
-                WzHack_SetPlayerPower(i, w, npp, v);
-            else
-                WzHack_SetPlayerPower(me, w, 3000, v);
-		}
-	}
-}
-
 BOOL WZHACK_API WzHack_GetPlayerNumberOfUnits(unsigned player_id, HANDLE warzoneHandle, int wz_version, DWORD *number_of_units)
 {
     BOOL bOk;
@@ -935,10 +930,8 @@ BOOL WZHACK_API WzHack_SetPlayerWastedPower(unsigned player, int wz_version, int
     int major, minor, patch;
     DWORD wastedAddr;
 
-    // Extrai os números da versão
-    major = wz_version / 100;
-    minor = (wz_version / 10) % 10;
-    patch = wz_version % 10;
+    // Obtém os números da versão
+    GetVersionFromWzVer(wz_version, &major, &minor, &patch);
 
     // Obtém o index de início
     WzHack_GetWzPpoStartIndex(major, minor, patch, &start);
@@ -957,13 +950,73 @@ BOOL WZHACK_API WzHack_SetPlayerWastedPower(unsigned player, int wz_version, int
         return FALSE;
 
     // Calcula o endereço
-    wastedAddr = libhack_get_base_addr64(hack) + wz_off[start + player].power_offset + 0x28;
+    wastedAddr = libhack_get_base_addr(hack) + wz_off[start + player].power_offset + 0x28;
 
     // Atualiza a quantidade de energia gasta
-    libhack_write_int_to_addr64(hack, static_cast<DWORD64>(wastedAddr), wasted);
+    libhack_write_int_to_addr(hack, static_cast<DWORD>(wastedAddr), wasted);
 
     // Libera a memória alocada
     libhack_free(hack);
 
     return TRUE;
+}
+
+void WZHACK_API GetVersionFromWzVer(int wz_version, int *major, int *minor, int *patch)
+{
+    // Extrai os números da versão
+    *major = wz_version / 100;
+    *minor = (wz_version / 10) % 10;
+    *patch = wz_version % 10;
+}
+
+BOOL WZHACK_API IsNumberOfUnitsSupported(int wz_version)
+{
+    int major, minor, patch;
+    int start_index;
+
+    // Obtém os números da versão
+    GetVersionFromWzVer(wz_version, &major, &minor, &patch);
+
+    WzHack_GetWzPpoStartIndex(major, minor, patch, &start_index);
+
+    return wz_off[start_index].units_offset > 0;
+}
+
+BOOL WZHACK_API IsNumberOfStructsSupported(int wz_version)
+{
+    int major, minor, patch;
+    int start_index;
+
+    // Obtém os números da versão
+    GetVersionFromWzVer(wz_version, &major, &minor, &patch);
+
+    WzHack_GetWzPpoStartIndex(major, minor, patch, &start_index);
+
+    return wz_off[start_index].structures_offset > 0;
+}
+
+void WZHACK_API WzHack_EraseEnergyFromAI(int wz_version)
+{
+    int major, minor, patch, start_index;
+    DWORD baseAddr;
+
+    if(!hack)
+        hack = libhack_init(WZ_PROCESS);
+
+    // Obtém o número de versão
+    GetVersionFromWzVer(wz_version, &major, &minor, &patch);
+
+    // Obtém a posição de início no vetor de offsets de acordo com a versão do jogo
+    WzHack_GetWzPpoStartIndex(major, minor, patch, &start_index);
+
+    // Abre o processo do warzone
+    if(!libhack_open_process(hack))
+        return;
+
+    // Obtém o endereço-base do processo
+    baseAddr = libhack_get_base_addr(hack);
+
+    // TODO: check if player is human or AI
+    for(int player = 1; player < MAX_PLAYERS; ++player)
+        libhack_write_int_to_addr(hack, baseAddr + wz_off[player].power_offset, 0);
 }
