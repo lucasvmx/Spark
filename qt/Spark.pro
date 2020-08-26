@@ -27,22 +27,26 @@ Release:DEFINES += _RELEASE
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+	../src/dynamic_loader.c \
+	../src/exception.cpp \
         ../src/main.cpp \
         ../src/frmmain.cpp \
+	../src/threads.cpp \
     ../src/wzhack.cpp \
     ../src/frmsettings.cpp \
-    ../src/task.cpp \
 	../src/frmabout.cpp
 
 HEADERS += \
 	../libs/libhack/consts.h \
 	../libs/libhack/hack.h \
 	../libs/libhack/process.h \
+	../src/dynamic_loader.h \
+	../src/exception.h \
         ../src/frmmain.h \
+	../src/threads.h \
 	../src/version.h \
     ../src/wzhack.h \
     ../src/frmsettings.h \
-    ../src/task.h \
 	../src/frmabout.h
 
 FORMS += \

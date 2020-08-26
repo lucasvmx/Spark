@@ -1,9 +1,20 @@
+/**
+ * @file version.h
+ * @author Lucas Vieira de Jesus (lucas.engen.cc@gmail.com)
+ * @brief Informações sobre a versão do programa
+ * @version 0.1
+ * @date 2020-08-22
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ */
+
 #ifndef VERSION_H
 #define VERSION_H
 
 // Versão do programa
-#define MAJOR	1
-#define MINOR	4
+#define MAJOR	2
+#define MINOR	0
 #define PATCH	0
 
 #endif // VERSION_H

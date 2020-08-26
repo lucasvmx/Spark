@@ -1,7 +1,7 @@
-[quality-url]: https://img.shields.io/codefactor/grade/github/lucas-engen/Warzone-2100-Hack/master?style=flat-square
-[downloads-url]: https://img.shields.io/github/downloads/lucas-engen/Warzone-2100-Hack/total?style=flat-square
-[license-url]: https://img.shields.io/github/license/lucas-engen/Warzone-2100-Hack?style=flat-square
-[commit-activity-url]: https://img.shields.io/github/commit-activity/y/lucas-engen/Warzone-2100-Hack?style=flat-square
+[quality-url]: https://img.shields.io/codefactor/grade/github/lucas-engen/Spark/master?style=flat-square
+[downloads-url]: https://img.shields.io/github/downloads/lucas-engen/Spark/total?style=flat-square
+[license-url]: https://img.shields.io/github/license/lucas-engen/Spark?style=flat-square
+[commit-activity-url]: https://img.shields.io/github/commit-activity/y/lucas-engen/Spark?style=flat-square
 
 [project-image]: resource/images/warzone2100.png
 
@@ -14,11 +14,11 @@
 
 <br />
 <p align="center">
-  <a href="https://github.com/lucas-engen/Warzone-2100-Hack">
+  <a href="https://github.com/lucas-engen/Spark">
     <img src="resource/images/warzone2100.png" alt="Logo" width="200" height="200">
   </a>
 
-  <h3 align="center">Warhack</h3>
+  <h3 align="center">Spark</h3>
 
   <p align="center">
     Um simples trainer para o game warzone 2100
@@ -39,11 +39,12 @@
 - [Como utilizar](#Utilização)
 
 ## Sobre
-Este projeto foi criado com o intuito de estudar como um programa é capaz de modificar o funcionamento de outro apenas modificando valores guardados na memória RAM. O jogo escolhido foi o [warzone 2100](https://wz2100.net/pt/).
+Este projeto foi criado com o intuito de estudar como um programa é capaz de modificar o funcionamento de outro apenas modificando valores guardados na memória RAM. O jogo escolhido foi o [Warzone 2100](https://wz2100.net/pt/).
+No momento ele funciona apenas no modo **Skirmish**
 
 ## Download
 
-Clique [aqui](https://github.com/lucas-engen/Warzone-2100-Hack/releases/latest
+Clique [aqui](https://github.com/lucas-engen/Spark/releases/latest
 ) para baixar a última versão estável deste programa.
 
 ## Recursos
@@ -57,9 +58,9 @@ Clique [aqui](https://github.com/lucas-engen/Warzone-2100-Hack/releases/latest
 
 ## Utilização
 
-- Abra o WarHack
+- Abra o Spark
 - Configure
-- Abre o Warzone2100
+- Abra o Warzone2100
 - Aproveite!
 
 ## Autor
