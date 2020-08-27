@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = WarHack
+TARGET = Spark
 TEMPLATE = app
 win32:RC_ICONS += ../resource/images/warzone2100_icon.ico
 
@@ -25,6 +25,9 @@ Release:DEFINES += _RELEASE
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+
+# Enable exceptions
+QMAKE_CXXFLAGS += -fexceptions
 
 SOURCES += \
 	../src/dynamic_loader.c \
@@ -57,7 +60,7 @@ FORMS += \
 RESOURCES += \
     ../resource/resources.qrc
 
-win32: LIBS += -L$$PWD/../libs/libhack -lhack -lpsapi
+win32: LIBS += -L$$PWD/../libs/libhack -lhack -lpsapi -static-libgcc
 
 INCLUDEPATH += $$PWD/../libs/libhack
-DEPENDPATH += $$PWD/../libs/libhack
+DEPENDPATH += $$PWD/../libs/libhack/bin
