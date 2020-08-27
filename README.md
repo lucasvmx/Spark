@@ -39,8 +39,8 @@
 - [Como utilizar](#Utilização)
 
 ## Sobre
-Este projeto foi criado com o intuito de estudar como um programa é capaz de modificar o funcionamento de outro apenas modificando valores guardados na memória RAM. O jogo escolhido foi o [Warzone 2100](https://wz2100.net/pt/).
-No momento ele funciona apenas no modo **Skirmish**
+Este projeto foi criado com o intuito de modificar o funcionamento do jogo enquanto eu jogava no modo **Skirmish**. Ao longo do tempo
+ele foi evoluindo e passando a ter mais funcionalidades.
 
 ## Download
 
