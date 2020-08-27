@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "exception.h"
 #include <QThread>
 
 namespace Threads
@@ -30,9 +31,12 @@ namespace Threads
         void wait(uint32_t seconds);
         void giveInfiniteEnergy();
         void eraseEnemyEnergy();
+        bool isGamePlayStarted() const;
+        void enableGodMode();
 
     signals:
         void updateStatus(QString status_text);
+        void showCriticalMsgBox(QString title, QString text);
     };
 
     class AntiCheatDetectionThread: public QThread

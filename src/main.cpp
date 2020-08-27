@@ -18,32 +18,37 @@
 
 static void CheckForOtherInstance()
 {
+#ifdef Q_OS_WIN
     HANDLE hMutex = nullptr;
 
-    hMutex = CreateMutexA(nullptr, TRUE, "WarHack_Mutex");
-    if (GetLastError() == ERROR_ALREADY_EXISTS)
-    {
-        QMessageBox::critical(nullptr, "Error", "Outra instância já está em execução");
-        exit(-1);
-    }
-
+    hMutex = CreateMutexA(nullptr, TRUE, "Spark_Mutex");
     if (hMutex == nullptr)
     {
         QMessageBox::critical(nullptr, "Error", QString::asprintf("Failed to create mutex: %lu", GetLastError()));
-        exit(0);
+        exit(1);
     }
 
-    // Carrega as funcões da DLL
-    LoadDLLFunctions();
+    if (GetLastError() == ERROR_ALREADY_EXISTS)
+    {
+        QMessageBox::critical(nullptr, "Error", "Outra instância já está em execução");
+        exit(1);
+    }
+#else
+    // TODO: implementar para o linux
+#endif
 }
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    frmMain w;
+    frmMain mainForm;
 
     CheckForOtherInstance();
-    w.show();
+
+    // Carrega as funcões da DLL
+    LoadDLLFunctions();
+
+    mainForm.show();
 
     return a.exec();
 }

@@ -17,4 +17,10 @@
 #define MINOR	0
 #define PATCH	0
 
+/**
+  * @brief nome do programa
+  *
+  */
+#define PROGNAME    "Spark"
+
 #endif // VERSION_H

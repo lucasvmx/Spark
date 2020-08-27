@@ -1,21 +1,23 @@
 #ifndef EXCEPTION_H
 #define EXCEPTION_H
 
+#include <QException>
+
 // Tamanho do buffer interno para essa classe
 #define INTERNAL_BUFLEN 512
 
-class Exception
+class Exception : QException
 {
 public:
     Exception(const char *what);
     Exception();
     ~Exception();
 
-    virtual void raise() const;
-    virtual const char *what() const;
+    void raise() const override;
+    const char *what();
 
 private:
-    char exception_text[INTERNAL_BUFLEN];
+    QString exception_text;
 };
 
 #endif // EXCEPTION_H

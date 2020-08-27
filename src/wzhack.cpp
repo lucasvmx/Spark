@@ -129,13 +129,10 @@ BOOL WzHack_GetStructStartIndex(int wz_version, unsigned short *start)
 {
     unsigned short local_start;
 	BOOL bOk = FALSE;
-    int major, minor, patch;
     const size_t len = arraySize(player_info);
 
     if (start == nullptr)
 		return FALSE;
-
-    GetVersionFromWzVer(wz_version, &major, &minor, &patch);
 
     for (unsigned i = 0; i < len; i++)
 	{
@@ -222,7 +219,7 @@ BOOL WzHack_FindProcess(const char *name, DWORD *pid)
 	
     SetLastError(ERROR_FILE_NOT_FOUND);
 
-    if(pid != nullptr)
+    if(*pid)
         *pid = local_pid;
 
 	return FALSE;
@@ -422,12 +419,20 @@ bool IsFeatureSupported(int wz_version, FEATURES feature)
     case FEATURE_GOD_MODE: return player_info[start].godMode_offset > 0;
     case FEATURE_GET_UNITS: return player_info[start].units_offset > 0;
     case FEATURE_CHANGE_POWER: return player_info[start].power_offset > 0;
-    case FEATURE_CHANGE_DAMAGE: return player_info[start].damage_modifier_offset > 0;
+    case FEATURE_CHANGE_DAMAGE_MODIFIER: return player_info[start].damage_modifier_offset > 0;
     case FEATURE_GET_STRUCTURES: return player_info[start].structures_offset > 0;
     case FEATURE_CHANGE_EXTRACTED_POWER: return player_info[start].extracted_power_offset > 0;
     case FEATURE_CHANGE_MAX_STORED_POWER: return player_info[start].max_power_offset > 0;
     case FEATURE_GET_SELECTED_PLAYER: return player_info[start].selectedPlayer_offset > 0;
     case FEATURE_CHANGE_WASTED_POWER: return player_info[start].wasted_power_offset > 0;
+
+    case FEATURE_CHECK_GAME_IS_RUNNING:
+        for(const auto& element : gstatus) {
+            if(element.warzone_version == wz_version)
+                return element.grpInitialized_offset > 0;
+        }
+
+        return false;
     }
 
     return false;

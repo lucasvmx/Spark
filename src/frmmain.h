@@ -36,6 +36,7 @@ public slots:
     void delegateSetText(QString text);
     void OnAction_AboutTriggered(bool x);
 
+    void showCriticalMsgBox(QString title, QString text);
 private:
     Ui::frmMain *ui;
     void setTextColorFromId(int id);

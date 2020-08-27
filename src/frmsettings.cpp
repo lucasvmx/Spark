@@ -13,11 +13,11 @@
 #include "ui_frmsettings.h"
 #include <QMessageBox>
 
-// id do jogador selecionado
-int player_id = -1;
+// id do jogador selecionado (padrão: 0)
+int player_id = 0;
 
-// tempo de espera entre uma iteração e a outra do hack
-int hacking_delay = -1;
+// tempo de espera entre uma iteração e a outra do hack (padrão: 5)
+int hacking_delay = 5;
 
 // flag para armazenar se a energia do inimigo deverá ser zerada
 bool bEraseEnemyEnergy = false;
@@ -63,20 +63,22 @@ void frmSettings::OnButtonSave_Clicked(bool b)
     bEraseEnemyEnergy = ui->radioButton_erase_enemy_energy->isChecked();
     bEnableGodMode = ui->checkBox_enable_godmode->isChecked();
     bPreventAntiCheatDetection = ui->checkBox_prevent_anticheat->isChecked();
-    hacking_delay = ui->horizontalSlider_delay->value() * 1000;
+    hacking_delay = ui->horizontalSlider_delay->value();
+    player_id = ui->comboBox_playerId->currentIndex();
 
     if(!bInfiniteEnergy && !bSupportSpecificPlayer && !bEraseEnemyEnergy && !bEnableGodMode)
     {
         bInfiniteEnergy = true;
-        QMessageBox::warning(0, "Atenção", "Você não escolheu nenhum algoritmo de hacking. Por padrão, o de energia"
-                                           "infinita será usado");
+        QMessageBox::warning(0, "Atenção",
+                             "Você não escolheu nenhum algoritmo de hacking. Por padrão, o de energia infinita será usado");
     } else
     {
         QMessageBox::information(0, "Sucesso", "Configurações salvas!");
+        this->close();
     }
 }
 
 void frmSettings::OnSliderMoved(int v)
 {
-    ui->label_3->setText(QString::asprintf( "%d segundos", v));
+    ui->labelWaitTime->setText(QString::asprintf( "%d segundos", v));
 }

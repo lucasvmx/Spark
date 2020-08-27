@@ -6,12 +6,12 @@ using namespace std;
 
 Exception::Exception(const char *what)
 {
-    strncpy(exception_text, what, arraySize(exception_text));
+    exception_text = QString(what);
 }
 
 Exception::Exception()
 {
-    memset(exception_text, 0, sizeof(exception_text));
+
 }
 
 Exception::~Exception()
@@ -24,7 +24,7 @@ void Exception::raise() const
     throw *this;
 }
 
-const char *Exception::what() const
+const char *Exception::what()
 {
-    return QString(this->exception_text).toStdString().c_str();
+    return this->exception_text.toStdString().c_str();
 }

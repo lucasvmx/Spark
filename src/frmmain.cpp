@@ -14,6 +14,7 @@
 #include "frmsettings.h"
 #include "threads.h"
 #include "frmabout.h"
+#include "exception.h"
 
 #include <QMessageBox>
 #include <cstdio>
@@ -29,13 +30,20 @@ frmMain::frmMain(QWidget *parent) :
     ui(new Ui::frmMain)
 {
     ui->setupUi(this);
-    hackingThread = new Threads::MainHackingThread();
-    this->connectAllSignals();
-    if(PATCH > 0)
-        this->setWindowTitle(QString("WarHack v%1.%2.%3").arg(MAJOR).arg(MINOR).arg(PATCH));
-    else
-        this->setWindowTitle(QString("WarHack v%1.%2").arg(MAJOR).arg(MINOR));
 
+    // Inicializa a classe das threads
+    hackingThread = new Threads::MainHackingThread();
+
+    // Conecta os sinais de usuário
+    this->connectAllSignals();
+
+    // Constroi o titulo
+    if(PATCH > 0)
+        this->setWindowTitle(QString("%1 v%1.%2.%3").arg(PROGNAME).arg(MAJOR).arg(MINOR).arg(PATCH));
+    else
+        this->setWindowTitle(QString("%1 v%2.%3").arg(PROGNAME).arg(MAJOR).arg(MINOR));
+
+    // Ajusta o tamanho da janela
     this->setFixedWidth(this->width());
     this->setFixedHeight(this->height());
 }
@@ -51,8 +59,9 @@ void frmMain::connectAllSignals()
     QObject::connect(ui->buttonSettings, SIGNAL(clicked(bool)), this, SLOT(OnButtonSettingsClicked(bool)));
     QObject::connect(ui->actionAbout_Qt, SIGNAL(triggered(bool)), this, SLOT(OnAction_AboutQtTriggered(bool)));
     QObject::connect(ui->actionQuit_2, SIGNAL(triggered(bool)), this, SLOT(OnAction_QuitTriggered(bool)));
-    QObject::connect(hackingThread, SIGNAL(update(QString)), this, SLOT(delegateSetText(QString)));
+    QObject::connect(hackingThread, SIGNAL(updateStatus(QString)), this, SLOT(delegateSetText(QString)));
     QObject::connect(ui->actionAbout_WarHack, SIGNAL(triggered(bool)), this, SLOT(OnAction_AboutTriggered(bool)));
+    QObject::connect(hackingThread, SIGNAL(showCriticalMsgBox(QString, QString)), this, SLOT(showCriticalMsgBox(QString, QString)));
 }
 
 void frmMain::OnButtonStartClicked(bool x)
@@ -164,4 +173,9 @@ void frmMain::println(int id, const char *text, ...)
 
     va_end(list);
     ui->textBrowserOutput->insertHtml(QString(buffer) + "<br>");
+}
+
+void frmMain::showCriticalMsgBox(QString title, QString text)
+{
+    QMessageBox::critical(0, title, text);
 }
