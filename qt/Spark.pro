@@ -10,7 +10,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = Spark
 TEMPLATE = app
-win32:RC_ICONS += ../resource/images/warzone2100_icon.ico
+#win32:RC_ICONS += ../resource/images/iconfinder__snowflake_1679761_ico.ico
+win32:RC_FILE += ../resource/spark.rc
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -43,6 +44,7 @@ HEADERS += \
 	../libs/libhack/consts.h \
 	../libs/libhack/hack.h \
 	../libs/libhack/process.h \
+	../resource/spark.rc \
 	../src/dynamic_loader.h \
 	../src/exception.h \
         ../src/frmmain.h \

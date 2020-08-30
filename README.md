@@ -3,7 +3,7 @@
 [license-url]: https://img.shields.io/github/license/lucas-engen/Spark?style=flat-square
 [commit-activity-url]: https://img.shields.io/github/commit-activity/y/lucas-engen/Spark?style=flat-square
 
-[project-image]: resource/images/warzone2100.png
+[project-image]: resource/images/iconfinder__snowflake_1679761.png
 
 ![quality][quality-url]
 ![downloads][downloads-url]
@@ -15,7 +15,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/lucas-engen/Spark">
-    <img src="resource/images/warzone2100.png" alt="Logo" width="200" height="200">
+    <img src="resource/images/iconfinder__snowflake_1679761.png" alt="Logo" width="200" height="200">
   </a>
 
   <h3 align="center">Spark</h3>
@@ -58,7 +58,7 @@ Clique [aqui](https://github.com/lucas-engen/Spark/releases/latest
 
 ## Utilização
 
-[Como utilizar](USAGE.md)
+[Clique aqui para ver o simples tutorial](USAGE.md)
 
 ## Autor
 Lucas Vieira de Jesus - [Gmail](mailto:lucas.engen.cc@gmail.com)

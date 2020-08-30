@@ -40,7 +40,7 @@ static void CheckForOtherInstance()
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
     frmMain mainForm;
 
     CheckForOtherInstance();
@@ -48,7 +48,9 @@ int main(int argc, char *argv[])
     // Carrega as funcões da DLL
     LoadDLLFunctions();
 
+    // Muda o ícone da janela
+    app.setWindowIcon(QIcon(":/images/iconfinder__snowflake_1679761_ico.ico"));
     mainForm.show();
 
-    return a.exec();
+    return app.exec();
 }

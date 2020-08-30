@@ -16,41 +16,107 @@
 
 namespace Threads
 {
+    /**
+     * @brief The MainHackingThread class
+     */
     class MainHackingThread : public QThread
     {
         Q_OBJECT
 
     public:
+        /**
+         * @brief Inicializa a classe
+         */
         MainHackingThread();
-        void runHack();
 
     private:
         void run();
         void startLibhack();
+
+        /**
+         * @brief Aguarda até que o warzone 2100 seja aberto
+         */
         void waitForWarzone();
+
+        /**
+         * @brief wait Aguarda por um tempo, sem bloquear a execução da thread
+         * @param seconds Tempo a aguardar
+         */
         void wait(uint32_t seconds);
+
+        /**
+         * @brief Oferece energia "infinita" ao jogador
+         */
         void giveInfiniteEnergy();
+
+        /**
+         * @brief Zera a energia dos jogadores inimigos
+         */
         void eraseEnemyEnergy();
+
+        /**
+         * @brief Verifica se a partida já começou
+         * @return true se a partida tiver começado, falso caso contrário
+         */
         bool isGamePlayStarted() const;
+
+        /**
+         * @brief Habilita o modo deus
+         */
         void enableGodMode();
 
     signals:
+
+        /**
+         * @brief Exibe um texto no console da IU
+         * @param status_text
+         */
         void updateStatus(QString status_text);
+
+        /**
+         * @brief Exibe uma caixa de mensagem de alerta
+         * @param title Título da mensagem
+         * @param text Texto principal
+         */
         void showCriticalMsgBox(QString title, QString text);
     };
 
+    /**
+     * @brief The AntiCheatDetectionThread class
+     */
     class AntiCheatDetectionThread: public QThread
     {
         Q_OBJECT
 
     public:
+        /**
+         * @brief AntiCheatDetectionThread
+         * @param warzone_version Versão do warzone 2100
+         */
         AntiCheatDetectionThread(unsigned short warzone_version);
-        void preventAntiCheatDetection();
 
     private:
+
+        /**
+         * @brief wz_version Armazena a versão do warzone
+         */
         unsigned short wz_version;
+
+        /**
+         * @brief getGameStatusIndex Obtém a posição de inicio na estrutura game_status
+         * @return
+         */
         int getGameStatusIndex();
+
+        /**
+         * @brief wait Aguarda por um tempo determinado, evitando o bloqueio da thread
+         * @param seconds Tempo a ser aguardado
+         */
         void wait(uint32_t seconds);
+
+        /**
+         * @brief run Executa a thread
+         */
         void run();
     };
 }

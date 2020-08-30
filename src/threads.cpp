@@ -88,10 +88,6 @@ void MainHackingThread::run()
         // Obtém o valor máximo da energia
         MAX_POWER = GetWarzoneMaxPowerValue(::detected_warzone_version);
 
-#ifdef QT_DEBUG
-        qDebug("Max power for this version: %u\n", MAX_POWER);
-#endif
-
         // Se certifica se que a versão é conhecida
         Q_ASSERT(::detected_warzone_version != WZ_UNKNOWN);
 
@@ -101,7 +97,7 @@ void MainHackingThread::run()
         if(bPreventAntiCheatDetection)
         {
             antiCheat = new AntiCheatDetectionThread(::detected_warzone_version);
-            antiCheat->preventAntiCheatDetection();
+            antiCheat->start();
         }
 
         // Realizar as interferências no jogo
@@ -125,11 +121,6 @@ void MainHackingThread::run()
         antiCheat->exit(0);
 
     emit updateStatus(tr("Operações finalizadas"));
-}
-
-void MainHackingThread::runHack()
-{
-    this->run();
 }
 
 void MainHackingThread::startLibhack()
@@ -267,6 +258,8 @@ bool MainHackingThread::isGamePlayStarted() const
 void MainHackingThread::enableGodMode()
 {
     unsigned long addrToWrite = 0;
+    int god_mode;
+    int bytes_written = 0;
     Q_ASSERT(hack_handle != nullptr);
 
     // Calcula o endereço para escrita
@@ -279,19 +272,29 @@ void MainHackingThread::enableGodMode()
         break;
     }
 
+    qDebug("Endereço encontrado: %#lx\n", addrToWrite);
+
     if(addrToWrite)
-        libhack_write_int_to_addr(::hack_handle, addrToWrite, 1);
+    {
+        do
+        {
+            bytes_written = libhack_write_int_to_addr(::hack_handle, addrToWrite, 1);
+            if(bytes_written <= 0) {
+                fprintf(stderr, "(%s:%d) erro ao habilitar o god mode: %lu\n", __FILE__, __LINE__, GetLastError());
+                break;
+            }
+
+            // Certifica-se de que o modo Deus está habilitado
+            god_mode = libhack_read_int_from_addr(::hack_handle, addrToWrite);
+            qDebug("god mode: %d", god_mode);
+        } while((god_mode == 0) && !(this->isInterruptionRequested()) && (libhack_process_is_running(::hack_handle)));
+    }
 }
 
 AntiCheatDetectionThread::AntiCheatDetectionThread(unsigned short warzone_version)
 {
     Q_ASSERT(hack_handle != nullptr);
     this->wz_version = warzone_version;
-}
-
-void AntiCheatDetectionThread::preventAntiCheatDetection()
-{
-    this->run();
 }
 
 int AntiCheatDetectionThread::getGameStatusIndex()

@@ -11,6 +11,7 @@
 
 #include "frmabout.h"
 #include "ui_frmabout.h"
+#include "version.h"
 #include <QMovie>
 #include <windows.h>
 
@@ -21,6 +22,7 @@ frmAbout::frmAbout(QWidget *parent) :
     ui->setupUi(this);
     this->setFixedSize(this->width(),this->height());
     this->connectSignals();
+    this->setWindowTitle(QString("Sobre o %1").arg(PROGNAME));
 
     QMovie *movie = new QMovie(":/images/lulzsec.gif");
     ui->movieLabel->setMovie(movie);

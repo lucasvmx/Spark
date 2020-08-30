@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>WarHack - Settings</string>
+   <string/>
   </property>
   <property name="windowIcon">
    <iconset resource="../resource/resources.qrc">

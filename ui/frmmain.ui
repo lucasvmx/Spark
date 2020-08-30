@@ -217,7 +217,7 @@ QGroupBox::title {
      <normaloff>:/images/if_Blue_ball_132060.ico</normaloff>:/images/if_Blue_ball_132060.ico</iconset>
    </property>
    <property name="text">
-    <string>Sobre o WarHack</string>
+    <string>Sobre o Spark</string>
    </property>
   </action>
  </widget>

@@ -11,6 +11,7 @@
 
 #include "frmsettings.h"
 #include "ui_frmsettings.h"
+#include "version.h"
 #include <QMessageBox>
 
 // id do jogador selecionado (padrão: 0)
@@ -40,6 +41,7 @@ frmSettings::frmSettings(QWidget *parent) : QWidget(parent), ui(new Ui::frmSetti
     this->connectAllSignals();
     this->setFixedHeight(this->height());
     this->setFixedWidth(this->width());
+    this->setWindowTitle(QString("%1 - configurações").arg(PROGNAME));
 }
 
 frmSettings::~frmSettings()
@@ -66,7 +68,8 @@ void frmSettings::OnButtonSave_Clicked(bool b)
     hacking_delay = ui->horizontalSlider_delay->value();
     player_id = ui->comboBox_playerId->currentIndex();
 
-    if(!bInfiniteEnergy && !bSupportSpecificPlayer && !bEraseEnemyEnergy && !bEnableGodMode)
+    if(!bInfiniteEnergy && !bSupportSpecificPlayer &&
+            !bEraseEnemyEnergy && !bEnableGodMode && !bPreventAntiCheatDetection)
     {
         bInfiniteEnergy = true;
         QMessageBox::warning(0, "Atenção",

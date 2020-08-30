@@ -1,38 +1,40 @@
 # Como utilizar o Spark
 
-## 1. Abra o Spark e clique em **Configurações**
+<br>
+
+### 1. Abra o Spark e clique em **Configurações**
 
 <br>
 <br>
 
-![tela-inicial](images/start-screen.png)
+![tela-inicial](resource/images/start-screen.png)
 <br><br><br>
 
-## 2. Faça a configuração desejada
+### 2. Faça a configuração desejada
 - Neste caso, iremos configurar o hack para que o jogador 0 sempre receba o valor máximo de energia a cada 60 segundos.
 
-![tela-config](images/settings-window.png)
+![tela-config](resource/images/settings-window.png)
 <br>
 
-## 3. Salve as configurações
+### 3. Salve as configurações
 <br>
 
-![tela-salvar](images/save-settings.png)
+![tela-salvar](resource/images/save-settings.png)
 
-## 4. Aperte em iniciar
+### 4. Aperte em iniciar
 <br>
 
 - Nessa etapa, o programa irá ficar aguardando pela abertura do warzone 2100. Assim que o warzone 2100 for aberto, as modificações já começarão a ser feitas.
 
-![iniciar](images/start-window.png)
+![iniciar](resource/images/start-window.png)
 <br>
 <br>
 
-## 4. Abra o warzone 2100 e jogue normalmente
+### 5. Abra o warzone 2100 e jogue normalmente
 
-![warzone-skirmish-config](images/warzone-skirmish.png)
-![low-energy](images/low-energy.png)
-![high-energy](images/high-energy.png)
+![warzone-skirmish-config](resource/images/warzone-skirmish.png)
+![low-energy](resource/images/low-energy.png)
+![high-energy](resource/images/high-energy.png)
 
 <br>
 <br>
