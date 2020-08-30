@@ -58,10 +58,7 @@ Clique [aqui](https://github.com/lucas-engen/Spark/releases/latest
 
 ## Utilização
 
-- Abra o Spark
-- Configure
-- Abra o Warzone2100
-- Aproveite!
+[Como utilizar](USAGE.md)
 
 ## Autor
 Lucas Vieira de Jesus - [Gmail](mailto:lucas.engen.cc@gmail.com)
