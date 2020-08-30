@@ -56,8 +56,6 @@ void MainHackingThread::run()
 
     try {
 
-        Q_ASSERT(1 == 2);
-
         // Inicializa a libhack
         this->startLibhack();
 
@@ -242,6 +240,9 @@ bool MainHackingThread::isGamePlayStarted() const
 {
     unsigned long addressToRead = 0;
     int started;
+
+    if(!libhack_process_is_running(::hack_handle))
+        throw new Exception("O warzone 2100 foi fechado subitamente");
 
     if(IsFeatureSupported(::detected_warzone_version, FEATURE_CHECK_GAME_IS_RUNNING))
     {
