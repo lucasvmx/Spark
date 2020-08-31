@@ -89,7 +89,12 @@ extern pSetPowerModifier setPowerModifier;
 /**
  * @brief isHumanPlayer Verifica se o jogador é humano (int player)
  */
-extern pIsHumanPlayer isHumanPlayer;
+extern pIsHumanPlayer IsHumanPlayer;
+
+/**
+ * @brief ClearPlayerPower Zera a energia do jogador selecionado
+ */
+extern pClear ClearPlayerPower;
 
 // Funções comuns
 

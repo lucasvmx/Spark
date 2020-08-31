@@ -12,9 +12,31 @@
 #include "frmmain.h"
 #include <QApplication>
 #include <QMessageBox>
+#include <QObject>
+#include <signal.h>
+#ifdef Q_OS_WIN
 #include <windows.h>
+#endif
 #include "wzhack.h"
 #include "dynamic_loader.h"
+
+void signal_handler(int signum)
+{
+    switch(signum)
+    {
+    case SIGABRT:
+    case SIGSEGV:
+        QMessageBox::critical(0, QObject::tr("Falha de aplicativo"),
+                              QObject::tr("Um erro crítico foi detectado e o programa precisa ser fechado. "
+                                          "Código do erro: %1").arg(signum));
+    }
+
+#ifdef Q_OS_WIN
+    ExitProcess(1);
+#else
+    exit(1);
+#endif
+}
 
 static void CheckForOtherInstance()
 {
@@ -43,13 +65,15 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     frmMain mainForm;
 
+    signal(SIGABRT, signal_handler);
+    signal(SIGSEGV, signal_handler);
+
     CheckForOtherInstance();
 
     // Carrega as funcões da DLL
     LoadDLLFunctions();
 
-    // Muda o ícone da janela
-    app.setWindowIcon(QIcon(":/images/iconfinder__snowflake_1679761_ico.ico"));
+    // Exibe a janela
     mainForm.show();
 
     return app.exec();

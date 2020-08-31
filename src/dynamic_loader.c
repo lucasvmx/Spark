@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include "dynamic_loader.h"
+#include "process.h"
 
 #define KERNEL_DLL      "kernel32.dll"
 #define PSAPI_DLL       "psapi.dll"
@@ -24,8 +25,8 @@ QFPINA fQueryFullProcessImageFileName = NULL;
 pAddPower addPower = NULL;
 pSetPowerModifier setPowerModifier = NULL;
 pPrintChatMsg printchatmsg = NULL;
-pIsHumanPlayer isHumanPlayer = NULL;
-//pClear clearPlayerPower = NULL;
+pIsHumanPlayer IsHumanPlayer = NULL;
+pClear ClearPlayerPower = NULL;
 
 void LoadDLLFunctions()
 {
@@ -90,12 +91,23 @@ void LoadDLLFunctions()
 void LoadWarzoneFunctions(struct libhack_handle *handle)
 {
     if(handle == NULL) {
-        fprintf(stderr, "(%s:%d) null pointer to libhack\n", __FILE__, __LINE__);
+        fprintf(stdout, "(%s:%d) null pointer to libhack\n", __FILE__, __LINE__);
         ExitProcess(1);
     }
 
-    addPower = (pAddPower)((DWORD)handle->hModule + 0x11bb30);
-    isHumanPlayer = (pIsHumanPlayer)((DWORD)handle->hModule + 0x00f9540);
-    printchatmsg = (pPrintChatMsg)((DWORD)handle->hModule + 0x00f9c20);
-    setPowerModifier = (pSetPowerModifier)((DWORD)handle->hModule + 0x11c350);
+    if(!((DWORD)(handle->hModule))) {
+        fprintf(stdout, "(%s:%d) invalid hModule value\n", __FILE__, __LINE__);
+        ExitProcess(1);
+    }
+
+    addPower = (pAddPower)((DWORD)(handle->hModule) + 0x11bb30);
+    IsHumanPlayer = (pIsHumanPlayer)((DWORD)(handle->hModule) + 0x00f9540);
+    printchatmsg = (pPrintChatMsg)((DWORD)(handle->hModule) + 0x00f9c20);
+    setPowerModifier = (pSetPowerModifier)((DWORD)(handle->hModule) + 0x11c350);
+    ClearPlayerPower = (pClear)((DWORD)(handle->hModule) + 0x11bd30);
+
+    fprintf(stdout, "addPower: %p\n", addPower);
+    fprintf(stdout, "isHumanPlayer: %p\n", IsHumanPlayer);
+    fprintf(stdout, "printchatmsg: %p\n", printchatmsg);
+    fprintf(stdout, "setPowerModifier: %p\n", setPowerModifier);
 }

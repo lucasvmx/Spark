@@ -32,7 +32,13 @@ namespace Threads
     private:
         void run();
         void startLibhack();
-
+		
+		/**
+		 * @brief Determina se a thread do trainer deve continuar em execução
+		 * @return TRUE se ela deve continuar em execução, FALSE caso contrário
+		 */
+		bool canContinue() const;
+		
         /**
          * @brief Aguarda até que o warzone 2100 seja aberto
          */
@@ -59,7 +65,13 @@ namespace Threads
          * @return true se a partida tiver começado, falso caso contrário
          */
         bool isGamePlayStarted() const;
-
+		
+        /**
+         * @brief Alias para isGamePlayStarted()
+         * @return true se a partida tiver começado, falso caso contrário
+         */
+		bool isGamePlayRunning() const;
+		
         /**
          * @brief Habilita o modo deus
          */

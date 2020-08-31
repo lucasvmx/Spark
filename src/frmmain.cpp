@@ -38,10 +38,10 @@ frmMain::frmMain(QWidget *parent) :
     this->connectAllSignals();
 
     // Constroi o titulo
-    if(PATCH > 0)
-        this->setWindowTitle(QString("%1 v%1.%2.%3").arg(PROGNAME).arg(MAJOR).arg(MINOR).arg(PATCH));
+    if(SPARK_PATCH > 0)
+        this->setWindowTitle(QString("%1 v%2.%3.%4").arg(PROGNAME).arg(SPARK_MAJOR).arg(SPARK_MINOR).arg(SPARK_PATCH));
     else
-        this->setWindowTitle(QString("%1 v%2.%3").arg(PROGNAME).arg(MAJOR).arg(MINOR));
+        this->setWindowTitle(QString("%1 v%2.%3").arg(PROGNAME).arg(SPARK_MAJOR).arg(SPARK_MINOR));
 
     // Ajusta o tamanho da janela
     this->setFixedWidth(this->width());
@@ -70,13 +70,13 @@ void frmMain::OnButtonStartClicked(bool x)
 
     if(hackingThread->isRunning())
     {
-        printText(error, "Uma outra tarefa já está em execução. Parando ...<br>");
+        println(error, tr("Uma outra tarefa já está em execução. Parando ..."));
         hackingThread->requestInterruption();
         return;
     }
 
     ui->textBrowserOutput->clear();
-    printText(log_info, "Iniciando ...<br>");
+    println(log_info, tr("Iniciando ..."));
     hackingThread->start();
 }
 
@@ -87,7 +87,7 @@ void frmMain::OnButtonSettingsClicked(bool x)
 
     if(settings != nullptr && settings->isVisible())
     {
-        QMessageBox::critical(this, "Erro", "A caixa de configurações já está aberta");
+        QMessageBox::critical(this, tr("Erro"), tr("A caixa de configurações já está aberta"));
     } else {
         settings = new frmSettings();
         settings->show();
@@ -110,7 +110,7 @@ void frmMain::OnAction_QuitTriggered(bool x)
 
 void frmMain::delegateSetText(QString text)
 {
-    printText(log_info,text.toStdString().c_str());
+    println(log_info, text);
 }
 
 void frmMain::OnAction_AboutTriggered(bool x)
@@ -124,7 +124,7 @@ void frmMain::OnAction_AboutTriggered(bool x)
 
     if(about->isVisible())
     {
-        QMessageBox::warning(this, "Erro", "A janela sobre encontra-se aberta");
+        QMessageBox::warning(this, tr("Erro"), tr("A janela sobre encontra-se aberta"));
     } else {
         about->show();
     }
@@ -146,33 +146,16 @@ void frmMain::setTextColorFromId(int id)
         return;
 }
 
-void frmMain::printText(int id, const char *text, ...)
+void frmMain::printText(int id, QString text)
 {
-    va_list list;
-    char buffer[BUFLEN];
-
-    va_start(list,text);
-    vsnprintf(buffer, arraySize(buffer), text, list);
-
     this->setTextColorFromId(id);
-
-    va_end(list);
-
-    ui->textBrowserOutput->insertHtml(QString(buffer));
+    ui->textBrowserOutput->insertHtml(text);
 }
 
-void frmMain::println(int id, const char *text, ...)
+void frmMain::println(int id, QString text)
 {
-    va_list list;
-    char buffer[BUFLEN];
-
-    va_start(list, text);
-    vsnprintf(buffer, arraySize(buffer), text, list);
-
     this->setTextColorFromId(id);
-
-    va_end(list);
-    ui->textBrowserOutput->insertHtml(QString(buffer) + "<br>");
+    ui->textBrowserOutput->insertHtml(text + "<br>");
 }
 
 void frmMain::showCriticalMsgBox(QString title, QString text)

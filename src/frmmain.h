@@ -40,8 +40,8 @@ public slots:
 private:
     Ui::frmMain *ui;
     void setTextColorFromId(int id);
-    void printText(int id, const char *text, ...);
-    void println(int id, const char *text, ...);
+    void printText(int id, QString text);
+    void println(int id, QString text);
 };
 
 enum textId {

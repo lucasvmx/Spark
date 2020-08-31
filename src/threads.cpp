@@ -26,7 +26,7 @@
 using namespace Threads;
 
 static libhack_handle *hack_handle = nullptr;
-static uint32_t MAX_POWER;
+static uint32_t max_power;
 
 /**
  * @brief start Posição inicial na struct, de acordo com a versão do warzone atualmente em execução
@@ -54,16 +54,20 @@ void MainHackingThread::run()
     DWORD warzone_path_len = arraySize(warzone_path);
     AntiCheatDetectionThread *antiCheat = nullptr;
 
+#ifdef Q_OS_WIN
+    RtlSecureZeroMemory(warzone_path, sizeof(warzone_path));
+#endif
+
     try {
 
         // Inicializa a libhack
         this->startLibhack();
 
-        // Carrega as funções específicas do warzone
-        LoadWarzoneFunctions(hack_handle);
-
         // Verifica se o warzone já está aberto. Se não estiver, aguarda pela sua abertura
         this->waitForWarzone();
+
+        // Carrega as funções específicas do warzone
+        LoadWarzoneFunctions(hack_handle);
 
         // Obtém o caminho completo do executável do warzone 2100
         if(!fQueryFullProcessImageFileName(hack_handle->hProcess, 0, warzone_path, &warzone_path_len))
@@ -72,7 +76,7 @@ void MainHackingThread::run()
         // Verifica qual versão do warzone está em execução
         ::detected_warzone_version = WzHack_GetWarzoneVersion(warzone_path);
 
-        emit updateStatus(tr("Aguardando usuário entrar na partida ...<br>"));
+        emit updateStatus(tr("Aguardando usuário entrar na partida ..."));
 
         // Aguarda o usuário entrar na partida
         while(!this->isGamePlayStarted())
@@ -80,13 +84,12 @@ void MainHackingThread::run()
 
         // Verifica se a versão suporta as operações solicitadas
         if(bEnableGodMode) Q_ASSERT(IsFeatureSupported(detected_warzone_version, FEATURE_GOD_MODE));
-        if(bInfiniteEnergy) Q_ASSERT(IsFeatureSupported(detected_warzone_version, FEATURE_CHANGE_POWER));
-        if(bEraseEnemyEnergy) Q_ASSERT(isHumanPlayer != nullptr);
+        if(bInfiniteEnergy || bEraseEnemyEnergy) Q_ASSERT(IsFeatureSupported(detected_warzone_version, FEATURE_CHANGE_POWER));
 
-        emit updateStatus(tr("Partida iniciada<br>"));
+        emit updateStatus(tr("Partida iniciada"));
 
         // Obtém o valor máximo da energia
-        MAX_POWER = GetWarzoneMaxPowerValue(::detected_warzone_version);
+        max_power = GetWarzoneMaxPowerValue(::detected_warzone_version);
 
         // Se certifica se que a versão é conhecida
         Q_ASSERT(::detected_warzone_version != WZ_UNKNOWN);
@@ -103,11 +106,21 @@ void MainHackingThread::run()
         // Realizar as interferências no jogo
         if(bEnableGodMode)
             this->enableGodMode();
+		
+		// Continua as alterações no jogo até que ele seja fechado
+		while(this->canContinue())
+		{
+			if(this->isGamePlayRunning()) {
+				if(bInfiniteEnergy)
+					giveInfiniteEnergy();
+				else if(bEraseEnemyEnergy)
+					eraseEnemyEnergy();				
+			}
+			
+			// Aguarda pelo número de segundos desejado ou até que uma interrupção seja solicitada
+			wait(::hacking_delay);
+		}
 
-        if(bInfiniteEnergy)
-            giveInfiniteEnergy();
-        else if(bEraseEnemyEnergy)
-            eraseEnemyEnergy();
     } catch(Exception *e)
     {
         fprintf(stderr, "(%s:%d) %s\n", __FILE__, __LINE__, e->what());
@@ -120,7 +133,8 @@ void MainHackingThread::run()
     if(antiCheat)
         antiCheat->exit(0);
 
-    emit updateStatus(tr("Operações finalizadas"));
+    emit updateStatus(tr("O Warzone 2100 foi fechado"));
+	emit updateStatus(tr("Clique novamente no botão iniciar para rodar o trainer"));
 }
 
 void MainHackingThread::startLibhack()
@@ -130,11 +144,16 @@ void MainHackingThread::startLibhack()
         throw new Exception(tr("Erro ao inicializar a libhack: %1").arg(GetLastError()).toStdString().c_str());
 }
 
+bool MainHackingThread::canContinue() const
+{
+	return ((libhack_process_is_running(::hack_handle)) && !(this->isInterruptionRequested()));
+}
+
 void MainHackingThread::waitForWarzone()
 {
     Q_ASSERT(hack_handle != nullptr);
 
-    emit updateStatus(tr("Aguardando pelo warzone ...<br>"));
+    emit updateStatus(tr("Aguardando pelo warzone ..."));
 
     // Tenta abrir o warzone
     while(!libhack_open_process(hack_handle))
@@ -152,7 +171,7 @@ void MainHackingThread::waitForWarzone()
     if(!(::base_addr > 0))
         throw new Exception(tr("Falha ao obter endereço-base do processo").toStdString().c_str());
 
-    emit updateStatus("Warzone 2100 em execução ...<br>");
+    emit updateStatus("Warzone 2100 em execução ...");
 }
 
 void MainHackingThread::wait(uint32_t seconds)
@@ -163,11 +182,13 @@ void MainHackingThread::wait(uint32_t seconds)
 
     while(waited < time_to_wait)
     {
-        if(isInterruptionRequested() || !(libhack_process_is_running(::hack_handle)))
+        if(!(this->canContinue()))
             break;
 
 #ifdef Q_OS_WIN
         Sleep(static_cast<DWORD>(milisseconds));
+#else
+		usleep(milisseconds * milisseconds);
 #endif
         waited += milisseconds;
     }
@@ -185,46 +206,30 @@ void MainHackingThread::giveInfiniteEnergy()
         addressToWrite = ::base_addr + player_info[::start].power_offset;
 
     // Fazer o jogador ter energia infinita
-    while(!this->isInterruptionRequested() && libhack_process_is_running(::hack_handle))
-    {
 
-        // Aumenta a energia do jogador selecionado para o valor máximo
-        status = libhack_write_int_to_addr(hack_handle, addressToWrite, ::MAX_POWER);
+	// Aumenta a energia do jogador selecionado para o valor máximo
+	status = libhack_write_int_to_addr(hack_handle, addressToWrite, ::max_power);
 
-        if(status <= 0)
-            throw new Exception(tr("Falha ao oferecer energia ao jogador %1").arg(::player_id).toStdString().c_str());
-
-        // Aguarda pelo número de segundos desejado ou até que uma interrupção seja solicitada
-        wait(::hacking_delay);
-    }
+	if(status <= 0)
+		throw new Exception(tr("Falha ao oferecer energia ao jogador %1").arg(::player_id).toStdString().c_str());
 }
 
 void MainHackingThread::eraseEnemyEnergy()
 {
     unsigned long addrToWrite;
 
-    // Certifica-se de que podemos acessar a função
-    Q_ASSERT(isHumanPlayer);
+	// FIXME: encontrar método para não zerar a energia dos jogadores amigos
+	for(int player = 0; player < MAX_PLAYERS; player++)
+	{
+		// Não zerar a energia do jogador favorecido
+        if(bSupportSpecificPlayer || (::player_id == player))
+			continue;
 
-    // Calcula o endereço de leitura
-    addrToWrite = ::base_addr + ::player_info[::start].power_offset;
+        // Calcula o endereço de escrita
+        addrToWrite = ::base_addr + ::player_info[::start + player].power_offset;
 
-    while(!this->isInterruptionRequested() && libhack_process_is_running(::hack_handle))
-    {
-        // FIXME: encontrar método para não zerar a energia dos jogadores amigos
-        for(int player = 0; player < MAX_PLAYERS; player++)
-        {
-            // Não zerar a energia do jogador favorecido
-            if(bSupportSpecificPlayer && (::player_id == player))
-                continue;
-
-            if(!isHumanPlayer(player))
-                libhack_write_int_to_addr(hack_handle, addrToWrite, 0);
-        }
-
-        // Aguarda pelo número de segundos desejado ou até que uma interrupção seja solicitada
-        wait(::hacking_delay);
-    }
+        libhack_write_int_to_addr(hack_handle, addrToWrite, 0);
+	}
 }
 
 bool MainHackingThread::isGamePlayStarted() const
@@ -250,9 +255,18 @@ bool MainHackingThread::isGamePlayStarted() const
             started = libhack_read_int_from_addr(::hack_handle, addressToRead);
             return started == 1;
         }
+    } else {
+        throw new Exception("Essa versão do warzone ainda não suporta a detecção de status "
+                            "(verificar se a partida foi iniciada). Envie um e-mail para "
+                            "lucas.engen.cc@gmail.com e reporte o ocorrido :)");
     }
 
     return false;
+}
+
+bool MainHackingThread::isGamePlayRunning() const
+{
+	return this->isGamePlayStarted();
 }
 
 void MainHackingThread::enableGodMode()
@@ -272,8 +286,6 @@ void MainHackingThread::enableGodMode()
         break;
     }
 
-    qDebug("Endereço encontrado: %#lx\n", addrToWrite);
-
     if(addrToWrite)
     {
         do
@@ -286,7 +298,7 @@ void MainHackingThread::enableGodMode()
 
             // Certifica-se de que o modo Deus está habilitado
             god_mode = libhack_read_int_from_addr(::hack_handle, addrToWrite);
-            qDebug("god mode: %d", god_mode);
+
         } while((god_mode == 0) && !(this->isInterruptionRequested()) && (libhack_process_is_running(::hack_handle)));
     }
 }

@@ -13,9 +13,9 @@
 #define VERSION_H
 
 // Versão do programa
-#define MAJOR	2
-#define MINOR	0
-#define PATCH	0
+#define SPARK_MAJOR	2
+#define SPARK_MINOR	0
+#define SPARK_PATCH	0
 
 /**
   * @brief nome do programa

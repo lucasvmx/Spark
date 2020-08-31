@@ -219,8 +219,9 @@ BOOL WzHack_FindProcess(const char *name, DWORD *pid)
 	
     SetLastError(ERROR_FILE_NOT_FOUND);
 
-    if(*pid)
+    if(*pid) {
         *pid = local_pid;
+    }
 
 	return FALSE;
 }
