@@ -1,29 +1,13 @@
-/*
-    Hack para o warzone 2100
-
-    Versões suportadas:
-        * 2.3.9
-        * 3.1.5
-        * 3.2.3
-
-    Características:
-        * Energia infinita
-        * Easter egg
-
-    Descrição:
-        Este programa permite que o jogador possua uma energia sempre acima do valor
-        que ele quiser. Com esta ferramenta você pode, por exemplo, fazer com que
-        nunca a sua energia esteja abaixo de 60000 por mais de 1 minuto.
-
-    Aviso:
-        Se for compilar no Visual Studio, ative a opção 'MultiByte'
-
-    Autor:
-        Lucas Vieira de Jesus <lucas.engen.cc@gmail.com>
-
-    Testado no:
-        Microsoft Windows [versão 10.0.16299.125] x64
-*/
+/**
+ * @file frmsettings.h
+ * @author Lucas Vieira de Jesus (lucas.engen.cc@gmail.com)
+ * @brief 
+ * @version 0.1
+ * @date 2020-08-22
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ */
 
 #ifndef FRMSETTINGS_H
 #define FRMSETTINGS_H
@@ -51,10 +35,25 @@ private:
     Ui::frmSettings *ui;
 };
 
-extern int globalId;
-extern int globalDelay;
-extern bool globalZero;
-extern bool globalSupport;
-extern bool globalHighEnergy;
+// id do jogador selecionado
+extern int player_id;
+
+// tempo de espera entre uma iteração e a outra do hack
+extern int hacking_delay;
+
+// flag para armazenar se a energia do inimigo deverá ser zerada
+extern bool bEraseEnemyEnergy;
+
+// flag para armazenar se um jogador em específico deverá ser favorecido
+extern bool bSupportSpecificPlayer;
+
+// flag para armazenar se o jogador escolhido deverá ter a energia infinita
+extern bool bInfiniteEnergy;
+
+// flag para armzenar se o modo Deus deverá ser habilitado
+extern bool bEnableGodMode;
+
+// flag para armazenar se a detecção de anti-cheat deverá ser burlada
+extern bool bPreventAntiCheatDetection;
 
 #endif // FRMSETTINGS_H

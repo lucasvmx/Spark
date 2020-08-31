@@ -13,7 +13,6 @@ vs2017/.vs/
 *.idb
 *.filters
 *.config
-*.dll
 *.exp
 *.lib
 *.txt
@@ -22,7 +21,7 @@ release
 x64
 x86
 .qmake.stash
-build
 maps
 *.pro.user.*
 .vscode
+build-*

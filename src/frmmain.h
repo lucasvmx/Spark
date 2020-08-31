@@ -1,29 +1,13 @@
-/*
-    Hack para o warzone 2100
-
-    Versões suportadas:
-        * 2.3.9
-        * 3.1.5
-        * 3.2.3
-
-    Características:
-        * Energia infinita
-        * Easter egg
-
-    Descrição:
-        Este programa permite que o jogador possua uma energia sempre acima do valor
-        que ele quiser. Com esta ferramenta você pode, por exemplo, fazer com que
-        nunca a sua energia esteja abaixo de 60000 por mais de 1 minuto.
-
-    Aviso:
-        Se for compilar no Visual Studio, ative a opção 'MultiByte'
-
-    Autor:
-        Lucas Vieira de Jesus <lucas.engen.cc@gmail.com>
-
-    Testado no:
-        Microsoft Windows [versão 10.0.16299.125] x64
-*/
+/**
+ * @file frmmain.h
+ * @author Lucas Vieira de Jesus (lucas.engen.cc@gmail.com)
+ * @brief Informações da janela principal
+ * @version 0.1
+ * @date 2020-08-22
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ */
 
 #ifndef FRMMAIN_H
 #define FRMMAIN_H
@@ -52,9 +36,12 @@ public slots:
     void delegateSetText(QString text);
     void OnAction_AboutTriggered(bool x);
 
+    void showCriticalMsgBox(QString title, QString text);
 private:
     Ui::frmMain *ui;
-    void printText(int id, const char *text, ...);
+    void setTextColorFromId(int id);
+    void printText(int id, QString text);
+    void println(int id, QString text);
 };
 
 enum textId {

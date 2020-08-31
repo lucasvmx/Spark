@@ -1,39 +1,39 @@
-/*
-    Hack para o warzone 2100
-
-    Versões suportadas:
-        * 2.3.9
-        * 3.1.5
-        * 3.2.3
-
-    Características:
-        * Energia infinita
-        * Easter egg
-
-    Descrição:
-        Este programa permite que o jogador possua uma energia sempre acima do valor
-        que ele quiser. Com esta ferramenta você pode, por exemplo, fazer com que
-        nunca a sua energia esteja abaixo de 60000 por mais de 1 minuto.
-
-    Aviso:
-        Se for compilar no Visual Studio, ative a opção 'MultiByte'
-
-    Autor:
-        Lucas Vieira de Jesus <lucas.engen.cc@gmail.com>
-
-    Testado no:
-        Microsoft Windows [versão 10.0.16299.125] x64
-*/
+/**
+ * @file frmsettings.cpp
+ * @author Lucas Vieira de Jesus (lucas.engen.cc@gmail.com)
+ * @brief Janela para configurar o hack
+ * @version 0.1
+ * @date 2020-08-22
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ */
 
 #include "frmsettings.h"
 #include "ui_frmsettings.h"
+#include "version.h"
 #include <QMessageBox>
 
-int globalId = -1;
-int globalDelay = -1;
-bool globalZero = false;
-bool globalSupport = false;
-bool globalHighEnergy = false;
+// id do jogador selecionado (padrão: 0)
+int player_id = 0;
+
+// tempo de espera entre uma iteração e a outra do hack (padrão: 5)
+int hacking_delay = 5;
+
+// flag para armazenar se a energia do inimigo deverá ser zerada
+bool bEraseEnemyEnergy = false;
+
+// flag para armazenar se um jogador em específico deverá ser favorecido
+bool bSupportSpecificPlayer = false;
+
+// flag para armazenar se o jogador escolhido deverá ter a energia infinita
+bool bInfiniteEnergy = false;
+
+// flag para armzenar se o modo Deus deverá ser habilitado
+bool bEnableGodMode = false;
+
+// flag para armazenar se a detecção de anti-cheat deverá ser burlada
+bool bPreventAntiCheatDetection = false;
 
 frmSettings::frmSettings(QWidget *parent) : QWidget(parent), ui(new Ui::frmSettings)
 {
@@ -41,6 +41,7 @@ frmSettings::frmSettings(QWidget *parent) : QWidget(parent), ui(new Ui::frmSetti
     this->connectAllSignals();
     this->setFixedHeight(this->height());
     this->setFixedWidth(this->width());
+    this->setWindowTitle(QString("%1 - configurações").arg(PROGNAME));
 }
 
 frmSettings::~frmSettings()
@@ -51,41 +52,36 @@ frmSettings::~frmSettings()
 void frmSettings::connectAllSignals()
 {
     QObject::connect(ui->buttonSave, SIGNAL(clicked(bool)), this, SLOT(OnButtonSave_Clicked(bool)));
-    QObject::connect(ui->horizontalSlider, SIGNAL(sliderMoved(int)), this, SLOT(OnSliderMoved(int)));
+    QObject::connect(ui->horizontalSlider_delay, SIGNAL(sliderMoved(int)), this, SLOT(OnSliderMoved(int)));
 }
 
 void frmSettings::OnButtonSave_Clicked(bool b)
 {
-    int playerId = -1;
-    int delay = -1;
-    bool zero_energy = false;
-    bool support_player = false;
-    bool high_energy = false;
+    Q_UNUSED(b);
 
-    (void)b;
+    // Extrai os dados da configuração
+    bInfiniteEnergy = ui->radioButton_infinite_energy->isChecked();
+    bSupportSpecificPlayer = ui->checkBox_support_specific_player->isChecked();
+    bEraseEnemyEnergy = ui->radioButton_erase_enemy_energy->isChecked();
+    bEnableGodMode = ui->checkBox_enable_godmode->isChecked();
+    bPreventAntiCheatDetection = ui->checkBox_prevent_anticheat->isChecked();
+    hacking_delay = ui->horizontalSlider_delay->value();
+    player_id = ui->comboBox_playerId->currentIndex();
 
-    playerId = ui->comboBox->currentIndex();
-    delay = ui->horizontalSlider->value();
-    zero_energy = ui->checkBox->isChecked();
-    support_player = ui->checkBox_2->isChecked();
-    high_energy = ui->checkBox_3->isChecked();
-
-    /*
-        Independentemente do slot em que estamos, nosso id sempre será o 0
-        Os demais id'serão sempre reservados para a IA
-    */
-
-    globalId = playerId;
-    globalDelay = delay;
-    globalZero = zero_energy;
-    globalSupport = support_player;
-    globalHighEnergy = high_energy;
-
-    QMessageBox::information(this, "WarHack", "Configurações salvas!");
-    this->close();
+    if(!bInfiniteEnergy && !bSupportSpecificPlayer &&
+            !bEraseEnemyEnergy && !bEnableGodMode && !bPreventAntiCheatDetection)
+    {
+        bInfiniteEnergy = true;
+        QMessageBox::warning(0, "Atenção",
+                             "Você não escolheu nenhum algoritmo de hacking. Por padrão, o de energia infinita será usado");
+    } else
+    {
+        QMessageBox::information(0, "Sucesso", "Configurações salvas!");
+        this->close();
+    }
 }
 
 void frmSettings::OnSliderMoved(int v)
 {
-    ui->label_3->setText(QString::asprintf( "%d segundos", v));
+    ui->labelWaitTime->setText(QString::asprintf( "%d segundos", v));
 }

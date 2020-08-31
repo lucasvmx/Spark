@@ -1,57 +1,49 @@
-/*
-    Hack para o warzone 2100
-
-    Versões suportadas:
-        * 2.3.9
-        * 3.1.5
-        * 3.2.3
-
-    Características:
-        * Energia infinita
-        * Easter egg
-
-    Descrição:
-        Este programa permite que o jogador possua uma energia sempre acima do valor
-        que ele quiser. Com esta ferramenta você pode, por exemplo, fazer com que
-        nunca a sua energia esteja abaixo de 60000 por mais de 1 minuto.
-
-    Aviso:
-        Se for compilar no Visual Studio, ative a opção 'MultiByte'
-
-    Autor:
-        Lucas Vieira de Jesus <lucas.engen.cc@gmail.com>
-
-    Testado no:
-        Microsoft Windows [versão 10.0.16299.125] x64
-*/
+/**
+ * @file frmmain.cpp
+ * @author Lucas Vieira de Jesus (lucas.engen.cc@gmail.com)
+ * @brief Janela principal da interface gráfica
+ * @version 0.1
+ * @date 2020-08-22
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ */
 
 #include "frmmain.h"
 #include "ui_frmmain.h"
 #include "frmsettings.h"
-#include "task.h"
+#include "threads.h"
 #include "frmabout.h"
+#include "exception.h"
 
 #include <QMessageBox>
-#include <stdio.h>
-#include <stdarg.h>
+#include <cstdio>
+#include <cstdarg>
 
 #include "wzhack.h"
 #include "version.h"
 
-static task *hack_task = nullptr;
+static Threads::MainHackingThread *hackingThread = nullptr;
 
 frmMain::frmMain(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::frmMain)
 {
     ui->setupUi(this);
-    hack_task = new task();
-    this->connectAllSignals();
-    if(PATCH > 0)
-        this->setWindowTitle(QString("WarHack v%1.%2.%3").arg(MAJOR).arg(MINOR).arg(PATCH));
-    else
-        this->setWindowTitle(QString("WarHack v%1.%2").arg(MAJOR).arg(MINOR));
 
+    // Inicializa a classe das threads
+    hackingThread = new Threads::MainHackingThread();
+
+    // Conecta os sinais de usuário
+    this->connectAllSignals();
+
+    // Constroi o titulo
+    if(SPARK_PATCH > 0)
+        this->setWindowTitle(QString("%1 v%2.%3.%4").arg(PROGNAME).arg(SPARK_MAJOR).arg(SPARK_MINOR).arg(SPARK_PATCH));
+    else
+        this->setWindowTitle(QString("%1 v%2.%3").arg(PROGNAME).arg(SPARK_MAJOR).arg(SPARK_MINOR));
+
+    // Ajusta o tamanho da janela
     this->setFixedWidth(this->width());
     this->setFixedHeight(this->height());
 }
@@ -67,34 +59,35 @@ void frmMain::connectAllSignals()
     QObject::connect(ui->buttonSettings, SIGNAL(clicked(bool)), this, SLOT(OnButtonSettingsClicked(bool)));
     QObject::connect(ui->actionAbout_Qt, SIGNAL(triggered(bool)), this, SLOT(OnAction_AboutQtTriggered(bool)));
     QObject::connect(ui->actionQuit_2, SIGNAL(triggered(bool)), this, SLOT(OnAction_QuitTriggered(bool)));
-    QObject::connect(hack_task,SIGNAL(update(QString)), this, SLOT(delegateSetText(QString)));
+    QObject::connect(hackingThread, SIGNAL(updateStatus(QString)), this, SLOT(delegateSetText(QString)));
     QObject::connect(ui->actionAbout_WarHack, SIGNAL(triggered(bool)), this, SLOT(OnAction_AboutTriggered(bool)));
+    QObject::connect(hackingThread, SIGNAL(showCriticalMsgBox(QString, QString)), this, SLOT(showCriticalMsgBox(QString, QString)));
 }
 
 void frmMain::OnButtonStartClicked(bool x)
 {
-    (void)x;
+    Q_UNUSED(x)
 
-    if(hack_task->isRunning())
+    if(hackingThread->isRunning())
     {
-        printText(error, "Uma outra tarefa já está em execução. Parando ...<br>");
-        hack_task->requestInterruption();
+        println(error, tr("Uma outra tarefa já está em execução. Parando ..."));
+        hackingThread->requestInterruption();
         return;
     }
 
     ui->textBrowserOutput->clear();
-    printText(log_info, "Iniciando ...<br>");
-    hack_task->start();
+    println(log_info, tr("Iniciando ..."));
+    hackingThread->start();
 }
 
 void frmMain::OnButtonSettingsClicked(bool x)
 {
-    UNREFERENCED_PARAMETER(x)
+    Q_UNUSED(x)
     static frmSettings *settings = nullptr;
 
     if(settings != nullptr && settings->isVisible())
     {
-        QMessageBox::critical(this, "Erro", "A caixa de configurações já está aberta");
+        QMessageBox::critical(this, tr("Erro"), tr("A caixa de configurações já está aberta"));
     } else {
         settings = new frmSettings();
         settings->show();
@@ -103,46 +96,42 @@ void frmMain::OnButtonSettingsClicked(bool x)
 
 void frmMain::OnAction_AboutQtTriggered(bool x)
 {
-    UNREFERENCED_PARAMETER(x)
+    Q_UNUSED(x)
+
     QApplication::aboutQt();
 }
 
 void frmMain::OnAction_QuitTriggered(bool x)
 {
-    UNREFERENCED_PARAMETER(x)
+    Q_UNUSED(x)
+
     this->close();
 }
 
 void frmMain::delegateSetText(QString text)
 {
-    printText(log_info,text.toStdString().c_str());
+    println(log_info, text);
 }
 
 void frmMain::OnAction_AboutTriggered(bool x)
 {
     static frmAbout *about = nullptr;
 
-    (void)x;
+    Q_UNUSED(x)
 
     if(about == nullptr)
         about = new frmAbout();
 
     if(about->isVisible())
     {
-        QMessageBox::warning(this, "Erro", "A janela sobre encontra-se aberta");
+        QMessageBox::warning(this, tr("Erro"), tr("A janela sobre encontra-se aberta"));
     } else {
         about->show();
     }
 }
 
-void frmMain::printText(int id, const char *text, ...)
+void frmMain::setTextColorFromId(int id)
 {
-    va_list list;
-    char buffer[256];
-
-    va_start(list,text);
-    vsnprintf(buffer, sizeof(char)*256,text, list);
-
     if(id == success)
        ui->textBrowserOutput->insertHtml("<font color=\"green\">[+]</font> ");
     else if(id == error)
@@ -155,6 +144,21 @@ void frmMain::printText(int id, const char *text, ...)
        ui->textBrowserOutput->insertHtml("<font color=\"blue\">[*]</font> ");
     else
         return;
+}
 
-    ui->textBrowserOutput->insertHtml(QString(buffer));
+void frmMain::printText(int id, QString text)
+{
+    this->setTextColorFromId(id);
+    ui->textBrowserOutput->insertHtml(text);
+}
+
+void frmMain::println(int id, QString text)
+{
+    this->setTextColorFromId(id);
+    ui->textBrowserOutput->insertHtml(text + "<br>");
+}
+
+void frmMain::showCriticalMsgBox(QString title, QString text)
+{
+    QMessageBox::critical(0, title, text);
 }

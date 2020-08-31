@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>313</width>
-    <height>342</height>
+    <width>324</width>
+    <height>372</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>WarHack - Settings</string>
+   <string/>
   </property>
   <property name="windowIcon">
    <iconset resource="../resource/resources.qrc">
@@ -36,21 +36,8 @@
       <string>Informações do jogador</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Id:</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="1">
-       <widget class="QComboBox" name="comboBox">
+       <widget class="QComboBox" name="comboBox_playerId">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-size:12pt; color:#00aaff;&quot;&gt;Seu id no jogo&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -166,6 +153,19 @@ QComboBox QAbstractItemView {
         </item>
        </widget>
       </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Id:</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0" colspan="2">
        <widget class="QLabel" name="label_4">
         <property name="styleSheet">
@@ -196,12 +196,12 @@ QComboBox QAbstractItemView {
       <string notr="true">color: #00c4ff</string>
      </property>
      <property name="text">
-      <string>Atraso (segundos):</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tempo de espera:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QSlider" name="horizontalSlider">
+    <widget class="QSlider" name="horizontalSlider_delay">
      <property name="toolTip">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-size:12pt; color:#00aaff;&quot;&gt;Especifica qual será o atraso entre uma leitura e a outra na memória do programa.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
@@ -229,7 +229,7 @@ QComboBox QAbstractItemView {
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label_3">
+    <widget class="QLabel" name="labelWaitTime">
      <property name="styleSheet">
       <string notr="true">color: rgb(255, 0, 0);</string>
      </property>
@@ -258,8 +258,26 @@ QComboBox QAbstractItemView {
       <string>Algoritmos de 'hacking'</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="checkBox">
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="checkBox_support_specific_player">
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;a name=&quot;tw-target-text&quot;/&gt;&lt;span style=&quot; font-family:'inherit'; font-size:12pt; color:#00aaff;&quot;&gt;F&lt;/span&gt;&lt;span style=&quot; font-family:'inherit'; font-size:12pt; color:#00aaff;&quot;&gt;avorece um jogador específico durante todo o jogo. Pode ser útil quando você tem a intenção de favorecer outro jogador do seu time.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="toolTipDuration">
+         <number>7000</number>
+        </property>
+        <property name="text">
+         <string>Favorecer jogador específico</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QRadioButton" name="radioButton_erase_enemy_energy">
         <property name="font">
          <font>
           <pointsize>8</pointsize>
@@ -272,32 +290,34 @@ QComboBox QAbstractItemView {
          <number>7000</number>
         </property>
         <property name="text">
-         <string>Energia zero</string>
+         <string>Zerar energia dos inimigos</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="checkBox_2">
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="checkBox_enable_godmode">
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;a name=&quot;tw-target-text&quot;/&gt;&lt;span style=&quot; font-family:'inherit'; font-size:12pt; color:#00aaff;&quot;&gt;Favorece um jogador específico durante todo o jogo.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="toolTipDuration">
-         <number>7000</number>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;tw-target-text&quot;/&gt;&lt;span style=&quot; font-family:'inherit'; font-size:12pt; color:#00aaff;&quot;&gt;Permite que o seu jogador visualize as instalações e unidades do inimigo&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string>Favorecer jogador específico</string>
+         <string>Habilitar o modo Deus</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="checkBox_3">
+      <item row="0" column="0">
+       <widget class="QRadioButton" name="radioButton_infinite_energy">
         <property name="text">
          <string>Energia sempre alta</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QCheckBox" name="checkBox_prevent_anticheat">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;tw-target-text&quot;/&gt;&lt;span style=&quot; font-family:'inherit'; font-size:12pt; color:#00aaff;&quot;&gt;Permite ao jogador usar os códigos de cheat internos do jogo sem que seja detectado&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Prevenir detecção de cheat</string>
         </property>
        </widget>
       </item>
