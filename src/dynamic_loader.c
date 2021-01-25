@@ -87,27 +87,3 @@ void LoadDLLFunctions()
         return;
     }
 }
-
-void LoadWarzoneFunctions(struct libhack_handle *handle)
-{
-    if(handle == NULL) {
-        fprintf(stdout, "(%s:%d) null pointer to libhack\n", __FILE__, __LINE__);
-        ExitProcess(1);
-    }
-
-    if(!((DWORD)(handle->hModule))) {
-        fprintf(stdout, "(%s:%d) invalid hModule value\n", __FILE__, __LINE__);
-        ExitProcess(1);
-    }
-
-    addPower = (pAddPower)((DWORD)(handle->hModule) + 0x11bb30);
-    IsHumanPlayer = (pIsHumanPlayer)((DWORD)(handle->hModule) + 0x00f9540);
-    printchatmsg = (pPrintChatMsg)((DWORD)(handle->hModule) + 0x00f9c20);
-    setPowerModifier = (pSetPowerModifier)((DWORD)(handle->hModule) + 0x11c350);
-    ClearPlayerPower = (pClear)((DWORD)(handle->hModule) + 0x11bd30);
-
-    fprintf(stdout, "addPower: %p\n", addPower);
-    fprintf(stdout, "isHumanPlayer: %p\n", IsHumanPlayer);
-    fprintf(stdout, "printchatmsg: %p\n", printchatmsg);
-    fprintf(stdout, "setPowerModifier: %p\n", setPowerModifier);
-}

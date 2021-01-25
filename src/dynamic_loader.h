@@ -103,11 +103,6 @@ extern pClear ClearPlayerPower;
  */
 void LoadDLLFunctions();
 
-/**
- * @brief LoadWarzoneFunctions Carrega as funções internas do prórprio warzone 2100
- */
-void LoadWarzoneFunctions(struct libhack_handle *handle);
-
 
 #ifdef __cplusplus
 }
