@@ -66,9 +66,6 @@ void MainHackingThread::run()
         // Verifica se o warzone já está aberto. Se não estiver, aguarda pela sua abertura
         this->waitForWarzone();
 
-        // Carrega as funções específicas do warzone
-        LoadWarzoneFunctions(hack_handle);
-
         // Obtém o caminho completo do executável do warzone 2100
         if(!fQueryFullProcessImageFileName(hack_handle->hProcess, 0, warzone_path, &warzone_path_len))
             throw new Exception(tr("Erro ao obter caminho do warzone: %1").arg(GetLastError()).toStdString().c_str());
