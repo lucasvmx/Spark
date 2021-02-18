@@ -20,11 +20,11 @@ jobs:
       uses: jurplel/install-qt-action@v2.12.2
     
     - name: Print Variables
-      run: echo "$BUILD_DIR and $PWD"
+      run: echo "current folder is $PWD and build dir is $BUILD_DIR"
     - name: Prepare build dir
-      run: mkdir $BUILD_DIR
+      run: mkdir $PWD/build
     - name: Generate Makefiles
-      run: qmake qt/Spark.pro -o $BUILD_DIR
+      run: qmake qt/Spark.pro -o $PWD/build
     - name: Build
       working-directory: $BUILD_DIR
       run: make
