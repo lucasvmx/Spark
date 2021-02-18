@@ -19,8 +19,8 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v2.12.2
     
-    - name: Print variables
-      run: echo "pwd: $PWD, build dir: $BUILD_DIR"
+    - name: Print Variables
+      run: echo "$BUILD_DIR and $PWD"
     - name: Prepare build dir
       run: mkdir $BUILD_DIR
     - name: Generate Makefiles
