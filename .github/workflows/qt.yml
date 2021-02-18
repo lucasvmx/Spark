@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  push:
+    branches: [ master, dev ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  BUILD_DIR: build
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2.12.2
+    
+    - name: Print variables
+      run: echo "pwd: $PWD, build dir: $BUILD_DIR"
+    - name: Prepare build dir
+      run: mkdir $BUILD_DIR
+    - name: Generate Makefiles
+      run: qmake qt/Spark.pro -o $BUILD_DIR
+    - name: Build
+      working-directory: $BUILD_DIR
+      run: make
