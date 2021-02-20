@@ -17,12 +17,18 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install Qt
       uses: jurplel/install-qt-action@v2.12.2
+      with:
+        arch: win32_mingw81
+        
     - name: Print Variables
+      shell: bash
       run: echo "current folder is $PWD and build dir is $BUILD_DIR"
     - name: Prepare build dir
-      run: mkdir $PWD/build
-    - name: Generate Makefiles 
-      run: qmake qt/Spark.pro -o $PWD/build
+      shell: bash
+      run: mkdir $BUILD_DIR
+    - name: Generate Makefiles
+      shell: bash
+      run: qmake qt/Spark.pro -o $BUILD_DIR
     - name: Build
-      working-directory: $PWD/$BUILD_DIR
-      run: make
+      shell: bash
+      run: make -C $BUILD_DIR
