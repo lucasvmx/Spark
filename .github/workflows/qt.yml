@@ -46,7 +46,9 @@ jobs:
       run: mkdir $BUILD_DIR
     - name: Generate Makefiles
       shell: bash
-      run: qmake qt/Spark.pro -o $BUILD_DIR
+      run: qmake qt/Spark.pro -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug" -o $BUILD_DIR
     - name: Build
       shell: bash
-      run: make -C $BUILD_DIR
+      run: |
+        make -f $BUILD_DIR/Makefile qmake_all
+        make -C $BUILD_DIR -j4
