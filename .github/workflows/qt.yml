@@ -15,6 +15,24 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Generate makefiles (libhack)
+      working-directory: 3rdparty\libhack
+      run: cmake -G "MinGW Makefiles" -B build
+    
+    - name: Bulid (libhack)
+      working-directory: 3rdparty\libhack
+      run: make -C build
+
+    - name: Copy output files
+      shell: bash
+      working-directory: 3rdparty/libhack/build
+      run: |
+      mv libhack.dll.a libhack.a
+      mv libhack.dll libhack.a ../../../libs/libhack/
+
     - name: Install Qt
       uses: jurplel/install-qt-action@v2.12.2
       with:
