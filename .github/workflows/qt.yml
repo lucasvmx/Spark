@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  build-x64:
 
     runs-on: windows-latest
     env:
