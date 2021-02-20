@@ -6,25 +6,23 @@ on:
   pull_request:
     branches: [ master ]
 
-env:
-  BUILD_DIR: build
-
 jobs:
   build:
 
     runs-on: windows-latest
+    env:
+        BUILD_DIR: build
 
     steps:
     - uses: actions/checkout@v2
     - name: Install Qt
       uses: jurplel/install-qt-action@v2.12.2
-    
     - name: Print Variables
       run: echo "current folder is $PWD and build dir is $BUILD_DIR"
     - name: Prepare build dir
       run: mkdir $PWD/build
-    - name: Generate Makefiles
+    - name: Generate Makefiles 
       run: qmake qt/Spark.pro -o $PWD/build
     - name: Build
-      working-directory: $BUILD_DIR
+      working-directory: $PWD/$BUILD_DIR
       run: make
