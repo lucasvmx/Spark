@@ -24,10 +24,12 @@ jobs:
       shell: bash
       run: echo "current folder is $PWD and build dir is $BUILD_DIR"
     - name: Prepare build dir
+      shell: bash
       run: mkdir $BUILD_DIR
-    - name: Generate Makefiles 
+    - name: Generate Makefiles
+      shell: bash
       run: qmake qt/Spark.pro -o $BUILD_DIR
     - name: Build
       shell: bash
-      working-directory: $PWD\$BUILD_DIR
+      working-directory: $BUILD_DIR
       run: make
