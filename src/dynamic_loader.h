@@ -22,7 +22,7 @@ extern "C" {
 #include <stdbool.h>
 #endif
 
-#include "hack.h"
+#include "init.h"
 
 #if defined(Q_OS_WIN) || defined(WIN32)
 #include <windows.h>

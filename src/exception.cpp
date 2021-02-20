@@ -1,5 +1,5 @@
 #include "exception.h"
-#include "hack.h"
+#include "init.h"
 #include <QString>
 
 using namespace std;
