@@ -27,6 +27,7 @@ public:
     explicit frmMain(QWidget *parent = nullptr);
     ~frmMain();
     void connectAllSignals();
+    void updateComponentsText();
 
 public slots:
     void OnButtonStartClicked(bool x);

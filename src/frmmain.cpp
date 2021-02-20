@@ -43,6 +43,8 @@ frmMain::frmMain(QWidget *parent) :
     else
         this->setWindowTitle(QString("%1 v%2.%3").arg(PROGNAME).arg(SPARK_MAJOR).arg(SPARK_MINOR));
 
+    updateComponentsText();
+
     // Ajusta o tamanho da janela
     this->setFixedWidth(this->width());
     this->setFixedHeight(this->height());
@@ -62,6 +64,17 @@ void frmMain::connectAllSignals()
     QObject::connect(hackingThread, SIGNAL(updateStatus(QString)), this, SLOT(delegateSetText(QString)));
     QObject::connect(ui->actionAbout_WarHack, SIGNAL(triggered(bool)), this, SLOT(OnAction_AboutTriggered(bool)));
     QObject::connect(hackingThread, SIGNAL(showCriticalMsgBox(QString, QString)), this, SLOT(showCriticalMsgBox(QString, QString)));
+}
+
+void frmMain::updateComponentsText()
+{
+    ui->buttonSettings->setText(tr("Configurações"));
+    ui->buttonStart->setText(tr("Iniciar"));
+    ui->menuFile->setTitle(tr("Arquivo"));
+    ui->menuAbout->setTitle(tr("Sobre"));
+    ui->actionQuit_2->setText(tr("Sair"));
+    ui->actionAbout_Qt->setText(tr("Sobre o Qt"));
+    ui->actionAbout_WarHack->setText(tr("Sobre o Spark"));
 }
 
 void frmMain::OnButtonStartClicked(bool x)
