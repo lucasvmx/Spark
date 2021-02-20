@@ -4,6 +4,8 @@
 
 using namespace std;
 
+char exceptionText[BUFLEN];
+
 Exception::Exception(const char *what)
 {
     exception_text = QString(what);
@@ -26,5 +28,6 @@ void Exception::raise() const
 
 const char *Exception::what()
 {
-    return this->exception_text.toStdString().c_str();
+    strncpy(exceptionText, exception_text.toStdString().c_str(), exception_text.length());
+    return const_cast<const char*>(&exceptionText[0]);
 }
