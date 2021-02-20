@@ -48,6 +48,23 @@ extern "C" {
 #endif
 #endif
 
+#define libhack_assert_or_exit(condition, exit_code) \
+	if(!condition) { \
+		fprintf(stdout, "libhack assert failure on %s line %d\n", __FILE__, __LINE__); \
+		exit(exit_code); \
+	}
+
+#define libhack_assert_or_warn(condition) \
+	if(!condition) { \
+		fprintf(stdout, "warn: assert failure on %s line %d\n", __FILE__, __LINE__); \
+	}
+
+#define libhack_assert_or_return(condition, retval) \
+	if(!condition) { \
+		fprintf(stdout, "warn: assert failure on %s line %d\n", __FILE__, __LINE__); \
+		return retval; \
+	}
+
 /**
  * @brief Handle to libhack
  * 
@@ -97,6 +114,20 @@ struct libhack_handle
  * @return const char* Program version
  */
 LIBHACK_API const char *libhack_getversion();
+
+/**
+ * @brief Gets the commit UUID
+ * 
+ * @return LIBHACK_API const* UUID corresponding to commit
+ */
+LIBHACK_API const char *libhack_getuuid();
+
+/**
+ * @brief Gets the program build date on UTC
+ * 
+ * @return LIBHACK_API const* string containing build date
+ */
+LIBHACK_API const char *libhack_get_utc_build_date();
 
 /**
  * @brief Initialize libhack
