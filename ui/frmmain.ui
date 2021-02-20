@@ -14,7 +14,7 @@
    <string>WarHack v1.2</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../resource/resources.qrc">
+   <iconset>
     <normaloff>:/images/warzone2100.png</normaloff>:/images/warzone2100.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
