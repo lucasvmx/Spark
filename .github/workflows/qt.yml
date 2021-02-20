@@ -31,5 +31,4 @@ jobs:
       run: qmake qt/Spark.pro -o $BUILD_DIR
     - name: Build
       shell: bash
-      working-directory: $BUILD_DIR
-      run: make
+      run: make -C $BUILD_DIR
