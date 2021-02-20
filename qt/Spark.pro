@@ -53,7 +53,7 @@ CONFIG += lrelease
 
 HEADERS += \
 	../libs/libhack/consts.h \
-	../libs/libhack/hack.h \
+	../libs/libhack/init.h \
 	../libs/libhack/process.h \
 	../resource/spark.rc \
 	../src/dynamic_loader.h \
