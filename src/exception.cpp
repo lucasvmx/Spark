@@ -28,6 +28,6 @@ void Exception::raise() const
 
 const char *Exception::what()
 {
-    strncpy(exceptionText, exception_text.toStdString().c_str(), exception_text.length());
+    strncpy(exceptionText, exception_text.toStdString().c_str(), sizeof(exceptionText));
     return const_cast<const char*>(&exceptionText[0]);
 }
