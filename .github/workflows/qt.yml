@@ -30,8 +30,8 @@ jobs:
       shell: bash
       working-directory: 3rdparty/libhack/build
       run: |
-      mv libhack.dll.a libhack.a
-      mv libhack.dll libhack.a ../../../libs/libhack/
+        mv libhack.dll.a libhack.a
+        mv libhack.dll libhack.a ../../../libs/libhack/
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v2.12.2
