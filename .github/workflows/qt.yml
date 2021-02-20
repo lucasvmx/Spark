@@ -21,7 +21,8 @@ jobs:
         arch: win32_mingw53
         
     - name: Print Variables
-      run: echo "current folder is $PWD and build dir is ${{BUILD_DIR}}"
+      shell: bash
+      run: echo "current folder is $PWD and build dir is $BUILD_DIR"
     - name: Prepare build dir
       run: mkdir $PWD\$BUILD_DIR
     - name: Generate Makefiles 
