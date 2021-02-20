@@ -18,6 +18,14 @@ jobs:
       with:
         submodules: true
 
+    - name: Install correct version of MinGW
+      run: |
+        choco uninstall mingw --force
+        choco uninstall strawberryperl --force
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW32
+        
     - name: Generate makefiles (libhack)
       working-directory: 3rdparty\libhack
       run: cmake -G "MinGW Makefiles" -B build
