@@ -14,7 +14,7 @@
    <string>WarHack v1.2</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../resource/resources.qrc">
+   <iconset>
     <normaloff>:/images/warzone2100.png</normaloff>:/images/warzone2100.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -218,6 +218,16 @@ QGroupBox::title {
    </property>
    <property name="text">
     <string>Sobre o Spark</string>
+   </property>
+  </action>
+  <action name="actionPortuguese">
+   <property name="text">
+    <string>Português</string>
+   </property>
+  </action>
+  <action name="actionEnglish">
+   <property name="text">
+    <string>English</string>
    </property>
   </action>
  </widget>

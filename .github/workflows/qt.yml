@@ -1,0 +1,54 @@
+name: Build
+
+on:
+  push:
+    branches: [ master, dev ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-x64:
+
+    runs-on: windows-latest
+    env:
+        BUILD_DIR: build
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+        
+    - name: Generate makefiles (libhack)
+      working-directory: 3rdparty\libhack
+      run: cmake -G "MinGW Makefiles" -B build
+    
+    - name: Bulid (libhack)
+      working-directory: 3rdparty\libhack
+      run: make -C build
+
+    - name: Copy output files
+      shell: bash
+      working-directory: 3rdparty/libhack/build
+      run: |
+        mv libhack.dll.a libhack.a
+        mv libhack.dll libhack.a ../../../libs/libhack/
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2.12.2
+      with:
+        arch: win64_mingw81
+        
+    - name: Print Variables
+      shell: bash
+      run: echo "current folder is $PWD and build dir is $BUILD_DIR"
+    - name: Prepare build dir
+      shell: bash
+      run: mkdir $BUILD_DIR
+    - name: Generate Makefiles
+      shell: bash
+      run: qmake qt/Spark.pro -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug" -o $BUILD_DIR
+    - name: Build
+      shell: bash
+      run: |
+        make -f $BUILD_DIR/Makefile qmake_all
+        make -C $BUILD_DIR -j4

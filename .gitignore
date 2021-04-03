@@ -25,3 +25,5 @@ maps
 *.pro.user.*
 .vscode
 build-*
+*.a
+*.dll

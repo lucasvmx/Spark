@@ -22,7 +22,7 @@ extern "C" {
 #include <stdbool.h>
 #endif
 
-#include "hack.h"
+#include "init.h"
 
 #if defined(Q_OS_WIN) || defined(WIN32)
 #include <windows.h>
@@ -37,13 +37,6 @@ typedef BOOL    (WINAPI *GFVI)(LPCSTR lptstrFilename, DWORD dwHandle,DWORD dwLen
 typedef DWORD   (WINAPI *GFVIS)(LPCSTR lptstrFilename, LPDWORD lpdwHandle);
 typedef BOOL    (WINAPI *VQV)(LPCVOID pBlock, LPCSTR lpSubBlock, LPVOID *lplpBuffer, PUINT puLen);
 typedef BOOL    (WINAPI *GMI)(HANDLE hProcess, HMODULE hModule, LPMODULEINFO lpmodinfo, DWORD cb);
-
-// Funções do warzone 2100
-typedef void (*pClear)();
-typedef void (*pAddPower)(int player, int32_t quantity);
-typedef bool (*pIsHumanPlayer)(int player);
-typedef void (*pPrintChatMsg)(const char *text, int from, bool team);
-typedef void (*pSetPowerModifier)(int player, int modifier);
 
 /**
  * @brief Alias para GetFileVersionInfoA
@@ -69,32 +62,6 @@ extern GMI fGetModuleInformation;
  * @brief fQueryFullProcessImageFileName Alias para QueryFullProcessImageFileName
  */
 extern QFPINA fQueryFullProcessImageFileName;
-
-/**
- * @brief addPower Aumenta a energia do jogador (player, quantity)
- */
-extern pAddPower addPower;
-
-/**
- * @brief printchatmsg Exibe uma mensagem de texto (const char *text, int from, bool team);
- */
-extern pPrintChatMsg printchatmsg;
-
-/**
- * @brief setPowerModifier Aumenta a porcentagem de energia gerada por cada extrator de petróleo
- * (int player, int modifier)
- */
-extern pSetPowerModifier setPowerModifier;
-
-/**
- * @brief isHumanPlayer Verifica se o jogador é humano (int player)
- */
-extern pIsHumanPlayer IsHumanPlayer;
-
-/**
- * @brief ClearPlayerPower Zera a energia do jogador selecionado
- */
-extern pClear ClearPlayerPower;
 
 // Funções comuns
 

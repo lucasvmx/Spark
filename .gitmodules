@@ -1,0 +1,3 @@
+[submodule "3rdparty/libhack"]
+	path = 3rdparty/libhack
+	url = https://github.com/lucas-engen/libhack

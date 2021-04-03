@@ -1,8 +1,10 @@
 #include "exception.h"
-#include "hack.h"
+#include "init.h"
 #include <QString>
 
 using namespace std;
+
+char exceptionText[BUFLEN];
 
 Exception::Exception(const char *what)
 {
@@ -26,5 +28,6 @@ void Exception::raise() const
 
 const char *Exception::what()
 {
-    return this->exception_text.toStdString().c_str();
+    strncpy(exceptionText, exception_text.toStdString().c_str(), sizeof(exceptionText));
+    return const_cast<const char*>(&exceptionText[0]);
 }

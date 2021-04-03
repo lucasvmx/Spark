@@ -41,7 +41,8 @@ frmSettings::frmSettings(QWidget *parent) : QWidget(parent), ui(new Ui::frmSetti
     this->connectAllSignals();
     this->setFixedHeight(this->height());
     this->setFixedWidth(this->width());
-    this->setWindowTitle(QString("%1 - configurações").arg(PROGNAME));
+    this->setWindowTitle(tr("%1 - configurações").arg(PROGNAME));
+    ui->label->setText(tr("Tempo de espera:"));
 }
 
 frmSettings::~frmSettings()
@@ -72,16 +73,16 @@ void frmSettings::OnButtonSave_Clicked(bool b)
             !bEraseEnemyEnergy && !bEnableGodMode && !bPreventAntiCheatDetection)
     {
         bInfiniteEnergy = true;
-        QMessageBox::warning(0, "Atenção",
-                             "Você não escolheu nenhum algoritmo de hacking. Por padrão, o de energia infinita será usado");
+        QMessageBox::warning(0, tr("Atenção"),
+                             tr("Você não escolheu nenhum algoritmo de hacking. Por padrão, o de energia infinita será usado"));
     } else
     {
-        QMessageBox::information(0, "Sucesso", "Configurações salvas!");
+        QMessageBox::information(0, tr("Sucesso"), tr("Configurações salvas!"));
         this->close();
     }
 }
 
 void frmSettings::OnSliderMoved(int v)
 {
-    ui->labelWaitTime->setText(QString::asprintf( "%d segundos", v));
+    ui->labelWaitTime->setText(QString::asprintf(tr("%d segundos").toStdString().c_str(), v));
 }

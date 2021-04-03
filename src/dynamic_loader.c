@@ -22,11 +22,6 @@ GFVIS fGetFileVersionInfoSizeA = NULL;
 VQV fVerQueryValueA = NULL;
 GMI fGetModuleInformation = NULL;
 QFPINA fQueryFullProcessImageFileName = NULL;
-pAddPower addPower = NULL;
-pSetPowerModifier setPowerModifier = NULL;
-pPrintChatMsg printchatmsg = NULL;
-pIsHumanPlayer IsHumanPlayer = NULL;
-pClear ClearPlayerPower = NULL;
 
 void LoadDLLFunctions()
 {

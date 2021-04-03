@@ -55,6 +55,8 @@ Clique [aqui](https://github.com/lucas-engen/Spark/releases/latest
   - Obtenção de informações do inimigo
     * Número de unidades construídas (VTOL's, Cyborgs, Tanques)
     * Número de estruturas construídas (fábricas, geradores, etc)
+  - Modo Deus (God Mode)
+  - Detecção do anticheat (apenas no modo Skirmish)
 
 ## Utilização
 

@@ -22,7 +22,7 @@ frmAbout::frmAbout(QWidget *parent) :
     ui->setupUi(this);
     this->setFixedSize(this->width(),this->height());
     this->connectSignals();
-    this->setWindowTitle(QString("Sobre o %1").arg(PROGNAME));
+    this->setWindowTitle(tr("Sobre o %1").arg(PROGNAME));
 
     QMovie *movie = new QMovie(":/images/lulzsec.gif");
     ui->movieLabel->setMovie(movie);

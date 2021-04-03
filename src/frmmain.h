@@ -14,6 +14,8 @@
 
 #include <QMainWindow>
 #include <QThread>
+#include <QApplication>
+#include <QTranslator>
 
 namespace Ui {
 class frmMain;
@@ -27,6 +29,7 @@ public:
     explicit frmMain(QWidget *parent = nullptr);
     ~frmMain();
     void connectAllSignals();
+
 
 public slots:
     void OnButtonStartClicked(bool x);

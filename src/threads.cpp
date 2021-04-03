@@ -168,7 +168,7 @@ void MainHackingThread::waitForWarzone()
     if(!(::base_addr > 0))
         throw new Exception(tr("Falha ao obter endereço-base do processo").toStdString().c_str());
 
-    emit updateStatus("Warzone 2100 em execução ...");
+    emit updateStatus(tr("Warzone 2100 em execução ..."));
 }
 
 void MainHackingThread::wait(uint32_t seconds)
@@ -197,11 +197,11 @@ void MainHackingThread::giveInfiniteEnergy()
     DWORD addressToWrite;
 
     // Calcula o endereço de leitura
-    if(bSupportSpecificPlayer)
+    if(bSupportSpecificPlayer) {
         addressToWrite = ::base_addr + player_info[::start + ::player_id].power_offset;
-    else
+    } else {
         addressToWrite = ::base_addr + player_info[::start].power_offset;
-
+    }
     // Fazer o jogador ter energia infinita
 
 	// Aumenta a energia do jogador selecionado para o valor máximo
@@ -235,7 +235,7 @@ bool MainHackingThread::isGamePlayStarted() const
     int started;
 
     if(!libhack_process_is_running(::hack_handle))
-        throw new Exception("O warzone 2100 foi fechado subitamente");
+        throw new Exception(tr("O warzone 2100 foi fechado subitamente").toStdString().c_str());
 
     if(IsFeatureSupported(::detected_warzone_version, FEATURE_CHECK_GAME_IS_RUNNING))
     {
@@ -253,9 +253,9 @@ bool MainHackingThread::isGamePlayStarted() const
             return started == 1;
         }
     } else {
-        throw new Exception("Essa versão do warzone ainda não suporta a detecção de status "
+        throw new Exception(tr("Essa versão do warzone ainda não suporta a detecção de status "
                             "(verificar se a partida foi iniciada). Envie um e-mail para "
-                            "lucas.engen.cc@gmail.com e reporte o ocorrido :)");
+                            "lucas.engen.cc@gmail.com e reporte o ocorrido :)").toStdString().c_str());
     }
 
     return false;
