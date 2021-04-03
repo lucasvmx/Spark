@@ -10,6 +10,7 @@
  */
 
 #include "frmmain.h"
+#include "frmlanguage.h"
 #include <QApplication>
 #include <QMessageBox>
 #include <QObject>
@@ -73,15 +74,33 @@ int main(int argc, char *argv[])
     signal(SIGABRT, signal_handler);
     signal(SIGSEGV, signal_handler);
 
-    translator.load("spark_en_us");
-    app.installTranslator(&translator);
 
     CheckForOtherInstance();
 
     // Carrega as funcões da DLL
     LoadDLLFunctions();
 
-    mainForm = new frmMain();
+    // Exibe o diálogo para selecionar o idioma
+    auto f = new frmLanguage(nullptr);
+    f->show();
+
+    while(f->isVisible()) {
+        app.processEvents();
+    }
+
+    f->close();
+
+    // Carrega a tradução selecionada
+    if(f->GetSelectedLanguage() == Ui::languages::ENGLISH) {
+        translator.load("spark_en_us");
+        app.installTranslator(&translator);
+        fprintf(stderr, "Loaded english translation\n");
+    } else {
+        fprintf(stderr, "Loaded portuguese translation\n");
+    }
+
+    mainForm = new frmMain(nullptr);
+
     // Exibe a janela
     mainForm->show();
 

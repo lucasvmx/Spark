@@ -220,6 +220,16 @@ QGroupBox::title {
     <string>Sobre o Spark</string>
    </property>
   </action>
+  <action name="actionPortuguese">
+   <property name="text">
+    <string>Português</string>
+   </property>
+  </action>
+  <action name="actionEnglish">
+   <property name="text">
+    <string>English</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>

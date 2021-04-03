@@ -45,7 +45,8 @@ SOURCES += \
 	../src/threads.cpp \
     ../src/wzhack.cpp \
     ../src/frmsettings.cpp \
-	../src/frmabout.cpp
+	../src/frmabout.cpp \
+    ../src/frmlanguage.cpp
 
 TRANSLATIONS += ../languages/spark_en_us.ts
 
@@ -63,12 +64,14 @@ HEADERS += \
 	../src/version.h \
     ../src/wzhack.h \
     ../src/frmsettings.h \
-	../src/frmabout.h
+	../src/frmabout.h \
+    ../src/frmlanguage.h
 
 FORMS += \
         ../ui/frmmain.ui \
     ../ui/frmsettings.ui \
-    ../ui/frmabout.ui
+    ../ui/frmabout.ui \
+    ../ui/frmlanguage.ui
 
 RESOURCES += \
     ../resource/resources.qrc
