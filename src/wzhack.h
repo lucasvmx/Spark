@@ -31,6 +31,7 @@
 #define WZ_330      330
 #define WZ_340      340
 #define WZ_341      341
+#define WZ_400      400
 #define WZ_UNKNOWN	0xFFF
 
 // Retorna o número de elementos de um array 2D
@@ -96,7 +97,8 @@ typedef enum GAME_FEATURES
 
 static const struct game_status gstatus[] =
 {
-    { 0x3b1b88, 0x39ce38, WZ_341 }
+    { 0x3b1b88, 0x39ce38, WZ_341 },
+    { 0x51a7c8, 0x5058f0, WZ_400 }
 };
 
 // power_offset + max_power_offset = energia máxima
@@ -180,7 +182,20 @@ static const struct player player_info[] =
     { 7, 0x39f843, 0x39f734, 0x9c3b28, 0x7b800c, 0, 0, 0x18, 0x20, 0x28, WZ_341},
     { 8, 0x39f843, 0x39f734, 0x9c3b28, 0x7b803c, 0, 0, 0x18, 0x20, 0x28, WZ_341},
     { 9, 0x39f843, 0x39f734, 0x9c3b28, 0x7b806c, 0, 0, 0x18, 0x20, 0x28, WZ_341},
-    { 10, 0x39f843, 0x39f734, 0x9c3b28, 0x7b809c, 0, 0, 0x18, 0x20, 0x28, WZ_341}
+    { 10, 0x39f843, 0x39f734, 0x9c3b28, 0x7b809c, 0, 0, 0x18, 0x20, 0x28, WZ_341},
+
+    // Warzone 2100 4.0.0
+    { 0, 0, 0, 0, 0x9206E4, 0, 0, 0, 0, 0, WZ_400},
+    { 1, 0, 0, 0, 0x920714, 0, 0, 0, 0, 0, WZ_400},
+    { 2, 0, 0, 0, 0x920744, 0, 0, 0, 0, 0, WZ_400},
+    { 3, 0, 0, 0, 0x920774, 0, 0, 0, 0, 0, WZ_400},
+    { 4, 0, 0, 0, 0x9207a4, 0, 0, 0, 0, 0, WZ_400},
+    { 5, 0, 0, 0, 0x9207d4, 0, 0, 0, 0, 0, WZ_400},
+    { 6, 0, 0, 0, 0x920804, 0, 0, 0, 0, 0, WZ_400},
+    { 7, 0, 0, 0, 0x920834, 0, 0, 0, 0, 0, WZ_400},
+    { 8, 0, 0, 0, 0x920864, 0, 0, 0, 0, 0, WZ_400},
+    { 9, 0, 0, 0, 0x920894, 0, 0, 0, 0, 0, WZ_400},
+    { 10, 0, 0, 0, 0x9208c4, 0, 0, 0, 0, 0, WZ_400}
 };
 
 /**
