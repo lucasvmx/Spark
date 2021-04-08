@@ -116,7 +116,7 @@ unsigned short WzHack_GetWarzoneVersion(const char *wz_filename)
     // Compila o número de versão para um único número
     iversion = (major * 100) + (minor * 10) + patch;
 
-    if((iversion > WZ_341) || (iversion < WZ_239))
+    if((iversion > WZ_400) || (iversion < WZ_239))
 		iversion = WZ_UNKNOWN;
 
 	if (buf)
@@ -396,13 +396,14 @@ uint32_t GetWarzoneMaxPowerValue(int warzone_version)
 {
     switch(warzone_version)
     {
-        case WZ_239:
-            return 100000;
-        case WZ_315:
-        case WZ_323:
-        case WZ_330:
-        case WZ_340:
-        case WZ_341:
+    case WZ_239:
+        return 100000;
+    case WZ_315:
+    case WZ_323:
+    case WZ_330:
+    case WZ_340:
+    case WZ_341:
+    case WZ_400:
              return 1000000;
     }
 

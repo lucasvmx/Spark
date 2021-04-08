@@ -101,9 +101,10 @@ void MainHackingThread::run()
         }
 
         // Realizar as interferências no jogo
-        if(bEnableGodMode)
+        if(bEnableGodMode) {
             this->enableGodMode();
-		
+        }
+
 		// Continua as alterações no jogo até que ele seja fechado
 		while(this->canContinue())
 		{
@@ -160,13 +161,17 @@ void MainHackingThread::waitForWarzone()
             throw new Exception(tr("Falha ao abrir processo do warzone: %1").arg(GetLastError()).toStdString().c_str());
 
         Sleep(5000);
-    }
 #endif
+    }
 
     // Obtém o endereço-base do processo e guarda na memória
     ::base_addr = libhack_get_base_addr(hack_handle);
     if(!(::base_addr > 0))
         throw new Exception(tr("Falha ao obter endereço-base do processo").toStdString().c_str());
+
+#ifdef QT_DEBUG
+    fprintf(stderr, "Endereço-base: %#x\n", ::base_addr);
+#endif
 
     emit updateStatus(tr("Warzone 2100 em execução ..."));
 }

@@ -48,7 +48,7 @@ SOURCES += \
 	../src/frmabout.cpp \
     ../src/frmlanguage.cpp
 
-TRANSLATIONS += ../languages/spark_en_us.ts
+TRANSLATIONS += ../languages/spark_en_us.translation
 
 CONFIG += lrelease
 
