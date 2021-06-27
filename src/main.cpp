@@ -92,9 +92,14 @@ int main(int argc, char *argv[])
 
     // Carrega a tradução selecionada
     if(f->GetSelectedLanguage() == Ui::languages::ENGLISH) {
-        translator.load("spark_en_us");
-        app.installTranslator(&translator);
-        fprintf(stderr, "Loaded english translation\n");
+        auto result = translator.load("spark_en_us");
+        if(result) {
+            app.installTranslator(&translator);
+            fprintf(stderr, "Loaded english translation\n");
+        } else {
+            QMessageBox::critical(0, TR("Erro"), TR("Falha ao carregar a tradução"));
+            exit(1)
+;        }
     } else {
         fprintf(stderr, "Loaded portuguese translation\n");
     }

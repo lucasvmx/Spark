@@ -260,7 +260,7 @@ bool MainHackingThread::isGamePlayStarted() const
     } else {
         throw new Exception(tr("Essa versão do warzone ainda não suporta a detecção de status "
                             "(verificar se a partida foi iniciada). Envie um e-mail para "
-                            "lucas.engen.cc@gmail.com e reporte o ocorrido :)").toStdString().c_str());
+                            "lucas.engen.cc@gmail.com contendo a versão do jogo e reporte o ocorrido :)").toStdString().c_str());
     }
 
     return false;
