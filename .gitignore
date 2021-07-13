@@ -27,3 +27,5 @@ maps
 build-*
 *.a
 *.dll
+BUILD
+autorevision.sh
