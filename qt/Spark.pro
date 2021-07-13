@@ -13,7 +13,7 @@ TEMPLATE = app
 win32:RC_ICONS += ../resource/images/iconfinder__snowflake_1679761_ico.ico
 #win32:RC_FILE += ../resource/spark.rc
 
-VERSION = 2.0.0.0
+VERSION = 2.3.0.0
 if(!greaterThan(QT_MAJOR_VERSION, 5)) {
 	QMAKE_TARGET_COMPANY = "Lucas Vieira"
 	QMAKE_TARGET_DESCRIPTION = "Spark - a simple trainer to warzone 2100"
@@ -53,9 +53,9 @@ TRANSLATIONS += ../languages/spark_en_us.translation
 CONFIG += lrelease
 
 HEADERS += \
-	../libs/libhack/consts.h \
-	../libs/libhack/init.h \
-	../libs/libhack/process.h \
+	../3rdparty/libhack/src/consts.h \
+	../3rdparty/libhack/src/init.h \
+	../3rdparty/libhack/src/process.h \
 	../resource/spark.rc \
 	../src/dynamic_loader.h \
 	../src/exception.h \
@@ -76,7 +76,8 @@ FORMS += \
 RESOURCES += \
     ../resource/resources.qrc
 
-win32: LIBS += -L$$PWD/../libs/libhack -lhack -lpsapi -static-libgcc
+win32: LIBS += -L$$PWD/../BUILD/ -lhack -lpsapi -static-libgcc
 
-INCLUDEPATH += $$PWD/../libs/libhack
-DEPENDPATH += $$PWD/../libs/libhack/bin
+message($$PWD)
+INCLUDEPATH += $$PWD/../3rdparty/libhack/src/
+DEPENDPATH += $$PWD/../BUILD/
