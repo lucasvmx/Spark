@@ -11,5 +11,5 @@ current = first
 
 print(f'offset is {diff} or {hex(diff)} in base 16')
 for i in range(0, 11):
-		print('{%d, 0, 0, 0, %s, 0, 0, 0, 0, 0, %s},' % (i, hex(current), ver))
+		print('\t{%d, 0, 0, 0, %s, 0, 0, 0, 0, 0, %s},' % (i, hex(current), ver))
 		current += diff
