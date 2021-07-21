@@ -20,16 +20,17 @@ jobs:
         
     - name: Generate makefiles (libhack)
       working-directory: 3rdparty\libhack
-      run: cmake -G "MinGW Makefiles" -B build
+      run: cmake -G "MinGW Makefiles" -B $BUILD_DIR
     
     - name: Bulid (libhack)
       working-directory: 3rdparty\libhack
-      run: make -C build
+      run: make -C $BUILD_DIR
 
     - name: Copy output files
       shell: bash
       working-directory: 3rdparty/libhack/build
       run: |
+        mkdir ../../../BUILD
         mv libhack.dll.a libhack.a
         mv libhack.dll libhack.a ../../../BUILD
 
