@@ -46,7 +46,9 @@ SOURCES += \
     ../src/wzhack.cpp \
     ../src/frmsettings.cpp \
 	../src/frmabout.cpp \
-    ../src/frmlanguage.cpp
+    ../src/frmlanguage.cpp \
+	../src/frmupdate.cpp \
+	../src/platform.cpp
 
 TRANSLATIONS += ../languages/spark_en_us.translation
 
@@ -65,19 +67,24 @@ HEADERS += \
     ../src/wzhack.h \
     ../src/frmsettings.h \
 	../src/frmabout.h \
-    ../src/frmlanguage.h
+    ../src/frmlanguage.h \
+	../src/frmupdate.h \
+	../src/platform.h
 
 FORMS += \
         ../ui/frmmain.ui \
     ../ui/frmsettings.ui \
     ../ui/frmabout.ui \
-    ../ui/frmlanguage.ui
+    ../ui/frmlanguage.ui \
+	../ui/frmupdate.ui
 
 RESOURCES += \
     ../resource/resources.qrc
 
 win32: LIBS += -L$$PWD/../BUILD/ -lhack -lpsapi -static-libgcc
 
-message($$PWD)
 INCLUDEPATH += $$PWD/../3rdparty/libhack/src/
 DEPENDPATH += $$PWD/../BUILD/
+
+DISTFILES += \
+	../resource/images/icon_update.ico
