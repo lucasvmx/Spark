@@ -10,8 +10,6 @@ jobs:
   build-x64:
 
     runs-on: windows-latest
-    env:
-        BUILD_DIR: build
 
     steps:
     - uses: actions/checkout@v2
@@ -20,11 +18,11 @@ jobs:
         
     - name: Generate makefiles (libhack)
       working-directory: 3rdparty\libhack
-      run: cmake -G "MinGW Makefiles" -B $BUILD_DIR
+      run: cmake -G "MinGW Makefiles" -B build
     
     - name: Bulid (libhack)
       working-directory: 3rdparty\libhack
-      run: make -C $BUILD_DIR
+      run: make -C build
 
     - name: Copy output files
       shell: bash
@@ -41,15 +39,15 @@ jobs:
         
     - name: Print Variables
       shell: bash
-      run: echo "current folder is $PWD and build dir is $BUILD_DIR"
+      run: echo "current folder is $PWD"
     - name: Prepare build dir
       shell: bash
-      run: mkdir $BUILD_DIR
+      run: mkdir build
     - name: Generate Makefiles
       shell: bash
-      run: qmake qt/Spark.pro -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug" -o $BUILD_DIR
+      run: qmake qt/Spark.pro -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug" -o build
     - name: Build
       shell: bash
       run: |
-        make -f $BUILD_DIR/Makefile qmake_all
-        make -C $BUILD_DIR -j4
+        make -f build/Makefile qmake_all
+        make -C build -j4
