@@ -40,9 +40,6 @@ jobs:
     - name: Print Variables
       shell: bash
       run: echo "current folder is $PWD"
-    - name: Prepare build dir
-      shell: bash
-      run: mkdir build
     - name: Generate Makefiles
       shell: bash
       run: qmake qt/Spark.pro -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug" -o build
