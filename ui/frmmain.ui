@@ -170,6 +170,7 @@ QGroupBox::title {
     </property>
     <addaction name="actionAbout_Qt"/>
     <addaction name="actionAbout_WarHack"/>
+    <addaction name="actionCheckUpdates"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuAbout"/>
@@ -228,6 +229,15 @@ QGroupBox::title {
   <action name="actionEnglish">
    <property name="text">
     <string>English</string>
+   </property>
+  </action>
+  <action name="actionCheckUpdates">
+   <property name="icon">
+    <iconset>
+     <normaloff>../resource/images/icon_update.ico</normaloff>../resource/images/icon_update.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Buscar atualizações</string>
    </property>
   </action>
  </widget>
