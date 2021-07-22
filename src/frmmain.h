@@ -38,6 +38,7 @@ public slots:
     void OnAction_QuitTriggered(bool x);
     void delegateSetText(QString text);
     void OnAction_AboutTriggered(bool x);
+    void OnAction_UpdateTriggered(bool x);
 
     void showCriticalMsgBox(QString title, QString text);
 private:

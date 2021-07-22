@@ -74,7 +74,6 @@ int main(int argc, char *argv[])
     signal(SIGABRT, signal_handler);
     signal(SIGSEGV, signal_handler);
 
-
     CheckForOtherInstance();
 
     // Carrega as funcões da DLL

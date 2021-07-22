@@ -24,11 +24,14 @@ public slots:
     void OnUpdateFailed();
     void OnUpdateButtonClick(bool);
     void OnMessageAvailable(QString);
+    void OnFinished();
 private:
     Ui::frmUpdate *ui;
     Updater *updateTask;
 
     void connectSignals();
+    void setUndefinedProgressBar();
+    void redefineProgressBar();
 };
 
 class Updater : public QThread {
@@ -42,6 +45,7 @@ public:
 signals:
     void messageAvailable(QString msg);
     void updateFailed();
+    void updateFinished();
 
 private:
 

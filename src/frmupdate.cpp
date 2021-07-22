@@ -39,7 +39,6 @@ void Updater::run()
     QStringList args;
 
     emit messageAvailable(tr("Buscando atualizações ..."));
-
     args << "--current_version" << ver << "--arch" << arch;
     auto status = p->execute(QDir::currentPath() + "/updater/updater.exe", args);
     if(status < 0) {
@@ -51,6 +50,7 @@ void Updater::run()
         {
         case 0xFF1:
             emit messageAvailable(tr("Você já possui a última versão"));
+            emit updateFinished();
             return;
 
         default:
@@ -64,6 +64,7 @@ void frmUpdate::LaunchUpdate()
 {
     if(!updateTask->isRunning())
     {
+        setUndefinedProgressBar();
         ui->textBrowser->clear();
         updateTask->start();
     } else {
@@ -78,6 +79,7 @@ frmUpdate::~frmUpdate()
 
 void frmUpdate::OnUpdateFailed()
 {
+    redefineProgressBar();
     QMessageBox::critical(0, tr("Erro"), tr("Algo deu errado com a atualização: clique para fechar a janela"));
     this->close();
 }
@@ -94,9 +96,28 @@ void frmUpdate::OnMessageAvailable(QString text)
     ui->textBrowser->append(text);
 }
 
+void frmUpdate::OnFinished()
+{
+    redefineProgressBar();
+}
+
 void frmUpdate::connectSignals()
 {
     QObject::connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(OnUpdateButtonClick(bool)));
     QObject::connect(updateTask, SIGNAL(messageAvailable(QString)), this, SLOT(OnMessageAvailable(QString)));
+    QObject::connect(updateTask, SIGNAL(updateFinished()), this, SLOT(OnFinished()));
+}
+
+void frmUpdate::setUndefinedProgressBar()
+{
+    ui->progressBar->setMaximum(0);
+    ui->progressBar->setMinimum(0);
+}
+
+void frmUpdate::redefineProgressBar()
+{
+    ui->progressBar->setMaximum(1);
+    ui->progressBar->setMinimum(0);
+    ui->progressBar->setValue(0);
 }
 

@@ -14,6 +14,7 @@
 #include "frmsettings.h"
 #include "threads.h"
 #include "frmabout.h"
+#include "frmupdate.h"
 #include "exception.h"
 
 #include <QMessageBox>
@@ -23,7 +24,10 @@
 #include "wzhack.h"
 #include "version.h"
 
+static bool bIs64Bit;
 static Threads::MainHackingThread *hackingThread = nullptr;
+static frmUpdate *updateWidget = nullptr;
+static frmAbout *aboutWidget = nullptr;
 
 frmMain::frmMain(QWidget *parent) :
     QMainWindow(parent),
@@ -34,15 +38,30 @@ frmMain::frmMain(QWidget *parent) :
     // Inicializa a classe das threads
     hackingThread = new Threads::MainHackingThread();
 
+    updateWidget = new frmUpdate();
+    aboutWidget = new frmAbout();
+
     // Conecta os sinais de usuário
     this->connectAllSignals();
 
+    QString title;
+
     // Constroi o titulo
     if(SPARK_PATCH > 0)
-        this->setWindowTitle(QString("%1 v%2.%3.%4").arg(PROGNAME).arg(SPARK_MAJOR).arg(SPARK_MINOR).arg(SPARK_PATCH));
+        title = QString("%1 v%2.%3.%4").arg(PROGNAME).arg(SPARK_MAJOR).arg(SPARK_MINOR).arg(SPARK_PATCH);
     else
-        this->setWindowTitle(QString("%1 v%2.%3").arg(PROGNAME).arg(SPARK_MAJOR).arg(SPARK_MINOR));
+        title = QString("%1 v%2.%3").arg(PROGNAME).arg(SPARK_MAJOR).arg(SPARK_MINOR);
 
+#if defined(__x86_64__)
+    bIs64Bit = true;
+    title = title + " - 64 bit";
+#else
+    bIs64Bit = false;
+    title = title + " - 32 bit";
+#endif
+
+    this->setWindowTitle(title);
+    
     // Ajusta o tamanho da janela
     this->setFixedWidth(this->width());
     this->setFixedHeight(this->height());
@@ -62,6 +81,7 @@ void frmMain::connectAllSignals()
     connect(hackingThread, SIGNAL(updateStatus(QString)), this, SLOT(delegateSetText(QString)));
     connect(ui->actionAbout_WarHack, SIGNAL(triggered(bool)), this, SLOT(OnAction_AboutTriggered(bool)));
     connect(hackingThread, SIGNAL(showCriticalMsgBox(QString, QString)), this, SLOT(showCriticalMsgBox(QString, QString)));
+    connect(ui->actionCheckUpdates, SIGNAL(triggered(bool)), this, SLOT(OnAction_UpdateTriggered(bool)));
 }
 
 void frmMain::OnButtonStartClicked(bool x)
@@ -161,4 +181,15 @@ void frmMain::println(int id, QString text)
 void frmMain::showCriticalMsgBox(QString title, QString text)
 {
     QMessageBox::critical(0, title, text);
+}
+
+void frmMain::OnAction_UpdateTriggered(bool x)
+{
+    (void)x;
+
+    if(updateWidget == nullptr)
+        updateWidget = new frmUpdate();
+
+    if(!updateWidget->isVisible())
+        updateWidget->show();
 }
