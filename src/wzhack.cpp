@@ -23,10 +23,11 @@
 #include <shlwapi.h>
 #include <assert.h>
 #include <stdint.h>
-#include "../libs/libhack/init.h"
-#include "../libs/libhack/process.h"
-#include "../libs/libhack/consts.h"
+#include "../3rdparty/libhack/src/init.h"
+#include "../3rdparty/libhack/src/process.h"
+#include "../3rdparty/libhack/src/consts.h"
 #include "wzhack.h"
+#include "platform.h"
 #include "dynamic_loader.h"
 
 /**
@@ -306,7 +307,7 @@ BOOL WzHack_SetPlayerMaxPowerStorage(unsigned player, int wz_version, int storag
     WzHack_GetStructStartIndex(wz_version, &start);
 
     // Muda a capacidade máxima de armazenamento do jogador
-    int status = libhack_write_int_to_addr(hack, player_info[start + player].max_power_offset, storage);
+    auto status = libhack_write_int_to_addr(hack, player_info[start + player].max_power_offset, storage);
 
     return status > 0 ? TRUE : FALSE;
 }
@@ -354,7 +355,6 @@ BOOL  WzHack_SetPlayerWastedPower(unsigned player, int wz_version, int wasted)
 {
     unsigned short start;
     int major, minor, patch;
-    DWORD wastedAddr;
 
     // Obtém os números da versão
     GetVersionFromWzVer(wz_version, &major, &minor, &patch);
@@ -371,6 +371,8 @@ BOOL  WzHack_SetPlayerWastedPower(unsigned player, int wz_version, int wasted)
 
     if(!libhack_open_process(hack) && (GetLastError() != ERROR_ALREADY_INITIALIZED))
         return FALSE;
+
+    DWORD wastedAddr;
 
     // Calcula o endereço
     wastedAddr = libhack_get_base_addr(hack) + player_info[start + player].power_offset + player_info[start].wasted_power_offset;
