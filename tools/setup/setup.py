@@ -104,6 +104,7 @@ def get_next_version(release_type: str):
     """
 
     url = "https://github.com/lucas-engen/Spark/releases/latest"
+    print(f"[info] Checking current release at {url} ...")
     response = urlopen(url)
     next_ver = response.url
     parse_result = urlparse(next_ver)
