@@ -7,76 +7,86 @@
         <source>Falha de aplicativo</source>
         <translation type="vanished">Application error</translation>
     </message>
+    <message>
+        <location filename="../src/main.cpp" line="80"/>
+        <source>Erro</source>
+        <translation>Error</translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="80"/>
+        <source>libhack.dll não encontrado</source>
+        <translation>libhack.dll not found</translation>
+    </message>
 </context>
 <context>
     <name>Threads::MainHackingThread</name>
     <message>
-        <location filename="../src/threads.cpp" line="71"/>
+        <location filename="../src/threads.cpp" line="78"/>
         <source>Erro ao obter caminho do warzone: %1</source>
         <translation>Error getting warzone installation path %1</translation>
     </message>
     <message>
-        <location filename="../src/threads.cpp" line="76"/>
+        <location filename="../src/threads.cpp" line="83"/>
         <source>Aguardando usuário entrar na partida ...</source>
         <translation>Waiting for user to join the match ...</translation>
     </message>
     <message>
-        <location filename="../src/threads.cpp" line="86"/>
+        <location filename="../src/threads.cpp" line="93"/>
         <source>Partida iniciada</source>
         <translation>Match started</translation>
     </message>
     <message>
-        <location filename="../src/threads.cpp" line="127"/>
+        <location filename="../src/threads.cpp" line="138"/>
         <source>Algo deu errado</source>
         <translation>Something was wrong</translation>
     </message>
     <message>
-        <location filename="../src/threads.cpp" line="134"/>
+        <location filename="../src/threads.cpp" line="145"/>
         <source>O Warzone 2100 foi fechado</source>
         <translation>Warzone2100 has been closed</translation>
     </message>
     <message>
-        <location filename="../src/threads.cpp" line="135"/>
+        <location filename="../src/threads.cpp" line="146"/>
         <source>Clique novamente no botão iniciar para rodar o trainer</source>
         <translation>Click the start button again to run the trainer</translation>
     </message>
     <message>
-        <location filename="../src/threads.cpp" line="142"/>
+        <location filename="../src/threads.cpp" line="153"/>
         <source>Erro ao inicializar a libhack: %1</source>
         <translation>Failed to start libhack %1</translation>
     </message>
     <message>
-        <location filename="../src/threads.cpp" line="154"/>
+        <location filename="../src/threads.cpp" line="165"/>
         <source>Aguardando pelo warzone ...</source>
         <translation>Waiting for warzone to be opened ...</translation>
     </message>
     <message>
-        <location filename="../src/threads.cpp" line="161"/>
+        <location filename="../src/threads.cpp" line="172"/>
         <source>Falha ao abrir processo do warzone: %1</source>
         <translation>Failed to open warzone2100 process: %1</translation>
     </message>
     <message>
-        <location filename="../src/threads.cpp" line="170"/>
+        <location filename="../src/threads.cpp" line="185"/>
         <source>Falha ao obter endereço-base do processo</source>
         <translation>Failed to get process base address</translation>
     </message>
     <message>
-        <location filename="../src/threads.cpp" line="176"/>
+        <location filename="../src/threads.cpp" line="195"/>
         <source>Warzone 2100 em execução ...</source>
         <translation>Warzone2100 is running ...</translation>
     </message>
     <message>
-        <location filename="../src/threads.cpp" line="216"/>
+        <location filename="../src/threads.cpp" line="244"/>
         <source>Falha ao oferecer energia ao jogador %1</source>
         <translation>Failed to give energy to player %1</translation>
     </message>
     <message>
-        <location filename="../src/threads.cpp" line="243"/>
+        <location filename="../src/threads.cpp" line="283"/>
         <source>O warzone 2100 foi fechado subitamente</source>
         <translation>Warzone 2100 has been closed abruptly</translation>
     </message>
     <message>
-        <location filename="../src/threads.cpp" line="261"/>
+        <location filename="../src/threads.cpp" line="305"/>
         <source>Essa versão do warzone ainda não suporta a detecção de status (verificar se a partida foi iniciada). Envie um e-mail para lucas.engen.cc@gmail.com contendo a versão do jogo e reporte o ocorrido :)</source>
         <translation>This warzone version isn&apos;t supported yet. Please send a mail to lucas.engen.cc@gmail.com containing game version with a detailed description</translation>
     </message>
@@ -93,25 +103,23 @@
         <translation>Searching updates</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="46"/>
+        <location filename="../src/frmupdate.cpp" line="45"/>
         <source>Erro ao executar o programa de atualização! Código: %1</source>
         <translation>Failed to search for updates. Error code: %1</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="51"/>
+        <location filename="../src/frmupdate.cpp" line="52"/>
+        <source>Você já possui a última versão</source>
+        <translation>You have the last version already</translation>
+    </message>
+    <message>
+        <location filename="../src/frmupdate.cpp" line="57"/>
         <source>Algo deu errado no processo de atualização (codigo: %1). Repita o processo</source>
         <translation>Failed to search for updates (error %1). Try again</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="54"/>
         <source>O processo de atualização foi concluído com sucesso</source>
-        <translation>The update process has been finished successfully</translation>
-    </message>
-    <message>
-        <location filename="../src/frmupdate.cpp" line="57"/>
-        <source>Saída:
-%1</source>
-        <translation></translation>
+        <translation type="vanished">The update process has been finished successfully</translation>
     </message>
 </context>
 <context>
@@ -149,19 +157,19 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/frmlanguage.ui" line="27"/>
+        <location filename="../ui/frmlanguage.ui" line="28"/>
         <source>Language...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/frmlanguage.ui" line="31"/>
+        <location filename="../ui/frmlanguage.ui" line="38"/>
         <source>Português</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Portuguese</translation>
     </message>
     <message>
-        <location filename="../ui/frmlanguage.ui" line="36"/>
+        <location filename="../ui/frmlanguage.ui" line="33"/>
         <source>English</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">English</translation>
     </message>
     <message>
         <location filename="../src/frmlanguage.cpp" line="10"/>
@@ -230,12 +238,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/frmmain.ui" line="226"/>
         <source>Português</source>
-        <translation type="unfinished"></translation>
+        <translation>Portuguese</translation>
     </message>
     <message>
         <location filename="../ui/frmmain.ui" line="231"/>
         <source>English</source>
-        <translation type="unfinished"></translation>
+        <translation>English</translation>
     </message>
     <message>
         <location filename="../ui/frmmain.ui" line="240"/>
@@ -362,92 +370,97 @@ p, li { white-space: pre-wrap; }
         <translation>Hacking algorithms</translation>
     </message>
     <message>
-        <location filename="../ui/frmsettings.ui" line="269"/>
+        <location filename="../ui/frmsettings.ui" line="314"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;a name=&quot;tw-target-text&quot;/&gt;&lt;span style=&quot; font-family:&apos;inherit&apos;; font-size:12pt; color:#00aaff;&quot;&gt;F&lt;/span&gt;&lt;span style=&quot; font-family:&apos;inherit&apos;; font-size:12pt; color:#00aaff;&quot;&gt;avorece um jogador específico durante todo o jogo. Pode ser útil quando você tem a intenção de favorecer outro jogador do seu time.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;a name=&quot;tw-target-text&quot;/&gt;&lt;span style=&quot; font-family:&apos;inherit&apos;; font-size:12pt; color:#00aaff;&quot;&gt;F&lt;/span&gt;&lt;span style=&quot; font-family:&apos;inherit&apos;; font-size:12pt; color:#00aaff;&quot;&gt;Favors a specific player throughout the game. It can be useful when you intend to favor another player on your team.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../ui/frmsettings.ui" line="275"/>
+        <location filename="../ui/frmsettings.ui" line="320"/>
         <source>Favorecer jogador específico</source>
         <translation>Favor specific player</translation>
     </message>
     <message>
-        <location filename="../ui/frmsettings.ui" line="287"/>
+        <location filename="../ui/frmsettings.ui" line="279"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; color:#00aaff;&quot;&gt;Faz com que a energia dos jogadores, exceto você, fique sempre nula.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; color:#00aaff;&quot;&gt;It causes the players&apos; energy (except the favored one) to always be nil.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../ui/frmsettings.ui" line="293"/>
+        <location filename="../ui/frmsettings.ui" line="285"/>
         <source>Zerar energia dos inimigos</source>
         <translation>Erase enemy energy</translation>
     </message>
     <message>
-        <location filename="../ui/frmsettings.ui" line="300"/>
+        <location filename="../ui/frmsettings.ui" line="292"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;tw-target-text&quot;/&gt;&lt;span style=&quot; font-family:&apos;inherit&apos;; font-size:12pt; color:#00aaff;&quot;&gt;Permite que o seu jogador visualize as instalações e unidades do inimigo&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;tw-target-text&quot;/&gt;&lt;span style=&quot; font-family:&apos;inherit&apos;; font-size:12pt; color:#00aaff;&quot;&gt;Allows your player to view the enemy&apos;s facilities and units&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../ui/frmsettings.ui" line="303"/>
+        <location filename="../ui/frmsettings.ui" line="295"/>
         <source>Habilitar o modo Deus</source>
         <translation>Enable god mode</translation>
     </message>
     <message>
-        <location filename="../ui/frmsettings.ui" line="310"/>
+        <location filename="../ui/frmsettings.ui" line="302"/>
         <source>Energia sempre alta</source>
         <translation>Energy always high</translation>
     </message>
     <message>
-        <location filename="../ui/frmsettings.ui" line="317"/>
+        <location filename="../ui/frmsettings.ui" line="264"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;tw-target-text&quot;/&gt;&lt;span style=&quot; font-family:&apos;inherit&apos;; font-size:12pt; color:#00aaff;&quot;&gt;Permite ao jogador usar os códigos de cheat internos do jogo sem que seja detectado&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;tw-target-text&quot;/&gt;&lt;span style=&quot; font-family:&apos;inherit&apos;; font-size:12pt; color:#00aaff;&quot;&gt;Allows the player to use the game&apos;s internal cheat codes without being detected&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../ui/frmsettings.ui" line="320"/>
+        <location filename="../ui/frmsettings.ui" line="267"/>
         <source>Prevenir detecção de cheat</source>
         <translation>Prevent cheat detection</translation>
     </message>
     <message>
-        <location filename="../ui/frmsettings.ui" line="330"/>
+        <location filename="../ui/frmsettings.ui" line="327"/>
+        <source>Aumentar a velocidade de geração de energia</source>
+        <translation>Increase energy generation speed</translation>
+    </message>
+    <message>
+        <location filename="../ui/frmsettings.ui" line="337"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-size:12pt; color:#ff0000;&quot;&gt;Salva as configurações&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-size:12pt; color:#ff0000;&quot;&gt;Save settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../ui/frmsettings.ui" line="352"/>
+        <location filename="../ui/frmsettings.ui" line="359"/>
         <source>Salvar</source>
         <translation>Save</translation>
     </message>
     <message>
-        <location filename="../src/frmsettings.cpp" line="44"/>
+        <location filename="../src/frmsettings.cpp" line="47"/>
         <source>%1 - configurações</source>
         <translation>%1 - Settings</translation>
     </message>
     <message>
-        <location filename="../src/frmsettings.cpp" line="45"/>
+        <location filename="../src/frmsettings.cpp" line="48"/>
         <source>Tempo de espera:</source>
         <translation>Delay:</translation>
     </message>
     <message>
-        <location filename="../src/frmsettings.cpp" line="76"/>
+        <location filename="../src/frmsettings.cpp" line="80"/>
         <source>Atenção</source>
         <translation>Warning</translation>
     </message>
     <message>
-        <location filename="../src/frmsettings.cpp" line="77"/>
+        <location filename="../src/frmsettings.cpp" line="81"/>
         <source>Você não escolheu nenhum algoritmo de hacking. Por padrão, o de energia infinita será usado</source>
         <translation>You have not chosen any hacking algorithms. By default, the infinite energy algorithm will be used</translation>
     </message>
     <message>
-        <location filename="../src/frmsettings.cpp" line="80"/>
+        <location filename="../src/frmsettings.cpp" line="84"/>
         <source>Sucesso</source>
         <translation>Success</translation>
     </message>
     <message>
-        <location filename="../src/frmsettings.cpp" line="80"/>
+        <location filename="../src/frmsettings.cpp" line="84"/>
         <source>Configurações salvas!</source>
         <translation>Settings saved!</translation>
     </message>
     <message>
-        <location filename="../src/frmsettings.cpp" line="87"/>
+        <location filename="../src/frmsettings.cpp" line="91"/>
         <source>%d segundos</source>
         <translation>%d seconds</translation>
     </message>
@@ -470,22 +483,22 @@ p, li { white-space: pre-wrap; }
         <translation>Spark - Update</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="68"/>
+        <location filename="../src/frmupdate.cpp" line="71"/>
         <source>Atualização</source>
         <translation>Update</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="68"/>
+        <location filename="../src/frmupdate.cpp" line="71"/>
         <source>O processo de atualização está em curso</source>
         <translation>The update process is running</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="79"/>
+        <location filename="../src/frmupdate.cpp" line="83"/>
         <source>Erro</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="79"/>
+        <location filename="../src/frmupdate.cpp" line="83"/>
         <source>Algo deu errado com a atualização: clique para fechar a janela</source>
         <translation>Failed to update. Click to close window</translation>
     </message>
