@@ -51,6 +51,8 @@ struct libhack_handle *WzHack_Initialize(const char *process_name)
             FatalAppExitA(0, "Falha ao inicializar a biblioteca libhack");
         }
 
+        wzhack_initialized = true;
+
         return hack;
     }
 
@@ -117,7 +119,7 @@ unsigned short WzHack_GetWarzoneVersion(const char *wz_filename)
     // Compila o número de versão para um único número
     iversion = (major * 100) + (minor * 10) + patch;
 
-    if((iversion > WZ_410) || (iversion < WZ_239))
+    if((iversion > WZ_427) || (iversion < WZ_239))
 		iversion = WZ_UNKNOWN;
 
 	if (buf)
@@ -248,7 +250,11 @@ BOOL WzHack_GetPlayerNumberOfUnits(unsigned player, int wz_version, DWORD *numbe
     WzHack_GetStructStartIndex(wz_version, &start);
 
     // Le o numero de unidades do jogador
+#ifdef Q_OS_WIN64
+    units = libhack_read_int_from_addr64(hack, player_info[start + player].units_offset);
+#else
     units = libhack_read_int_from_addr(hack, player_info[start + player].units_offset);
+#endif
 
     if(number_of_units != nullptr)
         *number_of_units = units;
@@ -258,7 +264,11 @@ BOOL WzHack_GetPlayerNumberOfUnits(unsigned player, int wz_version, DWORD *numbe
 
 BOOL WzHack_GetNumberOfBuiltStructures(unsigned player, int wz_version, DWORD *number_of_built_structures)
 {
+#ifdef Q_OS_WIN64
+    DWORD64 built_structures;
+#else
     DWORD built_structures;
+#endif
     USHORT start;
 
     Q_ASSERT(number_of_built_structures != nullptr);
@@ -279,7 +289,11 @@ BOOL WzHack_GetNumberOfBuiltStructures(unsigned player, int wz_version, DWORD *n
     WzHack_GetStructStartIndex(wz_version, &start);
 
     // Lê o número de estruturas construídas pelo jogador
+#ifdef Q_OS_WIN64
+    built_structures = libhack_read_int_from_addr64(hack, player_info[start + player].structures_offset);
+#else
     built_structures = libhack_read_int_from_addr(hack, player_info[start + player].structures_offset);
+#endif
 
     if(number_of_built_structures != nullptr)
         *number_of_built_structures = built_structures;
@@ -307,7 +321,11 @@ BOOL WzHack_SetPlayerMaxPowerStorage(unsigned player, int wz_version, int storag
     WzHack_GetStructStartIndex(wz_version, &start);
 
     // Muda a capacidade máxima de armazenamento do jogador
+#ifdef Q_OS_WIN64
+    auto status = libhack_write_int_to_addr64(hack, player_info[start + player].max_power_offset, storage);
+#else
     auto status = libhack_write_int_to_addr(hack, player_info[start + player].max_power_offset, storage);
+#endif
 
     return status > 0 ? TRUE : FALSE;
 }
@@ -316,7 +334,11 @@ BOOL WzHack_SetPlayerExtractedPower(unsigned player, int wz_version, int extract
 {
     unsigned short start;
     int major, minor, patch;
+#ifdef Q_OS_WIN64
+    DWORD64 extractedAddr;
+#else
     DWORD extractedAddr;
+#endif
 
     // Obtém os números da versão
     GetVersionFromWzVer(wz_version, &major, &minor, &patch);
@@ -339,11 +361,17 @@ BOOL WzHack_SetPlayerExtractedPower(unsigned player, int wz_version, int extract
         return FALSE;
 
     // Calcula o endereço
+#ifdef Q_OS_WIN64
+    extractedAddr = libhack_get_base_addr64(hack) + player_info[start + player].power_offset +
+            player_info[start].wasted_power_offset;
+    libhack_write_int_to_addr64(hack, static_cast<DWORD64>(extractedAddr), extracted);
+#else
     extractedAddr = libhack_get_base_addr(hack) + player_info[start + player].power_offset +
             player_info[start].wasted_power_offset;
 
     // Atualiza a quantidade de energia gasta
     libhack_write_int_to_addr(hack, static_cast<DWORD>(extractedAddr), extracted);
+#endif
 
     // Libera a memória alocada
     libhack_free(hack);
@@ -355,6 +383,11 @@ BOOL  WzHack_SetPlayerWastedPower(unsigned player, int wz_version, int wasted)
 {
     unsigned short start;
     int major, minor, patch;
+#ifdef Q_OS_WIN64
+    DWORD64 wastedAddr;
+#else
+    DWORD wastedAddr;
+#endif
 
     // Obtém os números da versão
     GetVersionFromWzVer(wz_version, &major, &minor, &patch);
@@ -372,13 +405,15 @@ BOOL  WzHack_SetPlayerWastedPower(unsigned player, int wz_version, int wasted)
     if(!libhack_open_process(hack) && (GetLastError() != ERROR_ALREADY_INITIALIZED))
         return FALSE;
 
-    DWORD wastedAddr;
+    // Calcula o endereço e atualiza a quantidade de energia gasta
+#ifdef Q_OS_WIN64
+    wastedAddr = libhack_get_base_addr64(hack) + player_info[start + player].power_offset + player_info[start].wasted_power_offset;
+    libhack_write_int_to_addr64(hack, static_cast<DWORD64>(wastedAddr), wasted);
+#else
 
-    // Calcula o endereço
     wastedAddr = libhack_get_base_addr(hack) + player_info[start + player].power_offset + player_info[start].wasted_power_offset;
-
-    // Atualiza a quantidade de energia gasta
     libhack_write_int_to_addr(hack, static_cast<DWORD>(wastedAddr), wasted);
+#endif
 
     // Libera a memória alocada
     libhack_free(hack);
@@ -424,6 +459,7 @@ bool IsFeatureSupported(int wz_version, FEATURES feature)
     case FEATURE_CHANGE_MAX_STORED_POWER: return player_info[start].max_power_offset > 0;
     case FEATURE_GET_SELECTED_PLAYER: return player_info[start].selectedPlayer_offset > 0;
     case FEATURE_CHANGE_WASTED_POWER: return player_info[start].wasted_power_offset > 0;
+	case FEATURE_CHANGE_POWER_MODIFIER: return player_info[start].power_modifier_offset > 0;
 
     case FEATURE_CHECK_GAME_IS_RUNNING:
         for(const auto& element : gstatus) {
