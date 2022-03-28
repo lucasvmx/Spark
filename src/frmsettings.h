@@ -56,4 +56,7 @@ extern bool bEnableGodMode;
 // flag para armazenar se a detecção de anti-cheat deverá ser burlada
 extern bool bPreventAntiCheatDetection;
 
+// flag para armazenar se a velocidade de geração de energia deve ser aumentada
+extern bool bIncreasePowerGenerationSpeed;
+
 #endif // FRMSETTINGS_H

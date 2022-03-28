@@ -35,6 +35,9 @@ bool bEnableGodMode = false;
 // flag para armazenar se a detecção de anti-cheat deverá ser burlada
 bool bPreventAntiCheatDetection = false;
 
+// flag para armazenar se a velocidade de geração de energia deve ser aumentada
+bool bIncreasePowerGenerationSpeed = false;
+
 frmSettings::frmSettings(QWidget *parent) : QWidget(parent), ui(new Ui::frmSettings)
 {
     ui->setupUi(this);
@@ -66,11 +69,12 @@ void frmSettings::OnButtonSave_Clicked(bool b)
     bEraseEnemyEnergy = ui->radioButton_erase_enemy_energy->isChecked();
     bEnableGodMode = ui->checkBox_enable_godmode->isChecked();
     bPreventAntiCheatDetection = ui->checkBox_prevent_anticheat->isChecked();
+    bIncreasePowerGenerationSpeed = ui->radioButton_increasePowerGen->isChecked();
     hacking_delay = ui->horizontalSlider_delay->value();
     player_id = ui->comboBox_playerId->currentIndex();
 
     if(!bInfiniteEnergy && !bSupportSpecificPlayer &&
-            !bEraseEnemyEnergy && !bEnableGodMode && !bPreventAntiCheatDetection)
+            !bEraseEnemyEnergy && !bEnableGodMode && !bPreventAntiCheatDetection && !bIncreasePowerGenerationSpeed)
     {
         bInfiniteEnergy = true;
         QMessageBox::warning(0, tr("Atenção"),
