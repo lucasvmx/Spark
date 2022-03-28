@@ -21,19 +21,21 @@
    <item row="0" column="0">
     <widget class="QComboBox" name="comboBox">
      <property name="currentIndex">
-      <number>-1</number>
-     </property>
-     <property name="placeholderText">
-      <string>Language...</string>
+      <number>0</number>
      </property>
      <item>
       <property name="text">
-       <string>Português</string>
+       <string>Language...</string>
       </property>
      </item>
      <item>
       <property name="text">
        <string>English</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Português</string>
       </property>
      </item>
     </widget>

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>324</width>
-    <height>372</height>
+    <height>408</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -258,21 +258,13 @@ QComboBox QAbstractItemView {
       <string>Algoritmos de 'hacking'</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="3" column="0">
-       <widget class="QCheckBox" name="checkBox_support_specific_player">
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
+      <item row="6" column="0">
+       <widget class="QCheckBox" name="checkBox_prevent_anticheat">
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;a name=&quot;tw-target-text&quot;/&gt;&lt;span style=&quot; font-family:'inherit'; font-size:12pt; color:#00aaff;&quot;&gt;F&lt;/span&gt;&lt;span style=&quot; font-family:'inherit'; font-size:12pt; color:#00aaff;&quot;&gt;avorece um jogador específico durante todo o jogo. Pode ser útil quando você tem a intenção de favorecer outro jogador do seu time.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="toolTipDuration">
-         <number>7000</number>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;tw-target-text&quot;/&gt;&lt;span style=&quot; font-family:'inherit'; font-size:12pt; color:#00aaff;&quot;&gt;Permite ao jogador usar os códigos de cheat internos do jogo sem que seja detectado&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string>Favorecer jogador específico</string>
+         <string>Prevenir detecção de cheat</string>
         </property>
        </widget>
       </item>
@@ -294,7 +286,7 @@ QComboBox QAbstractItemView {
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
+      <item row="5" column="0">
        <widget class="QCheckBox" name="checkBox_enable_godmode">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;tw-target-text&quot;/&gt;&lt;span style=&quot; font-family:'inherit'; font-size:12pt; color:#00aaff;&quot;&gt;Permite que o seu jogador visualize as instalações e unidades do inimigo&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -311,13 +303,28 @@ QComboBox QAbstractItemView {
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
-       <widget class="QCheckBox" name="checkBox_prevent_anticheat">
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="checkBox_support_specific_player">
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;tw-target-text&quot;/&gt;&lt;span style=&quot; font-family:'inherit'; font-size:12pt; color:#00aaff;&quot;&gt;Permite ao jogador usar os códigos de cheat internos do jogo sem que seja detectado&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;a name=&quot;tw-target-text&quot;/&gt;&lt;span style=&quot; font-family:'inherit'; font-size:12pt; color:#00aaff;&quot;&gt;F&lt;/span&gt;&lt;span style=&quot; font-family:'inherit'; font-size:12pt; color:#00aaff;&quot;&gt;avorece um jogador específico durante todo o jogo. Pode ser útil quando você tem a intenção de favorecer outro jogador do seu time.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="toolTipDuration">
+         <number>7000</number>
         </property>
         <property name="text">
-         <string>Prevenir detecção de cheat</string>
+         <string>Favorecer jogador específico</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QRadioButton" name="radioButton_increasePowerGen">
+        <property name="text">
+         <string>Aumentar a velocidade de geração de energia</string>
         </property>
        </widget>
       </item>
