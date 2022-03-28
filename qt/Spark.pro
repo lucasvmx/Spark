@@ -81,7 +81,7 @@ FORMS += \
 RESOURCES += \
     ../resource/resources.qrc
 
-win32: LIBS += -L$$PWD/../BUILD/ -lhack -lpsapi -static-libgcc
+win32: LIBS += -L$$PWD/../BUILD/ -lhack -lshlwapi -lpsapi -static-libgcc
 
 INCLUDEPATH += $$PWD/../3rdparty/libhack/src/
 DEPENDPATH += $$PWD/../BUILD/
