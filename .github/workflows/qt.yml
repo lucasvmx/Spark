@@ -20,7 +20,7 @@ jobs:
       working-directory: 3rdparty\libhack
       shell: bash
       run: |
-        curl https://raw.githubusercontent.com/Autorevision/autorevision/master/autorevision.sh
+        curl https://raw.githubusercontent.com/Autorevision/autorevision/master/autorevision.sh -o autorevision.sh
         chmod +x autorevision.sh
         bash ./autorevision.sh -t h > autorevision.h
         stat autorevision.h
