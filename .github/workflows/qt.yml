@@ -16,6 +16,14 @@ jobs:
       with:
         submodules: true
         
+    - name: Run autorevision
+      working-directory: 3rdparty\libhack
+      run: |
+        curl https://raw.githubusercontent.com/Autorevision/autorevision/master/autorevision.sh -o autorevision
+        chmod +x autorevision
+        ./autorevision -t h > autorevision.h
+        stat autorevision.h
+        
     - name: Generate makefiles (libhack)
       working-directory: 3rdparty\libhack
       run: cmake -G "MinGW Makefiles" -B build
