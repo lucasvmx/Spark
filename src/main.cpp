@@ -18,6 +18,7 @@
 #include <signal.h>
 #ifdef Q_OS_WIN
 #include <windows.h>
+#include <shlwapi.h>
 #endif
 #include "wzhack.h"
 #include "dynamic_loader.h"
@@ -73,6 +74,13 @@ int main(int argc, char *argv[])
 
     signal(SIGABRT, signal_handler);
     signal(SIGSEGV, signal_handler);
+
+#ifdef Q_OS_WIN
+    if(!PathFileExistsA("libhack.dll")) {
+        QMessageBox::critical(0, QObject::tr("Erro"), QObject::tr("libhack.dll não encontrado"));
+        ExitProcess(ERROR_FILE_NOT_FOUND);
+    }
+#endif
 
     CheckForOtherInstance();
 
