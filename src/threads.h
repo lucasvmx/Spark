@@ -77,6 +77,11 @@ namespace Threads
          */
         void enableGodMode();
 
+        /**
+         * @brief Aumenta a velocidade de geração de energia
+         */
+        void increasePowerGenerationSpeed(unsigned new_modifier);
+
     signals:
 
         /**
