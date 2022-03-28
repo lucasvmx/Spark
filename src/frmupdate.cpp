@@ -4,6 +4,10 @@
 #include <QDir>
 #include <QMessageBox>
 
+#ifdef QT_DEBUG
+#include <QDebug>
+#endif
+
 frmUpdate::frmUpdate(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::frmUpdate)
@@ -28,7 +32,7 @@ Updater::~Updater()
 
 void Updater::run()
 {
-    QString ver = QString("%1.%2.%3").arg(SPARK_MAJOR).arg(SPARK_MINOR-1).arg(SPARK_PATCH);
+    QString ver = QString("%1.%2.%3").arg(SPARK_MAJOR).arg(SPARK_MINOR).arg(SPARK_PATCH);
     QString arch;
 
 #if defined(Q_OS_WIN) && !defined(Q_OS_WIN32)
@@ -40,6 +44,7 @@ void Updater::run()
 
     emit messageAvailable(tr("Buscando atualizações ..."));
     args << "--current_version" << ver << "--arch" << arch;
+    qDebug() << args;
     auto status = p->execute(QDir::currentPath() + "/updater/updater.exe", args);
     if(status < 0) {
         emit messageAvailable(tr("Erro ao executar o programa de atualização! Código: %1").arg(status));
@@ -77,10 +82,11 @@ frmUpdate::~frmUpdate()
     delete ui;
 }
 
-void frmUpdate::OnUpdateFailed()
+void frmUpdate::OnFailed()
 {
     redefineProgressBar();
     QMessageBox::critical(0, tr("Erro"), tr("Algo deu errado com a atualização: clique para fechar a janela"));
+    ui->textBrowser->clear();
     this->close();
 }
 
@@ -106,6 +112,7 @@ void frmUpdate::connectSignals()
     QObject::connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(OnUpdateButtonClick(bool)));
     QObject::connect(updateTask, SIGNAL(messageAvailable(QString)), this, SLOT(OnMessageAvailable(QString)));
     QObject::connect(updateTask, SIGNAL(updateFinished()), this, SLOT(OnFinished()));
+    QObject::connect(updateTask, SIGNAL(updateFailed()), this, SLOT(OnFailed()));
 }
 
 void frmUpdate::setUndefinedProgressBar()

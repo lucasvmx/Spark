@@ -21,7 +21,7 @@ public:
     void LaunchUpdate();
 
 public slots:
-    void OnUpdateFailed();
+    void OnFailed();
     void OnUpdateButtonClick(bool);
     void OnMessageAvailable(QString);
     void OnFinished();
