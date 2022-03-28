@@ -33,10 +33,17 @@ static uint32_t max_power;
  */
 unsigned short start;
 
+#ifndef Q_OS_WIN64
 /**
  * @brief base_addr Endereço base do processo na memória
  */
-unsigned long base_addr;
+DWORD base_addr;
+#else
+/**
+ * @brief base_addr Endereço base do processo na memória (64 bits)
+ */
+DWORD64 base_addr;
+#endif
 
 /**
  * @brief warzone_version Versão do warzone
@@ -45,7 +52,7 @@ short detected_warzone_version;
 
 MainHackingThread::MainHackingThread()
 {
-    ::base_addr = 0UL;
+    ::base_addr = 0;
 }
 
 void MainHackingThread::run()
@@ -109,10 +116,14 @@ void MainHackingThread::run()
 		while(this->canContinue())
 		{
 			if(this->isGamePlayRunning()) {
-				if(bInfiniteEnergy)
-					giveInfiniteEnergy();
-				else if(bEraseEnemyEnergy)
-					eraseEnemyEnergy();				
+                if(bInfiniteEnergy) {
+                    giveInfiniteEnergy();
+                }
+                else if(bEraseEnemyEnergy) {
+                    eraseEnemyEnergy();
+                } else if(bIncreasePowerGenerationSpeed) {
+                    increasePowerGenerationSpeed(2000);
+                }
 			}
 			
 			// Aguarda pelo número de segundos desejado ou até que uma interrupção seja solicitada
@@ -165,12 +176,20 @@ void MainHackingThread::waitForWarzone()
     }
 
     // Obtém o endereço-base do processo e guarda na memória
+#ifndef Q_OS_WIN64
     ::base_addr = libhack_get_base_addr(hack_handle);
+#else
+    ::base_addr = libhack_get_base_addr64(hack_handle);
+#endif
     if(!(::base_addr > 0))
         throw new Exception(tr("Falha ao obter endereço-base do processo").toStdString().c_str());
 
 #ifdef QT_DEBUG
+#ifdef Q_OS_WIN64
+    fprintf(stderr, "Endereço-base: %llx\n", ::base_addr);
+#else
     fprintf(stderr, "Endereço-base: %#x\n", ::base_addr);
+#endif
 #endif
 
     emit updateStatus(tr("Warzone 2100 em execução ..."));
@@ -199,7 +218,11 @@ void MainHackingThread::wait(uint32_t seconds)
 void MainHackingThread::giveInfiniteEnergy()
 {
     int status;
+#ifndef Q_OS_WIN64
     DWORD addressToWrite;
+#else
+    DWORD64 addressToWrite;
+#endif
 
     // Calcula o endereço de leitura
     if(bSupportSpecificPlayer) {
@@ -207,10 +230,15 @@ void MainHackingThread::giveInfiniteEnergy()
     } else {
         addressToWrite = ::base_addr + player_info[::start].power_offset;
     }
+
     // Fazer o jogador ter energia infinita
 
 	// Aumenta a energia do jogador selecionado para o valor máximo
+#ifndef Q_OS_WIN64
 	status = libhack_write_int_to_addr(hack_handle, addressToWrite, ::max_power);
+#else
+    status = libhack_write_int_to_addr64(hack_handle, addressToWrite, ::max_power);
+#endif
 
 	if(status <= 0)
 		throw new Exception(tr("Falha ao oferecer energia ao jogador %1").arg(::player_id).toStdString().c_str());
@@ -218,7 +246,11 @@ void MainHackingThread::giveInfiniteEnergy()
 
 void MainHackingThread::eraseEnemyEnergy()
 {
+#ifndef Q_OS_WIN64
     unsigned long addrToWrite;
+#else
+    DWORD64 addrToWrite;
+#endif
 
 	// FIXME: encontrar método para não zerar a energia dos jogadores amigos
 	for(int player = 0; player < MAX_PLAYERS; player++)
@@ -230,13 +262,21 @@ void MainHackingThread::eraseEnemyEnergy()
         // Calcula o endereço de escrita
         addrToWrite = ::base_addr + ::player_info[::start + player].power_offset;
 
+#ifndef Q_OS_WIN64
         libhack_write_int_to_addr(hack_handle, addrToWrite, 0);
+#else
+        libhack_write_int_to_addr64(hack_handle, addrToWrite, 0);
+#endif
 	}
 }
 
 bool MainHackingThread::isGamePlayStarted() const
 {
+#ifndef Q_OS_WIN64
     unsigned long addressToRead = 0;
+#else
+    unsigned long long addressToRead = 0;
+#endif
     int started;
 
     if(!libhack_process_is_running(::hack_handle))
@@ -254,7 +294,11 @@ bool MainHackingThread::isGamePlayStarted() const
         }
 
         if(addressToRead) {
+#ifndef Q_OS_WIN64
             started = libhack_read_int_from_addr(::hack_handle, addressToRead);
+#else
+            started = libhack_read_int_from_addr64(::hack_handle, addressToRead);
+#endif
             return started == 1;
         }
     } else {
@@ -273,7 +317,11 @@ bool MainHackingThread::isGamePlayRunning() const
 
 void MainHackingThread::enableGodMode()
 {
-    unsigned long addrToWrite = 0;
+#ifdef Q_OS_WIN64
+    DWORD64 addrToWrite = 0;
+#else
+    DWORD addrToWrite = 0;
+#endif
     int god_mode;
     int bytes_written = 0;
     Q_ASSERT(hack_handle != nullptr);
@@ -292,6 +340,7 @@ void MainHackingThread::enableGodMode()
     {
         do
         {
+#ifndef Q_OS_WIN64
             bytes_written = libhack_write_int_to_addr(::hack_handle, addrToWrite, 1);
             if(bytes_written <= 0) {
                 fprintf(stderr, "(%s:%d) erro ao habilitar o god mode: %lu\n", __FILE__, __LINE__, GetLastError());
@@ -300,9 +349,40 @@ void MainHackingThread::enableGodMode()
 
             // Certifica-se de que o modo Deus está habilitado
             god_mode = libhack_read_int_from_addr(::hack_handle, addrToWrite);
+#else
+            bytes_written = libhack_write_int_to_addr64(::hack_handle, addrToWrite, 1);
+            if(bytes_written <= 0) {
+                fprintf(stderr, "(%s:%d) erro ao habilitar o god mode: %lu\n", __FILE__, __LINE__, GetLastError());
+                break;
+            }
 
+            // Certifica-se de que o modo Deus está habilitado
+            god_mode = libhack_read_int_from_addr64(::hack_handle, addrToWrite);
+#endif
         } while((god_mode == 0) && !(this->isInterruptionRequested()) && (libhack_process_is_running(::hack_handle)));
     }
+}
+
+void MainHackingThread::increasePowerGenerationSpeed(unsigned new_modifier)
+{
+#ifndef Q_OS_WIN64
+    DWORD powerModifierAddr;
+#else
+    DWORD64 powerModifierAddr;
+#endif
+
+    for(const auto& p : player_info) {
+        if(p.warzone_version == ::detected_warzone_version) {
+            powerModifierAddr = ::base_addr + p.power_modifier_offset + 0x20;
+            break;
+        }
+    }
+
+#ifdef Q_OS_WIN64
+    libhack_write_int_to_addr64(hack_handle, static_cast<DWORD64>(powerModifierAddr), new_modifier);
+#else
+    libhack_write_int_to_addr(hack_handle, static_cast<DWORD>(powerModifierAddr), new_modifier);
+#endif
 }
 
 AntiCheatDetectionThread::AntiCheatDetectionThread(unsigned short warzone_version)
