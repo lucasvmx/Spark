@@ -8,6 +8,7 @@ from download import download_latest_version
 from urllib.parse import urlparse
 from urllib.request import urlopen
 from os.path import split
+from sys import exit
 import argparse
 
 def parse_version_string(version_str: str):
@@ -42,18 +43,22 @@ def get_latest_version():
         str: String contendo a versão
     """
 
-    url = "https://github.com/lucas-engen/Spark/releases/latest"
-    response = urlopen(url)
-    next_ver = response.url
-    parse_result = urlparse(next_ver)
-    ver = split(parse_result.path)[1][1:]
-    splited_ver = ver.split(".")
+    try:
+        url = "https://github.com/lucas-engen/Spark/releases/latest"
+        response = urlopen(url)
+        next_ver = response.url
+        parse_result = urlparse(next_ver)
+        ver = split(parse_result.path)[1][1:]
+        splited_ver = ver.split(".")
 
-    major = int(splited_ver[0])
-    minor = int(splited_ver[1])
-    patch = int(splited_ver[2])
+        major = int(splited_ver[0])
+        minor = int(splited_ver[1])
+        patch = int(splited_ver[2])
+        
 
-    return major, minor, patch
+        return major, minor, patch
+    except Exception as err:
+        return 0, 0, 0
 
 
 if __name__ == "__main__":
