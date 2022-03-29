@@ -3,7 +3,7 @@
 # Lucas Vieira <lucas.engen.cc@gmail.com>
 #
 
-from status_codes import ALREADY_UPDATED
+from status_codes import ALREADY_UPDATED, UPDATE_FAILED
 from download import download_latest_version
 from urllib.parse import urlparse
 from urllib.request import urlopen
@@ -57,8 +57,8 @@ def get_latest_version():
         
 
         return major, minor, patch
-    except Exception as err:
-        return 0, 0, 0
+    except Exception:
+        raise
 
 
 if __name__ == "__main__":
@@ -74,7 +74,12 @@ if __name__ == "__main__":
     major, minor, patch = parse_version_string(args["current_version"])
 
     # Obtém a versão mais recente do programa
-    latest_major, latest_minor, latest_patch = get_latest_version()
+    try:
+        global latest_major, latest_minor, latest_patch
+        latest_major, latest_minor, latest_patch = get_latest_version()
+    except Exception as err:
+        print(f"[ERROR] Could not fetch latest version: {err}")
+        exit(UPDATE_FAILED)
 
     # Compara as versões
     curr_ver = major * 100 + minor * 10 + patch
