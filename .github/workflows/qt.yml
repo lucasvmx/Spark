@@ -18,10 +18,11 @@ jobs:
         
     - name: Run autorevision
       working-directory: 3rdparty\libhack
+      shell: bash
       run: |
-        curl https://raw.githubusercontent.com/Autorevision/autorevision/master/autorevision.sh -o autorevision
-        chmod +x autorevision
-        ./autorevision -t h > autorevision.h
+        curl https://raw.githubusercontent.com/Autorevision/autorevision/master/autorevision.sh -o autorevision.sh
+        chmod +x autorevision.sh
+        bash ./autorevision.sh -t h > autorevision.h
         stat autorevision.h
         
     - name: Generate makefiles (libhack)
