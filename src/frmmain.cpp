@@ -80,7 +80,7 @@ void frmMain::connectAllSignals()
     connect(ui->actionQuit_2, SIGNAL(triggered(bool)), this, SLOT(OnAction_QuitTriggered(bool)));
     connect(hackingThread, SIGNAL(updateStatus(QString)), this, SLOT(delegateSetText(QString)));
     connect(ui->actionAbout_WarHack, SIGNAL(triggered(bool)), this, SLOT(OnAction_AboutTriggered(bool)));
-    connect(hackingThread, SIGNAL(showCriticalMsgBox(QString, QString)), this, SLOT(showCriticalMsgBox(QString, QString)));
+    connect(hackingThread, SIGNAL(showCriticalMsgBox(QString,QString)), this, SLOT(showCriticalMsgBox(QString,QString)));
     connect(ui->actionCheckUpdates, SIGNAL(triggered(bool)), this, SLOT(OnAction_UpdateTriggered(bool)));
 }
 

@@ -13,7 +13,7 @@ TEMPLATE = app
 win32:RC_ICONS += ../resource/images/iconfinder__snowflake_1679761_ico.ico
 win32:RC_FILE += ../resource/spark.rc
 
-VERSION = 2.4.0.0
+VERSION = 2.4.1.0
 if(!greaterThan(QT_MAJOR_VERSION, 5)) {
 	QMAKE_TARGET_COMPANY = "Lucas Vieira"
 	QMAKE_TARGET_DESCRIPTION = "Spark - a simple trainer to warzone 2100"
