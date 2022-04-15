@@ -1,5 +1,5 @@
 [quality-url]: https://img.shields.io/codefactor/grade/github/lucas-engen/Spark/master?style=flat-square
-[downloads-url]: https://img.shields.io/github/downloads/lucas-engen/Spark/total?style=flat-square
+[downloads-url]: https://img.shields.io/github/downloads/lucas-engen/Spark/total?color=%23ff00ff&style=flat-square
 [license-url]: https://img.shields.io/github/license/lucas-engen/Spark?style=flat-square
 [commit-activity-url]: https://img.shields.io/github/commit-activity/y/lucas-engen/Spark?style=flat-square
 
