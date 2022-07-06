@@ -12,7 +12,10 @@
 #pragma once
 
 #include "exception.h"
+#include "GameSettings.hpp"
 #include <QThread>
+#include <QSharedPointer>
+#include <QMutex>
 
 namespace Threads
 {
@@ -27,12 +30,29 @@ namespace Threads
         /**
          * @brief Inicializa a classe
          */
-        MainHackingThread();
+        explicit MainHackingThread(QSharedPointer<GameSettings> cfg);
+
 
     private:
         void run();
         void startLibhack();
 		
+        /**
+         * @brief hack_handle ponteiro para o handle retornado por libhack_init
+         */
+        QSharedPointer<libhack_handle> hack_handle;
+        uint32_t max_power;
+
+        /**
+         * @brief player_id
+         */
+        int player_id;
+
+        /**
+         * @brief config armazena as configurações do cheat
+         */
+        GameSettings *config;
+
 		/**
 		 * @brief Determina se a thread do trainer deve continuar em execução
 		 * @return TRUE se ela deve continuar em execução, FALSE caso contrário
@@ -110,9 +130,11 @@ namespace Threads
          * @brief AntiCheatDetectionThread
          * @param warzone_version Versão do warzone 2100
          */
-        AntiCheatDetectionThread(unsigned short warzone_version);
+        AntiCheatDetectionThread(unsigned short warzone_version, libhack_handle *handle);
 
     private:
+
+        QSharedPointer<libhack_handle> hack_handle;
 
         /**
          * @brief wz_version Armazena a versão do warzone
