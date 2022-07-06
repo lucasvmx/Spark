@@ -35,8 +35,11 @@ frmMain::frmMain(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // Inicializa as configurações do jogo
+    gameCfg = QSharedPointer<GameSettings>(new GameSettings());
+
     // Inicializa a classe das threads
-    hackingThread = new Threads::MainHackingThread();
+    hackingThread = new Threads::MainHackingThread(gameCfg);
 
     updateWidget = new frmUpdate();
     aboutWidget = new frmAbout();
@@ -109,7 +112,7 @@ void frmMain::OnButtonSettingsClicked(bool x)
     {
         QMessageBox::critical(this, tr("Erro"), tr("A caixa de configurações já está aberta"));
     } else {
-        settings = new frmSettings();
+        settings = new frmSettings(nullptr, gameCfg);
         settings->show();
     }
 }

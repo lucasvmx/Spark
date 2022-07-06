@@ -48,7 +48,8 @@ SOURCES += \
 	../src/frmabout.cpp \
     ../src/frmlanguage.cpp \
 	../src/frmupdate.cpp \
-	../src/platform.cpp
+        ../src/platform.cpp \
+        ../src/GameSettings.cc
 
 TRANSLATIONS += ../languages/spark_en_us.translation
 
@@ -69,7 +70,8 @@ HEADERS += \
 	../src/frmabout.h \
     ../src/frmlanguage.h \
 	../src/frmupdate.h \
-	../src/platform.h
+        ../src/platform.h \
+        ../src/GameSettings.hpp
 
 FORMS += \
         ../ui/frmmain.ui \
