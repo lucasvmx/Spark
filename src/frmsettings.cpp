@@ -13,32 +13,11 @@
 #include "ui_frmsettings.h"
 #include "version.h"
 #include <QMessageBox>
+#ifdef QT_DEBUG
+#include <QDebug>
+#endif
 
-// id do jogador selecionado (padrão: 0)
-int player_id = 0;
-
-// tempo de espera entre uma iteração e a outra do hack (padrão: 5)
-int hacking_delay = 5;
-
-// flag para armazenar se a energia do inimigo deverá ser zerada
-bool bEraseEnemyEnergy = false;
-
-// flag para armazenar se um jogador em específico deverá ser favorecido
-bool bSupportSpecificPlayer = false;
-
-// flag para armazenar se o jogador escolhido deverá ter a energia infinita
-bool bInfiniteEnergy = false;
-
-// flag para armzenar se o modo Deus deverá ser habilitado
-bool bEnableGodMode = false;
-
-// flag para armazenar se a detecção de anti-cheat deverá ser burlada
-bool bPreventAntiCheatDetection = false;
-
-// flag para armazenar se a velocidade de geração de energia deve ser aumentada
-bool bIncreasePowerGenerationSpeed = false;
-
-frmSettings::frmSettings(QWidget *parent) : QWidget(parent), ui(new Ui::frmSettings)
+frmSettings::frmSettings(QWidget *parent, QSharedPointer<GameSettings> &config) : QWidget(parent), ui(new Ui::frmSettings)
 {
     ui->setupUi(this);
     this->connectAllSignals();
@@ -46,6 +25,7 @@ frmSettings::frmSettings(QWidget *parent) : QWidget(parent), ui(new Ui::frmSetti
     this->setFixedWidth(this->width());
     this->setWindowTitle(tr("%1 - configurações").arg(PROGNAME));
     ui->label->setText(tr("Tempo de espera:"));
+    configAlias = config;
 }
 
 frmSettings::~frmSettings()
@@ -64,19 +44,23 @@ void frmSettings::OnButtonSave_Clicked(bool b)
     Q_UNUSED(b);
 
     // Extrai os dados da configuração
-    bInfiniteEnergy = ui->radioButton_infinite_energy->isChecked();
-    bSupportSpecificPlayer = ui->checkBox_support_specific_player->isChecked();
-    bEraseEnemyEnergy = ui->radioButton_erase_enemy_energy->isChecked();
-    bEnableGodMode = ui->checkBox_enable_godmode->isChecked();
-    bPreventAntiCheatDetection = ui->checkBox_prevent_anticheat->isChecked();
-    bIncreasePowerGenerationSpeed = ui->radioButton_increasePowerGen->isChecked();
-    hacking_delay = ui->horizontalSlider_delay->value();
-    player_id = ui->comboBox_playerId->currentIndex();
+    configAlias->setConfigValue(S_INFINITE_ENERGY, ui->radioButton_infinite_energy->isChecked());
+    configAlias->setConfigValue(S_SUPPORT_SPECIFIC_PLAYER, ui->checkBox_support_specific_player->isChecked());
+    configAlias->setConfigValue(S_ERASE_ENEMY_POWER, ui->radioButton_erase_enemy_energy->isChecked());
+    configAlias->setConfigValue(S_ENABLE_GOD_MODE, ui->checkBox_enable_godmode->isChecked());
+    configAlias->setConfigValue(S_PREVENT_ANTICHEAT, ui->checkBox_prevent_anticheat->isChecked());
+    configAlias->setConfigValue(S_INCREASE_POWER_GEN_SPEED, ui->radioButton_increasePowerGen->isChecked());
+    configAlias->setConfigValue(S_HACK_DELAY, ui->horizontalSlider_delay->value());
+    configAlias->setConfigValue(S_PLAYER_ID, ui->comboBox_playerId->currentIndex());
 
-    if(!bInfiniteEnergy && !bSupportSpecificPlayer &&
-            !bEraseEnemyEnergy && !bEnableGodMode && !bPreventAntiCheatDetection && !bIncreasePowerGenerationSpeed)
+    if(!configAlias->getConfigValue(S_INFINITE_ENERGY).toBool() &&
+            !configAlias->getConfigValue(S_SUPPORT_SPECIFIC_PLAYER).toBool() &&
+            !configAlias->getConfigValue(S_ERASE_ENEMY_POWER).toBool() &&
+            !configAlias->getConfigValue(S_ENABLE_GOD_MODE).toBool() &&
+            !configAlias->getConfigValue(S_PREVENT_ANTICHEAT).toBool() &&
+            !configAlias->getConfigValue(S_INCREASE_POWER_GEN_SPEED).toBool())
     {
-        bInfiniteEnergy = true;
+        configAlias->setConfigValue(S_INFINITE_ENERGY, true);
         QMessageBox::warning(0, tr("Atenção"),
                              tr("Você não escolheu nenhum algoritmo de hacking. Por padrão, o de energia infinita será usado"));
     } else

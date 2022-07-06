@@ -44,7 +44,9 @@ void Updater::run()
 
     emit messageAvailable(tr("Buscando atualizações ..."));
     args << "--current_version" << ver << "--arch" << arch;
+#ifdef QT_DEBUG
     qDebug() << args;
+#endif
     auto status = p->execute(QDir::currentPath() + "/updater/updater.exe", args);
     if(status < 0) {
         emit messageAvailable(tr("Erro ao executar o programa de atualização! Código: %1").arg(status));

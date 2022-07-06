@@ -13,6 +13,11 @@
 #define FRMSETTINGS_H
 
 #include <QWidget>
+#include <QtGlobal>
+#include <memory>
+#include "GameSettings.hpp"
+
+using namespace std;
 
 namespace Ui {
 class frmSettings;
@@ -23,7 +28,7 @@ class frmSettings : public QWidget
     Q_OBJECT
 
 public:
-    explicit frmSettings(QWidget *parent = nullptr);
+    explicit frmSettings(QWidget *parent, QSharedPointer<GameSettings>& config);
     ~frmSettings();
     void connectAllSignals();
 
@@ -33,30 +38,8 @@ public slots:
 
 private:
     Ui::frmSettings *ui;
+    QSharedPointer<GameSettings> configAlias;
 };
 
-// id do jogador selecionado
-extern int player_id;
-
-// tempo de espera entre uma iteração e a outra do hack
-extern int hacking_delay;
-
-// flag para armazenar se a energia do inimigo deverá ser zerada
-extern bool bEraseEnemyEnergy;
-
-// flag para armazenar se um jogador em específico deverá ser favorecido
-extern bool bSupportSpecificPlayer;
-
-// flag para armazenar se o jogador escolhido deverá ter a energia infinita
-extern bool bInfiniteEnergy;
-
-// flag para armzenar se o modo Deus deverá ser habilitado
-extern bool bEnableGodMode;
-
-// flag para armazenar se a detecção de anti-cheat deverá ser burlada
-extern bool bPreventAntiCheatDetection;
-
-// flag para armazenar se a velocidade de geração de energia deve ser aumentada
-extern bool bIncreasePowerGenerationSpeed;
 
 #endif // FRMSETTINGS_H

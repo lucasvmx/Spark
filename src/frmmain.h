@@ -16,6 +16,8 @@
 #include <QThread>
 #include <QApplication>
 #include <QTranslator>
+#include <QSharedPointer>
+#include "GameSettings.hpp"
 
 namespace Ui {
 class frmMain;
@@ -46,6 +48,8 @@ private:
     void setTextColorFromId(int id);
     void printText(int id, QString text);
     void println(int id, QString text);
+
+    QSharedPointer<GameSettings> gameCfg;
 };
 
 enum textId {
