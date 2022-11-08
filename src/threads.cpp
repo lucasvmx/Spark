@@ -135,7 +135,7 @@ void MainHackingThread::run()
                 else if(config->getConfigValue(S_ERASE_ENEMY_POWER).toBool()) {
                     eraseEnemyEnergy();
                 } else if(config->getConfigValue(S_INCREASE_POWER_GEN_SPEED).toBool()) {
-                    increasePowerGenerationSpeed(2000);
+                    increasePowerGenerationSpeed(5000);
                 }
 			}
 			
@@ -389,7 +389,11 @@ void MainHackingThread::increasePowerGenerationSpeed(unsigned new_modifier)
 
     for(const auto& p : player_info) {
         if(p.warzone_version == ::detected_warzone_version) {
-            powerModifierAddr = ::base_addr + p.power_modifier_offset + 0x20;
+            if(p.warzone_version == WZ_431) {
+                powerModifierAddr = ::base_addr + p.power_modifier_offset;
+            } else {
+                powerModifierAddr = ::base_addr + p.power_modifier_offset + 0x20;
+            }
             break;
         }
     }
