@@ -36,6 +36,7 @@
 #define WZ_410      410
 #define WZ_427      427
 #define WZ_431      431
+#define WZ_432      432
 #define WZ_UNKNOWN	0xFFF
 
 // Retorna o número de elementos de um array 2D
@@ -111,7 +112,8 @@ static const struct game_status gstatus[] =
 
     // grpInitialised -> gameInitialised para o warzone 2100 4.2.7
     { 0xd1c1e8, 0x9031e0, WZ_427 },
-    { 0xf81630, 0xb684b0, WZ_431}
+    { 0xf81630, 0xb684b0, WZ_431 },
+    { 0xf82630, 0xb694b0, WZ_432 }
 };
 
 // power_offset + max_power_offset = energia máxima
@@ -260,7 +262,22 @@ static const struct player player_info[] =
     {7, 0xb6bf01, 0xb6b994, 0, 0xf86ddc, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
     {8, 0xb6bf01, 0xb6b994, 0, 0xf86e24, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
     {9, 0xb6bf01, 0xb6b994, 0, 0xf86e6c, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
-    {10, 0xb6bf01, 0xb6b994, 0, 0xf86eb4, 0, 0, 0, 0, 0, 0xf86c00, WZ_431}
+    {10, 0xb6bf01, 0xb6b994, 0, 0xf86eb4, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
+
+    // Warzone 2100 4.3.2
+    {0, 0xb6cf01, 0xb6c994, 0, 0xf87be4, 0, 0, 0, 0, 0, 0xf87c00, WZ_432},
+    {1, 0xb6cf01, 0xb6c994, 0, 0xf87c2c, 0, 0, 0, 0, 0, 0xf87c00, WZ_432},
+    {2, 0xb6cf01, 0xb6c994, 0, 0xf87c74, 0, 0, 0, 0, 0, 0xf87c00, WZ_432},
+    {3, 0xb6cf01, 0xb6c994, 0, 0xf87cbc, 0, 0, 0, 0, 0, 0xf87c00, WZ_432},
+    {4, 0xb6cf01, 0xb6c994, 0, 0xf87d04, 0, 0, 0, 0, 0, 0xf87c00, WZ_432},
+    {5, 0xb6cf01, 0xb6c994, 0, 0xf87d4c, 0, 0, 0, 0, 0, 0xf87c00, WZ_432},
+    {6, 0xb6cf01, 0xb6c994, 0, 0xf87d94, 0, 0, 0, 0, 0, 0xf87c00, WZ_432},
+    {7, 0xb6cf01, 0xb6c994, 0, 0xf87ddc, 0, 0, 0, 0, 0, 0xf87c00, WZ_432},
+    {8, 0xb6cf01, 0xb6c994, 0, 0xf87e24, 0, 0, 0, 0, 0, 0xf87c00, WZ_432},
+    {9, 0xb6cf01, 0xb6c994, 0, 0xf87e6c, 0, 0, 0, 0, 0, 0xf87c00, WZ_432},
+    {10, 0xb6cf01, 0xb6c994, 0, 0xf87eb4, 0, 0, 0, 0, 0, 0xf87c00, WZ_432}
+
+    // Modificador de energia fica em warzone2100.asPower + 0x20 (32 decimal)
 };
 
 /**
