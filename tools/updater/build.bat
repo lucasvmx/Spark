@@ -1,1 +1,0 @@
-pyinstaller -w --onefile -n updater -i updater.ico main.py
