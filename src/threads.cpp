@@ -384,6 +384,8 @@ void MainHackingThread::enableGodMode()
     {
         do
         {
+            qDebug("god mode address: %llx", addrToWrite);
+
 #ifndef Q_OS_WIN64
             mux.lock();
             bytes_written = libhack_write_int_to_addr(hack_handle.get(), addrToWrite, 1);
@@ -435,7 +437,7 @@ void MainHackingThread::increasePowerGenerationSpeed(unsigned new_modifier)
 
     for(const auto& p : player_info) {
         if(p.warzone_version == ::detected_warzone_version) {
-            if(p.warzone_version == WZ_431) {
+            if(p.warzone_version >= WZ_431) {
                 powerModifierAddr = ::base_addr + p.power_modifier_offset;
             } else {
                 powerModifierAddr = ::base_addr + p.power_modifier_offset + 0x20;
@@ -468,6 +470,8 @@ void MainHackingThread::increaseDamageOutput(unsigned new_damage)
 
     // calcula o endereço de escrita (isso só pode ser feito depois que a partida foi iniciada
     damageModifierAddr = ::base_addr + player_info[::start + player_id].damage_modifier_offset;
+
+    qDebug("damage output address: %llx", damageModifierAddr);
 
     // bloqueia o mutex global antes de acessar o ponteiro
     mux.lock();
@@ -544,12 +548,18 @@ void AntiCheatDetectionThread::wait(uint32_t seconds)
 void AntiCheatDetectionThread::run()
 {
     int index = this->getGameStatusIndex();
+#ifdef Q_OS_WIN64
+    DWORD64 addrToWrite;
+#else
     DWORD addrToWrite;
+#endif
 
     Q_ASSERT(index >= 0);
 
     // Calcula o endereço de escrita
     addrToWrite = ::base_addr + ::gstatus[index].cheated_offset;
+
+    qDebug("cheated offset: %llx", addrToWrite);
 
     try
     {
@@ -561,7 +571,11 @@ void AntiCheatDetectionThread::run()
                 break;
             }
 
+#ifdef Q_OS_WIN64
+            libhack_write_int_to_addr64(hack_handle.get(), addrToWrite, 0);
+#else
             libhack_write_int_to_addr(hack_handle.get(), addrToWrite, 0);
+#endif
             mux.unlock();
 
             // Atualiza o valor a cada 5 segundos
