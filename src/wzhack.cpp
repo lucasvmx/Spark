@@ -460,6 +460,7 @@ bool IsFeatureSupported(int wz_version, FEATURES feature)
     case FEATURE_GET_SELECTED_PLAYER: return player_info[start].selectedPlayer_offset > 0;
     case FEATURE_CHANGE_WASTED_POWER: return player_info[start].wasted_power_offset > 0;
 	case FEATURE_CHANGE_POWER_MODIFIER: return player_info[start].power_modifier_offset > 0;
+    case FEATURE_INCREASE_PLAYER_DAMAGE: return player_info[start].damage_modifier_offset > 0;
 
     case FEATURE_CHECK_GAME_IS_RUNNING:
         for(const auto& element : gstatus) {

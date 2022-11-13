@@ -52,6 +52,7 @@ void frmSettings::OnButtonSave_Clicked(bool b)
     configAlias->setConfigValue(S_INCREASE_POWER_GEN_SPEED, ui->radioButton_increasePowerGen->isChecked());
     configAlias->setConfigValue(S_HACK_DELAY, ui->horizontalSlider_delay->value());
     configAlias->setConfigValue(S_PLAYER_ID, ui->comboBox_playerId->currentIndex());
+    configAlias->setConfigValue(S_INCREASE_PLAYER_DAMAGE, ui->checkBox_increase_damage->isChecked());
 
     if(!configAlias->getConfigValue(S_INFINITE_ENERGY).toBool() &&
             !configAlias->getConfigValue(S_SUPPORT_SPECIFIC_PLAYER).toBool() &&

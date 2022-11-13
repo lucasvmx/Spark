@@ -102,6 +102,17 @@ namespace Threads
          */
         void increasePowerGenerationSpeed(unsigned new_modifier);
 
+        /**
+         * @brief increaseDamageOutput Aumenta os danos causados pelo jogador
+         * @param new_damage valor do dano
+         */
+        void increaseDamageOutput(unsigned new_damage = 500);
+
+        /**
+         * @brief performFeaturesChecking Verifica se todas as features solicitadas são suportadas
+         * @return true se forem suportadas, false c.c
+         */
+        bool performFeaturesChecking();
     signals:
 
         /**

@@ -96,6 +96,7 @@ typedef enum GAME_FEATURES
     FEATURE_CHANGE_MAX_STORED_POWER,
     FEATURE_CHANGE_EXTRACTED_POWER,
     FEATURE_CHANGE_WASTED_POWER,
+    FEATURE_INCREASE_PLAYER_DAMAGE,
 
     FEATURE_CHECK_GAME_IS_RUNNING,
 	FEATURE_CHANGE_POWER_MODIFIER
@@ -249,17 +250,17 @@ static const struct player player_info[] =
     {10, 0x906bf1, 0, 0, 0xd209e4, 0, 0, 0, 0, 0, 0xd20800, WZ_427},
 
     // Warzone 2100 4.3.1
-    {0, 0xb6bf01, 0, 0, 0xf86be4, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
-    {1, 0xb6bf01, 0, 0, 0xf86c2c, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
-    {2, 0xb6bf01, 0, 0, 0xf86c74, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
-    {3, 0xb6bf01, 0, 0, 0xf86cbc, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
-    {4, 0xb6bf01, 0, 0, 0xf86d04, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
-    {5, 0xb6bf01, 0, 0, 0xf86d4c, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
-    {6, 0xb6bf01, 0, 0, 0xf86d94, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
-    {7, 0xb6bf01, 0, 0, 0xf86ddc, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
-    {8, 0xb6bf01, 0, 0, 0xf86e24, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
-    {9, 0xb6bf01, 0, 0, 0xf86e6c, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
-    {10, 0xb6bf01, 0, 0, 0xf86eb4, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
+    {0, 0xb6bf01, 0xb6b994, 0, 0xf86be4, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
+    {1, 0xb6bf01, 0xb6b994, 0, 0xf86c2c, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
+    {2, 0xb6bf01, 0xb6b994, 0, 0xf86c74, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
+    {3, 0xb6bf01, 0xb6b994, 0, 0xf86cbc, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
+    {4, 0xb6bf01, 0xb6b994, 0, 0xf86d04, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
+    {5, 0xb6bf01, 0xb6b994, 0, 0xf86d4c, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
+    {6, 0xb6bf01, 0xb6b994, 0, 0xf86d94, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
+    {7, 0xb6bf01, 0xb6b994, 0, 0xf86ddc, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
+    {8, 0xb6bf01, 0xb6b994, 0, 0xf86e24, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
+    {9, 0xb6bf01, 0xb6b994, 0, 0xf86e6c, 0, 0, 0, 0, 0, 0xf86c00, WZ_431},
+    {10, 0xb6bf01, 0xb6b994, 0, 0xf86eb4, 0, 0, 0, 0, 0, 0xf86c00, WZ_431}
 };
 
 /**
@@ -373,5 +374,6 @@ uint32_t GetWarzoneMaxPowerValue(int wz_version);
  * @return true se a funcionalidade estiver disponível
  */
 bool IsFeatureSupported(int wz_version, FEATURES feature);
+
 
 #endif // HACK_H
