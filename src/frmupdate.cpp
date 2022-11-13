@@ -8,79 +8,137 @@
 #include <QDebug>
 #endif
 
+#ifdef Q_OS_WIN64
+#define ARCH "x64"
+#else
+#define ARCH "x86"
+#endif
+
 frmUpdate::frmUpdate(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::frmUpdate)
 {
-    updateTask = new Updater();
     ui->setupUi(this);
     setFixedSize(width(), height());
     setWindowTitle(tr("Spark - Atualização"));
 
+    m_manager = new QNetworkAccessManager();
     connectSignals();
+
+    progressRangeConfigured = false;
 }
 
-Updater::Updater()
+void frmUpdate::OnRequestFinished(QNetworkReply *reply)
 {
-    p = new QProcess();
-}
+    qDebug() << "request finished";
+    QString versionTag = reply->header(QNetworkRequest::LocationHeader).toUrl().fileName().toStdString().substr(1).c_str();
 
-Updater::~Updater()
-{
-    delete p;
-}
+    QVersionNumber current(SPARK_MAJOR, SPARK_MINOR, SPARK_PATCH);
+    QVersionNumber latest = QVersionNumber::fromString(versionTag);
 
-void Updater::run()
-{
-    QString ver = QString("%1.%2.%3").arg(SPARK_MAJOR).arg(SPARK_MINOR).arg(SPARK_PATCH);
-    QString arch;
+    if(latest > current) {
+        emit updateFound();
 
-#if defined(Q_OS_WIN) && !defined(Q_OS_WIN32)
-    arch = "x64";
-#else
-    arch = "x86";
-#endif
-    QStringList args;
+        OnMessageAvailable(tr("Atualização disponível. Versão %1").arg(latest.toString()));
 
-    emit messageAvailable(tr("Buscando atualizações ..."));
-    args << "--current_version" << ver << "--arch" << arch;
-#ifdef QT_DEBUG
-    qDebug() << args;
-#endif
-    auto status = p->execute(QDir::currentPath() + "/updater/updater.exe", args);
-    if(status < 0) {
-        emit messageAvailable(tr("Erro ao executar o programa de atualização! Código: %1").arg(status));
-        emit updateFailed();
-    } else {
-        // Handle exit code
-        switch(status)
-        {
-        case 0xFF1:
-            emit messageAvailable(tr("Você já possui a última versão"));
-            emit updateFinished();
-            return;
+        QMessageBox::StandardButton answer = QMessageBox::question(this, tr("Pergunta"),
+                              tr("Há uma atualização disponível (Versão %1). Deseja baixar?").arg(latest.toString()));
 
-        default:
-            emit messageAvailable(tr("Algo deu errado no processo de atualização (codigo: %1). Repita o processo").arg(status));
-            emit updateFailed();
+        if(answer == QMessageBox::StandardButton::Yes) {
+            OnMessageAvailable(tr("Baixando atualização ..."));
+
+            // Desconecta os sinais e conecta um novo
+            QObject::disconnect(m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(OnRequestFinished(QNetworkReply*)));
+            QObject::connect(m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(OnDownloadRequestFinished(QNetworkReply*)));
+
+            m_localFilename = QString("Spark-v%1-%2.exe").arg(latest.toString(), ARCH);
+
+            QNetworkRequest downloadRequest;
+            QString fileUrl = downloadBaseUrl + "/" + QString("v%1").arg(latest.toString()) + "/" +
+                    m_localFilename;
+
+            downloadRequest.setUrl(fileUrl);
+            OnMessageAvailable(tr("Baixando arquivo: %1 ...").arg(fileUrl));
+
+            QNetworkReply *r = m_manager->get(downloadRequest);
+            QObject::connect(r, SIGNAL(downloadProgress(qint64,qint64)), this, SLOT(OnDownloadProgressChange(qint64,qint64)));
+        } else {
+            OnMessageAvailable(tr("Atualização cancelada pelo usuário"));
+            ui->pushButton->setEnabled(true);
         }
+    } else {
+        ui->textBrowser->setMarkdown(tr("Você já está executando a última versão deste programa"));
+        ui->textBrowser->append(tr("Versão mais recente: %1").arg(latest.toString()));
+        redefineProgressBar();
+        ui->pushButton->setEnabled(true);
     }
+}
+
+void frmUpdate::OnDownloadProgressChange(qint64 received, qint64 bytesTotal)
+{
+    if(!progressRangeConfigured) {
+        ui->progressBar->setRange(0, bytesTotal);
+        progressRangeConfigured = true;
+    }
+
+    ui->progressBar->setValue(received);
+    OnMessageAvailable(tr("Baixados %1 de %2 KB").arg(received / 1024).arg(bytesTotal / 1024));
+}
+
+void frmUpdate::OnDownloadRequestFinished(QNetworkReply *reply)
+{
+    OnMessageAvailable(tr("Download finalizado com sucesso"));
+
+    QByteArray fileData = reply->readAll();
+
+    QFile file(m_localFilename);
+    file.open(QIODevice::ReadWrite);
+    file.write(fileData);
+    file.close();
+
+    // reseta a barra de progresso
+    this->redefineProgressBar();
+
+    QMessageBox::StandardButton answer = QMessageBox::question(this, tr("Pergunta"),
+                                                               tr("Você deseja executar o intalador agora?"));
+    if(answer == QMessageBox::StandardButton::Yes) {
+        QProcess::startDetached(m_localFilename);
+    }
+
+    ui->pushButton->setEnabled(true);
+
+    // Desconecta os objetos
+    QObject::disconnect(m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(OnDownloadRequestFinished(QNetworkReply*)));
+}
+
+void frmUpdate::OnErrorOccurred(QNetworkReply::NetworkError e)
+{
+    ui->pushButton->setEnabled(true);
+    qDebug() << "error:" <<e;
 }
 
 void frmUpdate::LaunchUpdate()
 {
-    if(!updateTask->isRunning())
-    {
-        setUndefinedProgressBar();
-        ui->textBrowser->clear();
-        updateTask->start();
-    } else {
-        QMessageBox::warning(0, tr("Atualização"), tr("O processo de atualização está em curso"));
-    }
+    ui->pushButton->setEnabled(false);
+
+    setUndefinedProgressBar();
+    ui->textBrowser->clear();
+
+    QNetworkRequest request(this->baseUrl);
+    request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::ManualRedirectPolicy);
+
+    // Conecta o sinal
+    QObject::connect(m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(OnRequestFinished(QNetworkReply*)));
+
+    QNetworkReply *r = m_manager->get(request);
+    QObject::connect(r, SIGNAL(errorOccurred(QNetworkReply::NetworkError)), this, SLOT(OnErrorOccurred(QNetworkReply::NetworkError)));
+
+    qDebug() << "request sent to" <<baseUrl;
 }
 
 frmUpdate::~frmUpdate()
 {
+    qDebug() <<  "destroying form ...";
     delete ui;
 }
 
@@ -112,9 +170,7 @@ void frmUpdate::OnFinished()
 void frmUpdate::connectSignals()
 {
     QObject::connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(OnUpdateButtonClick(bool)));
-    QObject::connect(updateTask, SIGNAL(messageAvailable(QString)), this, SLOT(OnMessageAvailable(QString)));
-    QObject::connect(updateTask, SIGNAL(updateFinished()), this, SLOT(OnFinished()));
-    QObject::connect(updateTask, SIGNAL(updateFailed()), this, SLOT(OnFailed()));
+    QObject::connect(this, &frmUpdate::updateFound, &frmUpdate::redefineProgressBar);
 }
 
 void frmUpdate::setUndefinedProgressBar()

@@ -188,9 +188,9 @@ void frmMain::OnAction_UpdateTriggered(bool x)
 {
     (void)x;
 
-    if(updateWidget == nullptr)
+    if(!updateWidget->isVisible()) {
+        delete updateWidget;
         updateWidget = new frmUpdate();
-
-    if(!updateWidget->isVisible())
         updateWidget->show();
+    }
 }
