@@ -15,13 +15,11 @@
 #include "threads.h"
 #include "frmabout.h"
 #include "frmupdate.h"
-#include "exception.h"
 
 #include <QMessageBox>
 #include <cstdio>
 #include <cstdarg>
 
-#include "wzhack.h"
 #include "version.h"
 
 static bool bIs64Bit;
