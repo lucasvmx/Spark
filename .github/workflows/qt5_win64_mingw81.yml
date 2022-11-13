@@ -1,4 +1,4 @@
-name: Build
+name: Build Qt 5.15.2 Win64 GCC 8.1.0
 
 on:
   push:
@@ -42,9 +42,10 @@ jobs:
         mv libhack.dll libhack.a ../../../BUILD
 
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2.12.2
+      uses: jurplel/install-qt-action@v3
       with:
         arch: win64_mingw81
+        version: 5.15.2
         
     - name: Print Variables
       shell: bash
