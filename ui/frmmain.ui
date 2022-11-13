@@ -234,8 +234,8 @@ QGroupBox::title {
   </action>
   <action name="actionCheckUpdates">
    <property name="icon">
-    <iconset>
-     <normaloff>../resource/images/icon_update.ico</normaloff>../resource/images/icon_update.ico</iconset>
+    <iconset resource="../resource/resources.qrc">
+     <normaloff>:/images/100114_update_icon.ico</normaloff>:/images/100114_update_icon.ico</iconset>
    </property>
    <property name="text">
     <string>Buscar atualizações</string>

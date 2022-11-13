@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../resource/resources.qrc">
+    <normaloff>:/images/iconfinder__snowflake_1679761_ico.ico</normaloff>:/images/iconfinder__snowflake_1679761_ico.ico</iconset>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QPushButton" name="pushButton">
@@ -36,6 +40,9 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resource/resources.qrc"/>
+  <include location="../resource/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
