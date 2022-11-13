@@ -14,6 +14,7 @@
 #define S_ENABLE_GOD_MODE "enable_god_mode"
 #define S_PREVENT_ANTICHEAT "prevent_anti_cheat_detection"
 #define S_INCREASE_POWER_GEN_SPEED "increase_power_generation_speed"
+#define S_INCREASE_PLAYER_DAMAGE "increase_player_damage"
 
 class GameSettings {
 

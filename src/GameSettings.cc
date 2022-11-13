@@ -63,6 +63,9 @@ void GameSettings::setDefault()
         {S_PREVENT_ANTICHEAT, false},
 
         // flag para armazenar se a velocidade de geração de energia deve ser aumentada
-        {S_INCREASE_POWER_GEN_SPEED, false}
+        {S_INCREASE_POWER_GEN_SPEED, false},
+
+        // flag para indiciar se os danos causados pelo jogador devem ser aumentados
+        {S_INCREASE_PLAYER_DAMAGE, false}
     };
 }

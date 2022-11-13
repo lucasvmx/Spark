@@ -6,16 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>381</width>
-    <height>374</height>
+    <width>405</width>
+    <height>490</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>WarHack v1.2</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>:/images/warzone2100.png</normaloff>:/images/warzone2100.png</iconset>
+   <iconset resource="../resource/resources.qrc">
+    <normaloff>:/images/iconfinder__snowflake_1679761_ico.ico</normaloff>:/images/iconfinder__snowflake_1679761_ico.ico</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="styleSheet">
@@ -118,6 +118,7 @@ QPushButton:hover {
     font-size: 14px;
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
+	font: 20px &quot;Arial&quot;;
 }
 
 QGroupBox::title {
@@ -154,7 +155,7 @@ QGroupBox::title {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>381</width>
+     <width>405</width>
      <height>21</height>
     </rect>
    </property>
@@ -233,8 +234,8 @@ QGroupBox::title {
   </action>
   <action name="actionCheckUpdates">
    <property name="icon">
-    <iconset>
-     <normaloff>../resource/images/icon_update.ico</normaloff>../resource/images/icon_update.ico</iconset>
+    <iconset resource="../resource/resources.qrc">
+     <normaloff>:/images/100114_update_icon.ico</normaloff>:/images/100114_update_icon.ico</iconset>
    </property>
    <property name="text">
     <string>Buscar atualizações</string>
@@ -243,7 +244,6 @@ QGroupBox::title {
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="../resource/resources.qrc"/>
   <include location="../resource/resources.qrc"/>
   <include location="../resource/resources.qrc"/>
  </resources>

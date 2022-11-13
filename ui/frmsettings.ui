@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>324</width>
-    <height>408</height>
+    <width>329</width>
+    <height>491</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -286,6 +286,13 @@ QComboBox QAbstractItemView {
         </property>
        </widget>
       </item>
+      <item row="0" column="0">
+       <widget class="QRadioButton" name="radioButton_infinite_energy">
+        <property name="text">
+         <string>Energia sempre alta</string>
+        </property>
+       </widget>
+      </item>
       <item row="5" column="0">
        <widget class="QCheckBox" name="checkBox_enable_godmode">
         <property name="toolTip">
@@ -293,13 +300,6 @@ QComboBox QAbstractItemView {
         </property>
         <property name="text">
          <string>Habilitar o modo Deus</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QRadioButton" name="radioButton_infinite_energy">
-        <property name="text">
-         <string>Energia sempre alta</string>
         </property>
        </widget>
       </item>
@@ -325,6 +325,13 @@ QComboBox QAbstractItemView {
        <widget class="QRadioButton" name="radioButton_increasePowerGen">
         <property name="text">
          <string>Aumentar a velocidade de geração de energia</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QCheckBox" name="checkBox_increase_damage">
+        <property name="text">
+         <string>Aumentar dano causado aos inimigos</string>
         </property>
        </widget>
       </item>
@@ -376,7 +383,6 @@ QPushButton:hover {
   </layout>
  </widget>
  <resources>
-  <include location="../resource/resources.qrc"/>
   <include location="../resource/resources.qrc"/>
   <include location="../resource/resources.qrc"/>
  </resources>

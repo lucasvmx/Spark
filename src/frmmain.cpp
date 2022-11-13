@@ -15,13 +15,11 @@
 #include "threads.h"
 #include "frmabout.h"
 #include "frmupdate.h"
-#include "exception.h"
 
 #include <QMessageBox>
 #include <cstdio>
 #include <cstdarg>
 
-#include "wzhack.h"
 #include "version.h"
 
 static bool bIs64Bit;
@@ -190,9 +188,9 @@ void frmMain::OnAction_UpdateTriggered(bool x)
 {
     (void)x;
 
-    if(updateWidget == nullptr)
+    if(!updateWidget->isVisible()) {
+        delete updateWidget;
         updateWidget = new frmUpdate();
-
-    if(!updateWidget->isVisible())
         updateWidget->show();
+    }
 }

@@ -1,7 +1,7 @@
-[quality-url]: https://img.shields.io/codefactor/grade/github/lucas-engen/Spark/master?style=flat-square
-[downloads-url]: https://img.shields.io/github/downloads/lucas-engen/Spark/total?color=%23ff00ff&style=flat-square
-[license-url]: https://img.shields.io/github/license/lucas-engen/Spark?style=flat-square
-[commit-activity-url]: https://img.shields.io/github/commit-activity/y/lucas-engen/Spark?style=flat-square
+[quality-url]: https://img.shields.io/codefactor/grade/github/lucasvmx/Spark/master?style=flat-square
+[downloads-url]: https://img.shields.io/github/downloads/lucasvmx/Spark/total?color=%23ff00ff&style=flat-square
+[license-url]: https://img.shields.io/github/license/lucasvmx/Spark?style=flat-square
+[commit-activity-url]: https://img.shields.io/github/commit-activity/y/lucasvmx/Spark?style=flat-square
 
 [project-image]: resource/images/iconfinder__snowflake_1679761.png
 
@@ -57,6 +57,7 @@ Clique [aqui](https://github.com/lucas-engen/Spark/releases/latest
     * Número de estruturas construídas (fábricas, geradores, etc)
   - Modo Deus (God Mode)
   - Detecção do anticheat (apenas no modo Skirmish)
+  - Aumento de dano causado pelas suas unidades
 
 ## Utilização
 
