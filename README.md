@@ -57,6 +57,7 @@ Clique [aqui](https://github.com/lucas-engen/Spark/releases/latest
     * Número de estruturas construídas (fábricas, geradores, etc)
   - Modo Deus (God Mode)
   - Detecção do anticheat (apenas no modo Skirmish)
+  - Aumento de dano causado pelas suas unidades
 
 ## Utilização
 
