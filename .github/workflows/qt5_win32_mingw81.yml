@@ -1,0 +1,60 @@
+name: Build Qt 5 Win32 GCC 8.1.0
+
+on:
+  push:
+    branches: [ master, dev, ci-test ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-x86:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+        
+    - name: Run autorevision
+      working-directory: 3rdparty\libhack
+      shell: bash
+      run: |
+        curl https://raw.githubusercontent.com/Autorevision/autorevision/master/autorevision.sh -o autorevision.sh
+        chmod +x autorevision.sh
+        bash ./autorevision.sh -t h > autorevision.h
+        stat autorevision.h
+        
+    - name: Generate makefiles (libhack)
+      working-directory: 3rdparty\libhack
+      run: cmake -G "MinGW Makefiles" -B build
+    
+    - name: Bulid (libhack)
+      working-directory: 3rdparty\libhack
+      run: make -C build
+
+    - name: Copy output files
+      shell: bash
+      working-directory: 3rdparty/libhack/build
+      run: |
+        mkdir ../../../BUILD
+        mv libhack.dll.a libhack.a
+        mv libhack.dll libhack.a ../../../BUILD
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        arch: win32_mingw81
+        version: 5.15.2
+        
+    - name: Print Variables
+      shell: bash
+      run: echo "current folder is $PWD"
+    - name: Generate Makefiles
+      shell: bash
+      run: qmake qt/Spark.pro -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug" -o build
+    - name: Build
+      shell: bash
+      run: |
+        make -f build/Makefile qmake_all
+        make -C build -j4
