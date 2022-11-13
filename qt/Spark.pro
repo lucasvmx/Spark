@@ -10,8 +10,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = Spark
 TEMPLATE = app
-win32:RC_ICONS += ../resource/images/iconfinder__snowflake_1679761_ico.ico
+#win32:RC_ICON += ../resource/images/iconfinder__snowflake_1679761_ico.ico
 win32:RC_FILE += ../resource/spark.rc
+win64:RC_FILE += ../resource/spark.rc
 
 VERSION = 2.4.1.0
 if(!greaterThan(QT_MAJOR_VERSION, 5)) {
@@ -89,4 +90,4 @@ INCLUDEPATH += $$PWD/../3rdparty/libhack/src/
 DEPENDPATH += $$PWD/../BUILD/
 
 DISTFILES += \
-	../resource/images/icon_update.ico
+        ../resource/images/icon_update.ico
