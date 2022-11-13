@@ -14,7 +14,7 @@
 
 // Versão do programa
 #define SPARK_MAJOR	2
-#define SPARK_MINOR	5
+#define SPARK_MINOR	6
 #define SPARK_PATCH	0
 
 /**
