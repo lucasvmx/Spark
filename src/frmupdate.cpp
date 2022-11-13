@@ -100,7 +100,7 @@ void frmUpdate::OnDownloadRequestFinished(QNetworkReply *reply)
     this->redefineProgressBar();
 
     QMessageBox::StandardButton answer = QMessageBox::question(this, tr("Pergunta"),
-                                                               tr("Você deseja executar o intalador agora?"));
+                                                               tr("Você deseja executar o instalador agora?"));
     if(answer == QMessageBox::StandardButton::Yes) {
         QProcess::startDetached(m_localFilename);
     }
