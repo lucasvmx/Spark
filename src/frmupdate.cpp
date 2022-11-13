@@ -139,6 +139,7 @@ void frmUpdate::LaunchUpdate()
 frmUpdate::~frmUpdate()
 {
     qDebug() <<  "destroying form ...";
+    delete m_manager;
     delete ui;
 }
 
