@@ -8,12 +8,12 @@
         <translation type="vanished">Application error</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="80"/>
+        <location filename="../src/main.cpp" line="79"/>
         <source>Erro</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="80"/>
+        <location filename="../src/main.cpp" line="79"/>
         <source>libhack.dll não encontrado</source>
         <translation>libhack.dll not found</translation>
     </message>
@@ -485,7 +485,7 @@ hr { height: 1px; border-width: 0; }
         <translation>Search updates</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="23"/>
+        <location filename="../src/frmupdate.cpp" line="24"/>
         <source>Spark - Atualização</source>
         <translation>Spark - Update</translation>
     </message>
@@ -498,58 +498,63 @@ hr { height: 1px; border-width: 0; }
         <translation type="vanished">The update process is running</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="42"/>
+        <location filename="../src/frmupdate.cpp" line="43"/>
         <source>Atualização disponível. Versão %1</source>
         <translation>Update available. Version %1</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="44"/>
-        <location filename="../src/frmupdate.cpp" line="102"/>
+        <location filename="../src/frmupdate.cpp" line="45"/>
+        <location filename="../src/frmupdate.cpp" line="111"/>
         <source>Pergunta</source>
         <translation>Question</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="45"/>
+        <location filename="../src/frmupdate.cpp" line="46"/>
         <source>Há uma atualização disponível (Versão %1). Deseja baixar?</source>
         <translation>An update is available (Version %1). Do you want to download?</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="48"/>
+        <location filename="../src/frmupdate.cpp" line="49"/>
         <source>Baixando atualização ...</source>
         <translation>Downloading update ...</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="61"/>
+        <location filename="../src/frmupdate.cpp" line="62"/>
         <source>Baixando arquivo: %1 ...</source>
         <translation>Downloading file: %1 ...</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="66"/>
+        <location filename="../src/frmupdate.cpp" line="67"/>
         <source>Atualização cancelada pelo usuário</source>
         <translation>Update canceled by user</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="70"/>
+        <location filename="../src/frmupdate.cpp" line="71"/>
         <source>Você já está executando a última versão deste programa</source>
         <translation>You are already running the latest version of this program</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="71"/>
+        <location filename="../src/frmupdate.cpp" line="72"/>
         <source>Versão mais recente: %1</source>
         <translation>Latest version: %1</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="85"/>
+        <location filename="../src/frmupdate.cpp" line="86"/>
         <source>Baixados %1 de %2 KB</source>
         <translation>Downloaded %1 out of %2 KB</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="90"/>
+        <location filename="../src/frmupdate.cpp" line="91"/>
         <source>Download finalizado com sucesso</source>
         <translation>Download successfully completed</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="103"/>
+        <location filename="../src/frmupdate.cpp" line="98"/>
+        <source>Não foi possível executar o instalador</source>
+        <translation>Couldn&apos;t execute installer</translation>
+    </message>
+    <message>
+        <location filename="../src/frmupdate.cpp" line="112"/>
         <source>Você deseja executar o instalador agora?</source>
         <translation>Do you want to run the installer now?</translation>
     </message>
@@ -558,12 +563,23 @@ hr { height: 1px; border-width: 0; }
         <translation type="vanished">Do you want to run the installer now?</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="148"/>
+        <location filename="../src/frmupdate.cpp" line="98"/>
+        <location filename="../src/frmupdate.cpp" line="165"/>
         <source>Erro</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../src/frmupdate.cpp" line="148"/>
+        <location filename="../src/frmupdate.cpp" line="118"/>
+        <source>Erro ao executar programa de instalação</source>
+        <translation>Failed to execute installer</translation>
+    </message>
+    <message>
+        <location filename="../src/frmupdate.cpp" line="120"/>
+        <source>Instalador em execução ...</source>
+        <translation>Installer is running...</translation>
+    </message>
+    <message>
+        <location filename="../src/frmupdate.cpp" line="165"/>
         <source>Algo deu errado com a atualização: clique para fechar a janela</source>
         <translation>Failed to update. Click to close window</translation>
     </message>
