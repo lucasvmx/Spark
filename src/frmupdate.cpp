@@ -3,6 +3,7 @@
 #include "version.h"
 #include <QDir>
 #include <QMessageBox>
+#include <QScopedPointer>
 
 #ifdef QT_DEBUG
 #include <QDebug>
@@ -90,9 +91,17 @@ void frmUpdate::OnDownloadRequestFinished(QNetworkReply *reply)
     OnMessageAvailable(tr("Download finalizado com sucesso"));
 
     QByteArray fileData = reply->readAll();
+    QString fullInstallerPath = QDir::cleanPath(QDir::tempPath() + QDir::separator() + m_localFilename);
 
-    QFile file(m_localFilename);
-    file.open(QIODevice::ReadWrite);
+    QFile file(fullInstallerPath);
+    if(!file.open(QIODevice::ReadWrite)) {
+        QMessageBox::critical(this, tr("Erro"), tr("Não foi possível executar o instalador"));
+        this->redefineProgressBar();
+        ui->pushButton->setEnabled(true);
+        QObject::disconnect(m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(OnDownloadRequestFinished(QNetworkReply*)));
+        return;
+    }
+
     file.write(fileData);
     file.close();
 
@@ -102,7 +111,14 @@ void frmUpdate::OnDownloadRequestFinished(QNetworkReply *reply)
     QMessageBox::StandardButton answer = QMessageBox::question(this, tr("Pergunta"),
                                                                tr("Você deseja executar o instalador agora?"));
     if(answer == QMessageBox::StandardButton::Yes) {
-        QProcess::startDetached(m_localFilename);
+        QScopedPointer<QProcess> installer = QScopedPointer<QProcess>(new QProcess());
+
+        // executa o programa de instalação
+        if(!installer->startDetached(fullInstallerPath)) {
+            OnMessageAvailable(tr("Erro ao executar programa de instalação"));
+        } else {
+            OnMessageAvailable(tr("Instalador em execução ..."));
+        }
     }
 
     ui->pushButton->setEnabled(true);
