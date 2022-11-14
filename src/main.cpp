@@ -20,7 +20,6 @@
 #include <windows.h>
 #include <shlwapi.h>
 #endif
-#include "wzhack.h"
 #include "dynamic_loader.h"
 
 #define TR(x)   QObject::tr(x)
