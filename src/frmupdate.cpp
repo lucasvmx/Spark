@@ -24,6 +24,8 @@ frmUpdate::frmUpdate(QWidget *parent) :
     setWindowTitle(tr("Spark - Atualização"));
 
     m_manager = new QNetworkAccessManager();
+    m_reply = nullptr;
+    m_download_reply = nullptr;
     connectSignals();
 
     progressRangeConfigured = false;
@@ -61,8 +63,8 @@ void frmUpdate::OnRequestFinished(QNetworkReply *reply)
             downloadRequest.setUrl(fileUrl);
             OnMessageAvailable(tr("Baixando arquivo: %1 ...").arg(fileUrl));
 
-            QNetworkReply *r = m_manager->get(downloadRequest);
-            QObject::connect(r, SIGNAL(downloadProgress(qint64,qint64)), this, SLOT(OnDownloadProgressChange(qint64,qint64)));
+            m_download_reply = m_manager->get(downloadRequest);
+            QObject::connect(m_download_reply, SIGNAL(downloadProgress(qint64,qint64)), this, SLOT(OnDownloadProgressChange(qint64,qint64)));
         } else {
             OnMessageAvailable(tr("Atualização cancelada pelo usuário"));
             ui->pushButton->setEnabled(true);
@@ -146,8 +148,8 @@ void frmUpdate::LaunchUpdate()
     // Conecta o sinal
     QObject::connect(m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(OnRequestFinished(QNetworkReply*)));
 
-    QNetworkReply *r = m_manager->get(request);
-    QObject::connect(r, SIGNAL(errorOccurred(QNetworkReply::NetworkError)), this, SLOT(OnErrorOccurred(QNetworkReply::NetworkError)));
+    m_reply = m_manager->get(request);
+    QObject::connect(m_reply, SIGNAL(errorOccurred(QNetworkReply::NetworkError)), this, SLOT(OnErrorOccurred(QNetworkReply::NetworkError)));
 
     qDebug() << "request sent to" <<baseUrl;
 }
@@ -157,6 +159,8 @@ frmUpdate::~frmUpdate()
     qDebug() <<  "destroying form ...";
     delete m_manager;
     delete ui;
+    delete m_reply;
+    delete m_download_reply;
 }
 
 void frmUpdate::OnFailed()

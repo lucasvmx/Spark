@@ -39,6 +39,7 @@ public slots:
 private:
     Ui::frmUpdate *ui;
     QNetworkAccessManager *m_manager;
+    QNetworkReply *m_reply, *m_download_reply;
     const QString baseUrl = "https://github.com/lucasvmx/Spark/releases/latest";
     const QString downloadBaseUrl = "https://github.com/lucasvmx/Spark/releases/download";
     QString m_localFilename; // nome do arquivo baixado a partir da atualização

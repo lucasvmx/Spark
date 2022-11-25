@@ -110,6 +110,9 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Loaded portuguese translation\n");
     }
 
+    // Libera a memória alocada
+    delete f;
+
     mainForm = new frmMain(nullptr);
 
     // Exibe a janela

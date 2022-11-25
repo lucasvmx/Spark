@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include "dynamic_loader.h"
-#include "process.h"
 
 #define KERNEL_DLL      "kernel32.dll"
 #define PSAPI_DLL       "psapi.dll"
